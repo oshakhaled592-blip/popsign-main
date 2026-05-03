@@ -8,8 +8,6 @@ import 'package:popsign/features/initialization/ui/screens/select_categories_scr
 import 'package:popsign/features/initialization/ui/screens/pre_start_screen.dart';
 import 'package:popsign/features/initialization/ui/screens/word_list_screen.dart';
 import 'package:popsign/features/initialization/ui/screens/learn_new_words_screen.dart';
-import 'package:popsign/features/initialization/ui/screens/learn_screen.dart';
-import 'package:popsign/features/initialization/ui/screens/i_know_screen.dart';
 import 'package:popsign/features/initialization/ui/screens/profile._screen.dart';
 import 'package:popsign/features/initialization/ui/screens/reset_screen.dart';
 import 'routes.dart';
@@ -18,105 +16,81 @@ class AppRouter {
   Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
 
+      /// 🟡 SPLASH
       case Routes.splash:
-        return MaterialPageRoute(builder: (_) => const SplashScreen());
+        return MaterialPageRoute(
+          builder: (_) => const SplashScreen(),
+        );
 
+      /// 🔐 LOGIN
       case Routes.login:
-        return MaterialPageRoute(builder: (_) => const LoginScreen());
+        return MaterialPageRoute(
+          builder: (_) => const LoginScreen(),
+        );
 
+      /// 📝 SIGNUP
       case Routes.signup:
-        return MaterialPageRoute(builder: (_) => const SignupScreen());
+        return MaterialPageRoute(
+          builder: (_) => const SignupScreen(),
+        );
 
+      /// 🚀 START
       case Routes.startPage:
-        return MaterialPageRoute(builder: (_) => const GetStartedScreen());
+        return MaterialPageRoute(
+          builder: (_) => const GetStartedScreen(),
+        );
 
+      /// 🌍 LANGUAGE
       case Routes.selectLanguage:
-        return MaterialPageRoute(builder: (_) => const ChooseLanguageScreen());
+        return MaterialPageRoute(
+          builder: (_) => const ChooseLanguageScreen(),
+        );
 
+      /// 🧠 CATEGORIES
       case Routes.selectCategories:
-        return MaterialPageRoute(builder: (_) => const SelectCategoriesScreen());
+        return MaterialPageRoute(
+          builder: (_) => const SelectCategoriesScreen(),
+        );
 
+      /// ⏳ PRE START
       case Routes.preStart:
-        return MaterialPageRoute(builder: (_) => const PreStartScreen());
+        return MaterialPageRoute(
+          builder: (_) => const PreStartScreen(),
+        );
 
-      /// WORD LIST
+      /// 📚 WORD LIST
       case Routes.wordList:
-        return MaterialPageRoute(builder: (_) => const WordListScreen());
+        return MaterialPageRoute(
+          builder: (_) => const WordListScreen(),
+        );
 
-      /// LEARN NEW WORDS
+      /// 🔥 LEARN NEW WORDS (UPDATED)
       case Routes.learnNewWords:
-        return _buildRoute(
-          settings,
-          (args) => LearnNewWordsScreen(
-            word: args['word'],
-            image: args['image'],
-          ),
-          fallback: const LearnNewWordsScreen(
-            word: 'mother',
-            image: 'assets/images/mother.png',
-          ),
+        return MaterialPageRoute(
+          builder: (_) => const LearnNewWordsScreen(),
         );
 
-      /// LEARN
-      case Routes.learn:
-        return _buildRoute(
-          settings,
-          (args) => LearnScreen(
-            word: args['word'],
-            image: args['image'],
-          ),
-          fallback: const LearnScreen(
-            word: 'mother',
-            image: 'assets/images/mother.png',
-          ),
-        );
-
-      /// I KNOW
-      case Routes.iKnow:
-        return _buildRoute(
-          settings,
-          (args) => IKnowScreen(
-            word: args['word'],
-            image: args['image'],
-          ),
-          fallback: const IKnowScreen(
-            word: 'mother',
-            image: 'assets/images/mother.png',
-          ),
-        );
-
-      /// PROFILE
+      /// 👤 PROFILE
       case Routes.profile:
         return MaterialPageRoute(
           builder: (_) => const ProfileScreen(),
         );
 
-      /// 🔥 RESET SCREEN
+      /// 🔴 RESET
       case Routes.reset:
         return MaterialPageRoute(
           builder: (_) => const ResetScreen(),
         );
 
+      /// ❌ DEFAULT
       default:
         return MaterialPageRoute(
           builder: (_) => const Scaffold(
-            body: Center(child: Text("No Route Found")),
+            body: Center(
+              child: Text("No Route Found"),
+            ),
           ),
         );
     }
-  }
-
-  Route<dynamic> _buildRoute(
-    RouteSettings settings,
-    Widget Function(Map<String, dynamic> args) builder, {
-    required Widget fallback,
-  }) {
-    final args = settings.arguments;
-
-    if (args is Map<String, dynamic>) {
-      return MaterialPageRoute(builder: (_) => builder(args));
-    }
-
-    return MaterialPageRoute(builder: (_) => fallback);
   }
 }

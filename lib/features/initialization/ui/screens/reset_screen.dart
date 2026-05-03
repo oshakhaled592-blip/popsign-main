@@ -62,7 +62,7 @@ class _ResetScreenState extends State<ResetScreen>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Image.asset(
-                      'assets/icon.png',
+                      'assets/images/Reset all button.png',
                       width: 40,
                       height: 40,
                     ),

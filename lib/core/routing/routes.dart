@@ -14,8 +14,6 @@ class Routes {
   static const String preStart = '/pre-start';
   static const String wordList = '/word-list';
   static const String learnNewWords = '/learn-new-words';
-  static const String learn = '/learn';
-  static const String iKnow = '/i-know';
   static const String profile = "/profile";
   static const String reset = '/reset';
 }

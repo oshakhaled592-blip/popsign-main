@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:popsign/core/routing/routes.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -8,178 +7,128 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen>
-    with SingleTickerProviderStateMixin {
-  bool isDark = false;
-
-  /// 👇 حطي لينك الصورة هنا
-  String profileImage = "https://i.pravatar.cc/300";
-
-  late AnimationController _controller;
-  late Animation<double> fadeAnimation;
-  late Animation<Offset> slideAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 800),
-    );
-
-    fadeAnimation = Tween<double>(begin: 0, end: 1).animate(_controller);
-
-    slideAnimation =
-        Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero)
-            .animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
-    );
-
-    _controller.forward();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  Widget buildItem(IconData icon, String title) {
-    return FadeTransition(
-      opacity: fadeAnimation,
-      child: SlideTransition(
-        position: slideAnimation,
-        child: ListTile(
-          leading: Icon(
-            icon,
-            color: isDark ? Colors.white70 : Colors.black54,
-          ),
-          title: Text(
-            title,
-            style: TextStyle(
-              color: isDark ? Colors.white : Colors.black,
-              fontSize: 16,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+class _ProfileScreenState extends State<ProfileScreen> {
+  bool isDark = true;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor:
-          isDark ? const Color(0xFF0D1117) : Colors.white,
+    Color bgColor = isDark ? const Color(0xFF0D1117) : Colors.white;
+    Color cardColor =
+        isDark ? const Color(0xFF161B22) : Colors.grey.shade100;
+    Color textColor = isDark ? Colors.white : Colors.black;
+    Color subText = Colors.grey;
 
+    return Scaffold(
+      backgroundColor: bgColor,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 10),
 
-              /// 🔥 Launcher Icon
-              CircleAvatar(
-                radius: 28,
-                backgroundColor: Colors.grey.shade200,
-                child: Image.asset(
-                  "assets/icon.png",
-                  width: 30,
-                ),
+              /// 🔹 TOP BAR
+              Row(
+                children: [
+                  /// ☰ MENU ICON
+                  Container(
+                    width: 45,
+                    height: 45,
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? Colors.white.withOpacity(0.05)
+                          : Colors.black.withOpacity(0.05),
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      icon: Icon(
+                        Icons.drag_handle_rounded, // الثلاث شرط
+                        color: textColor,
+                      ),
+                      onPressed: () {},
+                    ),
+                  ),
+                ],
               ),
 
               const SizedBox(height: 20),
 
-              /// 👤 Profile
-              FadeTransition(
-                opacity: fadeAnimation,
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 30,
-                      backgroundImage: NetworkImage(profileImage),
-                    ),
+              /// 🔹 PROFILE
+              Row(
+                children: [
+                  const CircleAvatar(
+                    radius: 30,
+                    backgroundImage:
+                        AssetImage('assets/images/profile.png'),
+                  ),
 
-                    const SizedBox(width: 12),
+                  const SizedBox(width: 12),
 
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Mrh Raju",
-                          style: TextStyle(
-                            color:
-                                isDark ? Colors.white : Colors.black,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        const Row(
-                          children: [
-                            Text(
-                              "Verified Profile",
-                              style: TextStyle(color: Colors.grey),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            "Mrh Raju",
+                            style: TextStyle(
+                              color: textColor,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
                             ),
-                            SizedBox(width: 5),
-                            Icon(Icons.verified,
-                                color: Colors.green, size: 16),
-                          ],
-                        ),
-                      ],
-                    ),
-
-                    const Spacer(),
-
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? Colors.white10
-                            : Colors.grey.shade300,
-                        borderRadius: BorderRadius.circular(20),
+                          ),
+                          const SizedBox(width: 5),
+                          const Icon(Icons.verified,
+                              color: Colors.green, size: 16),
+                        ],
                       ),
-                      child: Text(
-                        "3 Orders",
-                        style: TextStyle(
-                          color: isDark
-                              ? Colors.white
-                              : Colors.black,
-                        ),
+                      const SizedBox(height: 4),
+                      Text(
+                        "Verified Profile",
+                        style: TextStyle(color: subText),
                       ),
+                    ],
+                  ),
+
+                  const Spacer(),
+
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? Colors.white.withOpacity(0.1)
+                          : Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                  ],
-                ),
+                    child: Text(
+                      "3 Orders",
+                      style: TextStyle(color: textColor),
+                    ),
+                  ),
+                ],
               ),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: 25),
 
-              /// 🌙 Dark / Light
-              FadeTransition(
-                opacity: fadeAnimation,
+              /// 🔹 DARK MODE
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: cardColor,
+                  borderRadius: BorderRadius.circular(15),
+                ),
                 child: Row(
-                  mainAxisAlignment:
-                      MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.wb_sunny_outlined),
-                        const SizedBox(width: 10),
-                        Text(
-                          isDark ? "Dark Mode" : "Light Mode",
-                          style: TextStyle(
-                            color: isDark
-                                ? Colors.white
-                                : Colors.black,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
+                    Icon(Icons.dark_mode, color: textColor),
+                    const SizedBox(width: 10),
+                    Text(
+                      isDark ? "Dark Mode" : "Light Mode",
+                      style: TextStyle(color: textColor),
                     ),
+                    const Spacer(),
                     Switch(
                       value: isDark,
                       onChanged: (value) {
@@ -192,41 +141,54 @@ class _ProfileScreenState extends State<ProfileScreen>
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
 
-              buildItem(Icons.info_outline, "Account Information"),
-              buildItem(Icons.lock_outline, "Password"),
-              buildItem(Icons.translate, "Translate"),
-              buildItem(Icons.bar_chart, "My progress"),
+              /// 🔹 ITEMS
+              buildItem(Icons.info_outline, "Account Information", textColor, cardColor),
+              buildItem(Icons.lock_outline, "Password", textColor, cardColor),
+              buildItem(Icons.translate, "Translate", textColor, cardColor),
+              buildItem(Icons.bar_chart, "My progress", textColor, cardColor),
 
               const Spacer(),
 
-              /// 🔥 LOGOUT (المهم)
-              GestureDetector(
-                onTap: () {
-                  Navigator.pushNamedAndRemoveUntil(
-                    context,
-                    Routes.login, // 👈 صفحة اللوجين
-                    (route) => false,
-                  );
-                },
-                child: Row(
-                  children: const [
-                    Icon(Icons.logout, color: Colors.red),
-                    SizedBox(width: 10),
-                    Text(
-                      "Logout",
-                      style: TextStyle(
-                          color: Colors.red, fontSize: 16),
-                    ),
-                  ],
-                ),
+              /// 🔴 LOGOUT
+              Row(
+                children: const [
+                  Icon(Icons.logout, color: Colors.red),
+                  SizedBox(width: 8),
+                  Text(
+                    "Logout",
+                    style: TextStyle(color: Colors.red),
+                  )
+                ],
               ),
 
               const SizedBox(height: 20),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget buildItem(
+      IconData icon, String text, Color textColor, Color cardColor) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: textColor),
+          const SizedBox(width: 10),
+          Text(
+            text,
+            style: TextStyle(color: textColor),
+          ),
+        ],
       ),
     );
   }

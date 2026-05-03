@@ -37,43 +37,48 @@ class _WordListScreenState extends State<WordListScreen> {
     WordModel("finish", 3, "assets/images/finish.png"),
   ];
 
-  /// تعلم كلمة
-  void onLearn(int index) async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => LearnNewWordsScreen(
-          word: words[index].word,
-          image: words[index].image,
-        ),
-      ),
-    );
+  /// 🔢 المتبقي
+  int get remaining =>
+      words.where((w) => w.progress < 3).length;
 
-    if (result == true) {
-      setState(() {
-        if (words[index].progress < 3) {
-          words[index].progress++;
-        }
-      });
-    }
+  /// 📊 النسبة
+  int get percent {
+    int total = words.length * 3;
+    int done =
+        words.fold(0, (sum, w) => sum + w.progress);
+    return ((done / total) * 100).toInt();
   }
 
-  /// 🔥 فتح شاشة الريسيت + لودينج
+  /// 🔥 فتح التعلم
+  void onLearn(int index) async {
+    /// ✔ يزود التقدم
+    setState(() {
+      if (words[index].progress < 3) {
+        words[index].progress++;
+      }
+    });
+
+    /// ✔ يفتح الشاشة الجديدة (بدون word/image)
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const LearnNewWordsScreen(),
+      ),
+    );
+  }
+
+  /// 🔴 Reset
   void onReset() async {
-    final result = await Navigator.pushNamed(context, Routes.reset);
+    setState(() => resetState = ResetState.loading);
 
-    if (result == true) {
-      setState(() => resetState = ResetState.loading);
+    await Future.delayed(const Duration(seconds: 1));
 
-      await Future.delayed(const Duration(seconds: 1));
-
-      setState(() {
-        for (var w in words) {
-          w.progress = 0;
-        }
-        resetState = ResetState.active;
-      });
-    }
+    setState(() {
+      for (var w in words) {
+        w.progress = 0;
+      }
+      resetState = ResetState.active;
+    });
   }
 
   @override
@@ -81,6 +86,7 @@ class _WordListScreenState extends State<WordListScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF0F1218),
 
+      /// 🔝 APP BAR
       appBar: AppBar(
         backgroundColor: const Color(0xFF0F1218),
         elevation: 0,
@@ -103,23 +109,28 @@ class _WordListScreenState extends State<WordListScreen> {
         ],
       ),
 
+      /// 📱 BODY
       body: Column(
         children: [
           const SizedBox(height: 10),
 
-          /// 🔴 زرار Reset
-          ResetButton(state: resetState, onTap: onReset),
-
-          const SizedBox(height: 10),
-
-          const Text(
-            "20 new words left • 80% complete",
-            style: TextStyle(color: Colors.grey),
+          /// 🔴 RESET
+          ResetButton(
+            state: resetState,
+            onTap: onReset,
           ),
 
           const SizedBox(height: 10),
 
-          /// 📋 ليست الكلمات
+          /// 📊 TEXT
+          Text(
+            "$remaining new words left • $percent% complete",
+            style: const TextStyle(color: Colors.grey),
+          ),
+
+          const SizedBox(height: 10),
+
+          /// 📋 LIST
           Expanded(
             child: ListView.builder(
               itemCount: words.length,
@@ -219,7 +230,7 @@ class WordCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          /// صورة
+          /// 🖼️ IMAGE
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: Image.asset(
@@ -234,7 +245,7 @@ class WordCard extends StatelessWidget {
 
           const SizedBox(width: 12),
 
-          /// الكلمة
+          /// WORD
           Expanded(
             child: Text(
               word,
@@ -245,16 +256,19 @@ class WordCard extends StatelessWidget {
             ),
           ),
 
-          /// الدوتس
+          /// DOTS
           Row(
             children: List.generate(3, (i) {
               bool active = i < progress;
+
               return Container(
                 margin: const EdgeInsets.symmetric(horizontal: 2),
                 width: 6,
                 height: 6,
                 decoration: BoxDecoration(
-                  color: active ? Colors.green : const Color(0xFF2A2F3A),
+                  color: active
+                      ? Colors.green
+                      : const Color(0xFF2A2F3A),
                   shape: BoxShape.circle,
                 ),
               );
@@ -263,37 +277,45 @@ class WordCard extends StatelessWidget {
 
           const SizedBox(width: 10),
 
-          /// علامة الصح
+          /// CHECK
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: isDone ? Colors.green : const Color(0xFF2A2F3A),
+              color: isDone
+                  ? Colors.green
+                  : const Color(0xFF2A2F3A),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
               Icons.check,
               size: 16,
-              color: isDone ? Colors.white : Colors.white30,
+              color:
+                  isDone ? Colors.white : Colors.white30,
             ),
           ),
 
           const SizedBox(width: 10),
 
-          /// زرار Learn
+          /// 🔘 BUTTON
           GestureDetector(
             onTap: isDone ? null : onTap,
             child: Container(
               height: 36,
-              padding: const EdgeInsets.symmetric(horizontal: 14),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 14),
               decoration: BoxDecoration(
-                color: isDone ? const Color(0xFF2A2F3A) : Colors.white,
+                color: isDone
+                    ? const Color(0xFF2A2F3A)
+                    : Colors.white,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Center(
                 child: Text(
                   "Learn",
                   style: TextStyle(
-                    color: isDone ? Colors.white38 : Colors.black,
+                    color: isDone
+                        ? Colors.white38
+                        : Colors.black,
                   ),
                 ),
               ),
