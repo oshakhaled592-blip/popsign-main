@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dart analyze *)",
+      "Bash(flutter clean *)",
+      "Bash(flutter build *)",
+      "Bash(flutter pub *)",
+      "Bash(taskkill /F /IM java.exe /T)",
+      "Bash(taskkill /F /IM gradle.exe /T)"
+    ]
+  }
+}
