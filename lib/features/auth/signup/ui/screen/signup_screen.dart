@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:popsign/core/routing/routes.dart';
 import 'package:popsign/core/theme/app_colors.dart';
-import 'package:popsign/core/theme/styles.dart';
 import 'package:popsign/core/widgets/text_form_widget.dart';
 import 'package:popsign/features/auth/login/ui/widgets/dont_have_account.dart';
 
@@ -56,66 +55,103 @@ class _SignupScreenState extends State<SignupScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: 20.h),
+                SizedBox(height: 16.h),
 
-                // ── Back button ──────────────────────────────────────
+                // ── Back button ──────────────────────────────────
                 GestureDetector(
                   onTap: () => Navigator.pop(context),
                   child: Container(
-                    width: 42.w,
-                    height: 42.h,
+                    width: 44.w,
+                    height: 44.h,
                     decoration: BoxDecoration(
                       color: AppColors.darkGray,
                       borderRadius: BorderRadius.circular(14.r),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.arrow_back_rounded,
                       color: Colors.white,
-                      size: 20,
+                      size: 20.sp,
                     ),
                   ),
                 ),
 
                 SizedBox(height: 28.h),
 
-                // ── Logo + App name ──────────────────────────────────
+                // ── Logo ─────────────────────────────────────────
                 Center(
                   child: Column(
                     children: [
-                      Image.asset(
-                        'assets/images/Logo.png',
-                        height: 56.h,
-                        errorBuilder: (_, __, ___) => Icon(
-                          Icons.hearing_rounded,
-                          size: 56.h,
-                          color: Colors.white,
+                      Container(
+                        width: 72.w,
+                        height: 72.h,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [AppColors.linear1, AppColors.linear2],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(22.r),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.linear1.withValues(alpha: 0.45),
+                              blurRadius: 24,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Image.asset(
+                            'assets/images/Logo.png',
+                            width: 42.w,
+                            height: 42.h,
+                            fit: BoxFit.contain,
+                            errorBuilder: (_, __, ___) => Icon(
+                              Icons.hearing_rounded,
+                              size: 36.sp,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
                       ),
-                      SizedBox(height: 8.h),
+                      SizedBox(height: 10.h),
                       Text(
                         "I Hear You",
-                        style: AppTextStyles.font16boldWhite,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.5,
+                        ),
                       ),
                     ],
                   ),
                 ),
 
-                SizedBox(height: 28.h),
+                SizedBox(height: 32.h),
 
-                // ── Title ────────────────────────────────────────────
+                // ── Title ─────────────────────────────────────────
                 Text(
                   "Create Account",
-                  style: AppTextStyles.font24BoldWhite,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 26.sp,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.2,
+                  ),
                 ),
                 SizedBox(height: 5.h),
                 Text(
                   "Sign up to start learning words",
-                  style: AppTextStyles.font13RegularGray,
+                  style: TextStyle(
+                    color: AppColors.grayText,
+                    fontSize: 13.sp,
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
 
-                SizedBox(height: 24.h),
+                SizedBox(height: 28.h),
 
-                // ── Username ─────────────────────────────────────────
+                // ── Username ──────────────────────────────────────
                 _label("Username"),
                 SizedBox(height: 8.h),
                 TextFormWidget(
@@ -127,16 +163,14 @@ class _SignupScreenState extends State<SignupScreen> {
                     if (v == null || v.trim().isEmpty) {
                       return "Please enter your username";
                     }
-                    if (v.trim().length < 3) {
-                      return "At least 3 characters";
-                    }
+                    if (v.trim().length < 3) return "At least 3 characters";
                     return null;
                   },
                 ),
 
                 SizedBox(height: 16.h),
 
-                // ── Email ────────────────────────────────────────────
+                // ── Email ─────────────────────────────────────────
                 _label("Email"),
                 SizedBox(height: 8.h),
                 TextFormWidget(
@@ -155,7 +189,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
                 SizedBox(height: 16.h),
 
-                // ── Password ─────────────────────────────────────────
+                // ── Password ──────────────────────────────────────
                 _label("Password"),
                 SizedBox(height: 8.h),
                 TextFormWidget(
@@ -173,7 +207,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
                 SizedBox(height: 16.h),
 
-                // ── Confirm Password ─────────────────────────────────
+                // ── Confirm Password ──────────────────────────────
                 _label("Confirm Password"),
                 SizedBox(height: 8.h),
                 TextFormWidget(
@@ -193,13 +227,14 @@ class _SignupScreenState extends State<SignupScreen> {
                   },
                 ),
 
-                SizedBox(height: 30.h),
+                SizedBox(height: 34.h),
 
-                // ── Sign Up Button ───────────────────────────────────
-                SizedBox(
-                  width: double.infinity,
-                  height: 52.h,
-                  child: DecoratedBox(
+                // ── Sign Up Button ────────────────────────────────
+                GestureDetector(
+                  onTap: _signup,
+                  child: Container(
+                    width: double.infinity,
+                    height: 54.h,
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
                         colors: [AppColors.linear1, AppColors.linear2],
@@ -209,22 +244,21 @@ class _SignupScreenState extends State<SignupScreen> {
                       borderRadius: BorderRadius.circular(16.r),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.linear1.withValues(alpha: 0.35),
-                          blurRadius: 16,
+                          color: AppColors.linear1.withValues(alpha: 0.4),
+                          blurRadius: 20,
                           offset: const Offset(0, 6),
                         ),
                       ],
                     ),
-                    child: TextButton(
-                      onPressed: _signup,
-                      style: TextButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16.r),
-                        ),
-                      ),
+                    child: Center(
                       child: Text(
                         "Sign Up",
-                        style: AppTextStyles.font16boldWhite,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
                       ),
                     ),
                   ),
@@ -232,7 +266,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
                 SizedBox(height: 22.h),
 
-                // ── Login link ───────────────────────────────────────
+                // ── Login link ────────────────────────────────────
                 Center(
                   child: DontHaveAccount(
                     text: "Already have an account?",
@@ -242,7 +276,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 ),
 
-                SizedBox(height: 24.h),
+                SizedBox(height: 28.h),
               ],
             ),
           ),

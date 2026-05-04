@@ -223,7 +223,7 @@ class _LearnNewWordsScreenState
                                   BorderRadius.circular(30),
                               boxShadow: [
                                 BoxShadow(
-                                  color: glowColor.withOpacity(0.6),
+                                  color: glowColor.withValues(alpha: 0.6),
                                   blurRadius: 40,
                                   spreadRadius: 5,
                                 ),
