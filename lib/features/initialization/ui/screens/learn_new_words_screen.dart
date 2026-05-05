@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:confetti/confetti.dart';
@@ -266,6 +265,15 @@ class _LearnNewWordsScreenState
                             Color(0xFF10141F)
                           ],
                         ),
+                        boxShadow: mode != "none"
+                            ? [
+                                BoxShadow(
+                                  color: glowColor.withValues(alpha: 0.5),
+                                  blurRadius: 40,
+                                  spreadRadius: 5,
+                                ),
+                              ]
+                            : null,
                       ),
                       child: Column(
                         children: [

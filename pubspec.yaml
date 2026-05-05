@@ -11,7 +11,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-     
+    shared_preferences: ^2.5.5
+
 
   cupertino_icons: ^1.0.8
   flutter_screenutil: ^5.9.3

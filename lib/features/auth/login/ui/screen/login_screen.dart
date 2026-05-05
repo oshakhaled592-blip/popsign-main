@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../../../core/helpers/spacing.dart';
-import '../../../../../core/routing/routes.dart';
-import '../../../../../core/theme/styles.dart';
 import '../../../../../core/widgets/linear_button.dart';
 import '../../../../../core/widgets/logo_and_name.dart';
 import '../../../../../core/widgets/text_form_widget.dart';
@@ -17,132 +14,63 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
 
-  late TextEditingController emailController;
-  late TextEditingController passwordController;
-
-  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-
-  @override
-  void initState() {
-    super.initState();
-    emailController = TextEditingController();
-    passwordController = TextEditingController();
-  }
-
-  @override
-  void dispose() {
-    emailController.dispose();
-    passwordController.dispose();
-    super.dispose();
-  }
-
-  void login() {
-    if (formKey.currentState!.validate()) {
-      Navigator.pushReplacementNamed(context, Routes.startPage);
-    }
-  }
+  final formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true,
       body: SafeArea(
-        child: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.all(20.w),
           child: Form(
             key: formKey,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 35.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  verticalSpace(60),
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
 
-                  /// 🔥 Logo
-                  const LogoAndName(),
+                /// 🔥 LOGO
+                const LogoAndName(),
 
-                  verticalSpace(36),
+                const SizedBox(height: 40),
 
-                  /// 🔥 Title
-                  Text("Login", style: AppTextStyles.font24BoldWhite),
+                /// EMAIL
+                TextFormWidget(
+                  controller: emailController,
+                  hintText: "Email",
+                  icon: Icons.email_outlined,
+                  keyboardType: TextInputType.emailAddress,
+                ),
 
-                  Text(
-                    "please sign in to continue",
-                    style: AppTextStyles.font13RegularWhite,
-                  ),
+                const SizedBox(height: 15),
 
-                  verticalSpace(28),
+                /// PASSWORD
+                TextFormWidget(
+                  controller: passwordController,
+                  hintText: "Password",
+                  icon: Icons.lock_outline,
+                  obscureText: true,
+                ),
 
-                  /// 🔥 Email
-                  TextFormWidget(
-                    controller: emailController,
-                    hintText: "Email",
-                    icon: Icons.email_outlined,
-                    keyboardType: TextInputType.emailAddress,
-                    autofocus: true,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Please enter your email";
-                      }
-                      if (!value.contains('@')) {
-                        return "Invalid email";
-                      }
-                      return null;
-                    },
-                  ),
+                const SizedBox(height: 25),
 
-                  verticalSpace(20),
+                /// LOGIN BUTTON
+                LinearButton(
+                  text: "Login",
+                  onPressed: () {
+                    if (formKey.currentState!.validate()) {
+                      // TODO: login logic
+                    }
+                  },
+                ),
 
-                  /// 🔥 Password
-                  TextFormWidget(
-                    controller: passwordController,
-                    hintText: "Password",
-                    obscureText: true,
-                    icon: Icons.lock_outline,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Please enter your password";
-                      }
-                      if (value.length < 6) {
-                        return "Password must be at least 6 characters";
-                      }
-                      return null;
-                    },
-                  ),
+                const SizedBox(height: 20),
 
-                  verticalSpace(10),
-
-                  /// 🔥 Forgot Password
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      "Forgot Password?",
-                      style: AppTextStyles.font13Regularpink,
-                    ),
-                  ),
-
-                  verticalSpace(20),
-
-                  /// 🔥 Login Button
-                  LinearButton(
-                    text: "Login",
-                    onPressed: login,
-                  ),
-
-                  verticalSpace(20),
-
-                  /// 🔥 Sign Up
-                  DontHaveAccount(
-                    text: "Don't have an account? ",
-                    actionText: 'Sign Up',
-                    onTap: () {
-                      Navigator.pushNamed(context, Routes.signup);
-                    },
-                  ),
-
-                  verticalSpace(30),
-                ],
-              ),
+                /// DON'T HAVE ACCOUNT
+                const DontHaveAccount(),
+              ],
             ),
           ),
         ),

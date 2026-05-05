@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:popsign/core/helpers/spacing.dart';
-
-import '../../../../core/routing/routes.dart';
-import '../../../../core/theme/styles.dart';
+import '../../../../core/widgets/logo_and_name.dart';
 import '../../../../core/widgets/linear_button.dart';
 
 class GetStartedScreen extends StatelessWidget {
@@ -13,42 +9,24 @@ class GetStartedScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: SizedBox(
-          width: double.infinity,
+        child: Padding(
+          padding: const EdgeInsets.all(20),
           child: Column(
-            // mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              verticalSpace(20),
-              Image.asset(
-                "assets/images/start-image.png",
-                width: 400.w,
-                height: 400.h,
-                fit: BoxFit.cover,
-              ),
-              verticalSpace(40),
-              Text(
-                textAlign: TextAlign.center,
-                "Learn a Language easily with Cards",
-                style: AppTextStyles.font36BoldWhite,
-              ),
-              verticalSpace(16),
-              Text(
-                textAlign: TextAlign.center,
-                "Learn words using cards, choosing \nlevels that are convenient for you",
-                style: AppTextStyles.font17RegularGray,
-              ),
-              verticalSpace(40),
+              const Spacer(),
+
+              const LogoAndName(),
+
+              const Spacer(),
+
               LinearButton(
                 text: "Get Started",
-                height: 50.h,
-                width: 342.w,
-                icon: Icons.bolt,
                 onPressed: () {
-                  Navigator.pushNamed(context, Routes.selectLanguage);
+                  Navigator.pushNamed(context, "/chooseLanguage");
                 },
-                radius: 12.r,
               ),
+
+              const SizedBox(height: 20),
             ],
           ),
         ),

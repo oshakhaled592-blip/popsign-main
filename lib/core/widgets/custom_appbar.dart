@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:popsign/core/helpers/extension.dart';
-import 'package:popsign/core/theme/styles.dart';
 
 import '../theme/app_colors.dart';
+import '../theme/styles.dart';
 
 class CustomAppBar extends StatelessWidget {
   final String title;
   final bool isBackButton;
+
   const CustomAppBar({
     super.key,
     required this.title,
@@ -17,75 +17,36 @@ class CustomAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-
-      mainAxisSize: MainAxisSize.max,
       children: [
-        if (isBackButton == true)
+        if (isBackButton)
           GestureDetector(
-            onTap: () {
-              context.pop();
-            },
+            onTap: () => Navigator.pop(context),
             child: Container(
               width: 40.w,
               height: 40.h,
-              alignment: Alignment.center,
-              padding: EdgeInsets.only(left: 8.w),
               decoration: BoxDecoration(
-                color: AppColors.darkGray,
-                borderRadius: BorderRadius.circular(10.r),
+                color: Theme.of(context).cardColor,
+                borderRadius: BorderRadius.circular(12.r),
               ),
-              child: const Icon(
+              child: Icon(
+                Icons.arrow_back_ios_new,
                 size: 18,
-                Icons.arrow_back_ios,
-                color: Colors.white,
+                color: Theme.of(context).iconTheme.color,
               ),
             ),
           ),
-        // horizontalSpace(5),
+
         Expanded(
           child: Text(
             title,
-            style: AppTextStyles.font22BoldWhiteInter.copyWith(
-              overflow: TextOverflow.ellipsis,
-            ),
+            style: AppTextStyles.title(context),
             textAlign: TextAlign.center,
-            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
-        SizedBox(width: 48.w),
+
+        SizedBox(width: 40.w),
       ],
     );
-    // return ListTile(
-    //   leading: isBackButton
-    //       ? GestureDetector(
-    //           onTap: () {
-    //             context.pop();
-    //           },
-    //           child: Container(
-    //             width: 40.w,
-    //             height: 40.h,
-    //             alignment: Alignment.center,
-    //             padding: EdgeInsets.only(left: 8.w),
-    //             decoration: BoxDecoration(
-    //               color: AppColors.darkGray,
-    //               borderRadius: BorderRadius.circular(10.r),
-    //             ),
-    //             child: const Icon(
-    //               size: 18,
-    //               Icons.arrow_back_ios,
-    //               color: Colors.white,
-    //             ),
-    //           ),
-    //         )
-    //       : SizedBox.shrink(),
-    //   title: Text(
-    //     title,
-    //     style: AppTextStyles.font22BoldWhiteInter.copyWith(
-    //       overflow: TextOverflow.ellipsis,
-    //     ),
-    //     textAlign: TextAlign.center,
-    //     maxLines: 2,
-    //   ),
-    // );
   }
 }

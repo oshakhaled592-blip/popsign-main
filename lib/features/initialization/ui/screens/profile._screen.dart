@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -11,12 +12,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool isDark = true;
 
   @override
+  void initState() {
+    super.initState();
+    loadTheme(); // 👈 تحميل الثيم
+  }
+
+  /// 📥 LOAD THEME
+  void loadTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      isDark = prefs.getBool('isDark') ?? true;
+    });
+  }
+
+  /// 💾 SAVE THEME
+  void saveTheme(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isDark', value);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    Color bgColor = isDark ? const Color(0xFF0D1117) : Colors.white;
-    Color cardColor =
-        isDark ? const Color(0xFF161B22) : Colors.grey.shade100;
-    Color textColor = isDark ? Colors.white : Colors.black;
-    Color subText = Colors.grey;
+    Color bgColor = isDark ? const Color(0xFF0D1117) : const Color(0xFFF5F7FA);
+    Color cardColor = isDark ? const Color(0xFF161B22) : Colors.white;
+    Color textColor = isDark ? Colors.white : const Color(0xFF1A1A1A);
+    Color subText = isDark ? Colors.white38 : Colors.grey.shade600;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -27,27 +47,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               const SizedBox(height: 10),
 
-              /// 🔹 TOP BAR
+              /// 🔙 BUTTON
               Row(
                 children: [
-                  /// ☰ MENU ICON
-                  Container(
-                    width: 45,
-                    height: 45,
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? Colors.white.withValues(alpha:0.05)
-                          : Colors.black.withValues(alpha:0.05),
-                      shape: BoxShape.circle,
-                    ),
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                      icon: Icon(
-                        Icons.drag_handle_rounded, // الثلاث شرط
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      width: 45,
+                      height: 45,
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? Colors.white.withOpacity(0.05)
+                            : Colors.black.withOpacity(0.05),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.menu_rounded,
                         color: textColor,
                       ),
-                      onPressed: () {},
                     ),
                   ),
                 ],
@@ -55,7 +72,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               const SizedBox(height: 20),
 
-              /// 🔹 PROFILE
+              /// 👤 PROFILE
               Row(
                 children: [
                   const CircleAvatar(
@@ -63,9 +80,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     backgroundImage:
                         AssetImage('assets/images/profile.png'),
                   ),
-
                   const SizedBox(width: 12),
-
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -91,16 +106,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ],
                   ),
-
                   const Spacer(),
-
                   Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: isDark
-                          ? Colors.white.withValues(alpha:0.1)
-                          : Colors.grey.shade300,
+                          ? Colors.white.withOpacity(0.1)
+                          : const Color(0xFFEAEFF5),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -113,7 +126,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               const SizedBox(height: 25),
 
-              /// 🔹 DARK MODE
+              /// 🌗 DARK MODE
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
@@ -122,7 +135,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.dark_mode, color: textColor),
+                    Icon(
+                      isDark ? Icons.dark_mode : Icons.light_mode,
+                      color: textColor,
+                    ),
                     const SizedBox(width: 10),
                     Text(
                       isDark ? "Dark Mode" : "Light Mode",
@@ -131,23 +147,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const Spacer(),
                     Switch(
                       value: isDark,
+                      activeColor: Colors.green,
                       onChanged: (value) {
                         setState(() {
                           isDark = value;
                         });
+                        saveTheme(value); // 💾 حفظ
                       },
                     ),
                   ],
                 ),
               ),
-
-              const SizedBox(height: 10),
-
-              /// 🔹 ITEMS
-              buildItem(Icons.info_outline, "Account Information", textColor, cardColor),
-              buildItem(Icons.lock_outline, "Password", textColor, cardColor),
-              buildItem(Icons.translate, "Translate", textColor, cardColor),
-              buildItem(Icons.bar_chart, "My progress", textColor, cardColor),
 
               const Spacer(),
 
@@ -167,28 +177,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget buildItem(
-      IconData icon, String text, Color textColor, Color cardColor) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: textColor),
-          const SizedBox(width: 10),
-          Text(
-            text,
-            style: TextStyle(color: textColor),
-          ),
-        ],
       ),
     );
   }

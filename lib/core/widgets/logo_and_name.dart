@@ -4,6 +4,7 @@ import '../theme/styles.dart';
 
 class LogoAndName extends StatelessWidget {
   final bool compact;
+
   const LogoAndName({super.key, this.compact = false});
 
   @override
@@ -17,15 +18,16 @@ class LogoAndName extends StatelessWidget {
           errorBuilder: (_, __, ___) => Icon(
             Icons.hearing,
             size: compact ? 38.h : 90.h,
-            color: Colors.white,
           ),
         ),
+
         SizedBox(width: compact ? 10.w : 14.w),
+
         Text(
           "I Hear You",
           style: compact
-              ? AppTextStyles.font18BoldWhite
-              : AppTextStyles.font36SemiboldWhite,
+              ? AppTextStyles.title(context)
+              : AppTextStyles.title(context).copyWith(fontSize: 32),
         ),
       ],
     );
