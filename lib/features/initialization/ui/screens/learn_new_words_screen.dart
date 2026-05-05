@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:confetti/confetti.dart';
-import 'package:vibration/vibration.dart';
 
 class LearnNewWordsScreen extends StatefulWidget {
   const LearnNewWordsScreen({super.key});
@@ -57,7 +57,6 @@ class _LearnNewWordsScreenState
 
     for (var w in base) {
       final s = score[w.word] ?? 0;
-
       int repeat = s <= 0 ? 3 : (s == 1 ? 2 : 1);
 
       for (int i = 0; i < repeat; i++) {
@@ -70,6 +69,7 @@ class _LearnNewWordsScreenState
   }
 
   void toggleTranslation() {
+    HapticFeedback.selectionClick();
     setState(() => showTranslation = !showTranslation);
   }
 
@@ -94,20 +94,14 @@ class _LearnNewWordsScreenState
     }
   }
 
-  Future<void> vibrate(bool strong) async {
-    if (await Vibration.hasVibrator() ?? false) {
-      Vibration.vibrate(duration: strong ? 60 : 30);
-    }
-  }
-
   void selectKnow() {
     final word = words[currentIndex].word;
 
     score[word] = (score[word] ?? 0) + 1;
     correct++;
 
+    HapticFeedback.lightImpact();
     _confetti.play();
-    vibrate(false);
 
     setState(() {
       mode = "know";
@@ -122,7 +116,7 @@ class _LearnNewWordsScreenState
 
     score[word] = (score[word] ?? 0) - 1;
 
-    vibrate(true);
+    HapticFeedback.heavyImpact();
 
     setState(() {
       mode = "learn";
@@ -141,7 +135,6 @@ class _LearnNewWordsScreenState
   @override
   Widget build(BuildContext context) {
     final currentWord = words[currentIndex];
-
     double progress = (currentIndex + 1) / words.length;
 
     Color glowColor = Colors.transparent;
@@ -155,6 +148,61 @@ class _LearnNewWordsScreenState
           padding: const EdgeInsets.all(18),
           child: Column(
             children: [
+              /// 🔝 HEADER
+              Row(
+                mainAxisAlignment:
+                    MainAxisAlignment.spaceBetween,
+                children: [
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF171C2B),
+                        borderRadius:
+                            BorderRadius.circular(14),
+                      ),
+                      child: const Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                    ),
+                  ),
+
+                  const Text(
+                    "Learn new words",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  GestureDetector(
+                    onTap: () {
+                      // TODO: open menu / profile
+                    },
+                    child: Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF171C2B),
+                        borderRadius:
+                            BorderRadius.circular(14),
+                      ),
+                      child: const Icon(
+                        Icons.menu_rounded,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 20),
+
               /// 🎯 PROGRESS
               LinearProgressIndicator(
                 value: progress,
@@ -183,20 +231,17 @@ class _LearnNewWordsScreenState
                 ),
               ),
 
-              /// 🔥 3D CARD
+              /// 🔥 CARD
               Expanded(
                 child: GestureDetector(
                   onTap: toggleTranslation,
-
                   onPanUpdate: (details) {
                     setState(() {
                       rotateY += details.delta.dx * 0.005;
                       rotateX -= details.delta.dy * 0.005;
                     });
                   },
-
                   onPanEnd: (_) => resetTilt(),
-
                   onHorizontalDragEnd: (details) {
                     if (details.primaryVelocity! < 0) {
                       selectLearn();
@@ -204,198 +249,123 @@ class _LearnNewWordsScreenState
                       selectKnow();
                     }
                   },
-
                   child: Transform(
                     alignment: Alignment.center,
                     transform: Matrix4.identity()
                       ..setEntry(3, 2, 0.0012)
                       ..rotateX(rotateX)
                       ..rotateY(rotateY),
-                    child: Stack(
-                      children: [
-                        /// 🌈 GLOW
-                        Positioned.fill(
-                          child: AnimatedContainer(
-                            duration:
-                                const Duration(milliseconds: 300),
-                            decoration: BoxDecoration(
-                              borderRadius:
-                                  BorderRadius.circular(30),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: glowColor.withValues(alpha: 0.6),
-                                  blurRadius: 40,
-                                  spreadRadius: 5,
-                                ),
-                              ],
-                            ),
-                          ),
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        borderRadius:
+                            BorderRadius.circular(30),
+                        gradient: const LinearGradient(
+                          colors: [
+                            Color(0xFF18202E),
+                            Color(0xFF10141F)
+                          ],
                         ),
+                      ),
+                      child: Column(
+                        children: [
+                          const Text("A1 Level",
+                              style: TextStyle(
+                                  color: Colors.white38)),
 
-                        /// 🟦 CARD
-                        Container(
-                          padding: const EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                            borderRadius:
-                                BorderRadius.circular(30),
-                            gradient: const LinearGradient(
-                              colors: [
-                                Color(0xFF18202E),
-                                Color(0xFF10141F)
-                              ],
+                          const SizedBox(height: 10),
+
+                          Text(
+                            currentWord.word,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                          child: Column(
+
+                          const SizedBox(height: 20),
+
+                          Expanded(
+                            child: Center(
+                              child: showTranslation
+                                  ? Text(
+                                      currentWord.translation,
+                                      style:
+                                          const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 28,
+                                      ),
+                                    )
+                                  : const Icon(
+                                      Icons
+                                          .visibility_outlined,
+                                      color:
+                                          Colors.white38,
+                                      size: 40,
+                                    ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          Row(
                             children: [
-                              const Text("A1 Level",
-                                  style: TextStyle(
-                                      color: Colors.white38)),
-
-                              const SizedBox(height: 10),
-
-                              /// 🧠 PARALLAX WORD
-                              Transform.translate(
-                                offset: Offset(
-                                    rotateY * 40, rotateX * 40),
-                                child: Text(
-                                  currentWord.word,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 30,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-
-                              const SizedBox(height: 20),
-
-                              /// 👁️ CARD
                               Expanded(
-                                child: ClipRRect(
-                                  borderRadius:
-                                      BorderRadius.circular(20),
-                                  child: Stack(
-                                    children: [
-                                      /// 🌫️ BLUR
-                                      BackdropFilter(
-                                        filter: ImageFilter.blur(
-                                          sigmaX:
-                                              (rotateX.abs() +
-                                                      rotateY.abs()) *
-                                                  10,
-                                          sigmaY:
-                                              (rotateX.abs() +
-                                                      rotateY.abs()) *
-                                                  10,
-                                        ),
-                                        child: Container(
-                                          color: Colors.transparent,
-                                        ),
+                                child: GestureDetector(
+                                  onTap: selectKnow,
+                                  child: Container(
+                                    height: 55,
+                                    decoration:
+                                        BoxDecoration(
+                                      borderRadius:
+                                          BorderRadius
+                                              .circular(16),
+                                      border: Border.all(
+                                          color: Colors
+                                              .white24),
+                                    ),
+                                    child: const Center(
+                                      child: Text(
+                                        "I Know",
+                                        style: TextStyle(
+                                            color: Colors
+                                                .white),
                                       ),
-
-                                      Center(
-                                        child: AnimatedSwitcher(
-                                          duration: const Duration(
-                                              milliseconds: 300),
-                                          child: showTranslation
-                                              ? Text(
-                                                  currentWord
-                                                      .translation,
-                                                  key:
-                                                      const ValueKey(
-                                                          "text"),
-                                                  style:
-                                                      const TextStyle(
-                                                    color:
-                                                        Colors.white,
-                                                    fontSize: 28,
-                                                    fontWeight:
-                                                        FontWeight
-                                                            .bold,
-                                                  ),
-                                                )
-                                              : const Icon(
-                                                  Icons
-                                                      .visibility_outlined,
-                                                  key: ValueKey(
-                                                      "icon"),
-                                                  color:
-                                                      Colors.white38,
-                                                  size: 40,
-                                                ),
-                                        ),
-                                      ),
-                                    ],
+                                    ),
                                   ),
                                 ),
                               ),
-
-                              const SizedBox(height: 20),
-
-                              /// 🔘 BUTTONS
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: GestureDetector(
-                                      onTap: selectKnow,
-                                      child: Container(
-                                        height: 55,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(
-                                                  16),
-                                          color: mode == "know"
-                                              ? const Color(
-                                                  0xFF22C55E)
-                                              : Colors.transparent,
-                                          border: Border.all(
-                                              color:
-                                                  Colors.white24),
-                                        ),
-                                        child: const Center(
-                                          child: Text("I Know",
-                                              style: TextStyle(
-                                                  color: Colors
-                                                      .white)),
-                                        ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: selectLearn,
+                                  child: Container(
+                                    height: 55,
+                                    decoration:
+                                        BoxDecoration(
+                                      borderRadius:
+                                          BorderRadius
+                                              .circular(16),
+                                      border: Border.all(
+                                          color: Colors
+                                              .white24),
+                                    ),
+                                    child: const Center(
+                                      child: Text(
+                                        "Learn",
+                                        style: TextStyle(
+                                            color: Colors
+                                                .white),
                                       ),
                                     ),
                                   ),
-
-                                  const SizedBox(width: 12),
-
-                                  Expanded(
-                                    child: GestureDetector(
-                                      onTap: selectLearn,
-                                      child: Container(
-                                        height: 55,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(
-                                                  16),
-                                          color: mode == "learn"
-                                              ? const Color(
-                                                  0xFFFF4D4D)
-                                              : Colors.transparent,
-                                          border: Border.all(
-                                              color:
-                                                  Colors.white24),
-                                        ),
-                                        child: const Center(
-                                          child: Text("Learn",
-                                              style: TextStyle(
-                                                  color: Colors
-                                                      .white)),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                                ),
                               ),
                             ],
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
