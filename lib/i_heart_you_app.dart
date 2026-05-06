@@ -1,69 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class IHeartYouApp extends StatefulWidget {
+import 'core/routing/routes.dart';
+import 'core/routing/app_router.dart';
+
+class IHeartYouApp extends StatelessWidget {
   const IHeartYouApp({super.key});
 
   @override
-  State<IHeartYouApp> createState() => _IHeartYouAppState();
-}
-
-class _IHeartYouAppState extends State<IHeartYouApp> {
-  bool isDark = true;
-
-  void toggleTheme() {
-    setState(() {
-      isDark = !isDark;
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
+    return ScreenUtilInit(
+      designSize: const Size(390, 844),
+      minTextAdapt: true,
+      builder: (_, __) => MaterialApp(
+        debugShowCheckedModeBanner: false,
 
-      /// 🌙 DARK
-      theme: ThemeData(
-        brightness: Brightness.light,
-        scaffoldBackgroundColor: const Color(0xFFF5F7FB),
-        cardColor: Colors.white,
-        colorScheme: const ColorScheme.light(
-          primary: Color(0xFF22C55E),
+        theme: ThemeData(
+          brightness: Brightness.light,
+          scaffoldBackgroundColor: const Color(0xFFF5F7FB),
+          cardColor: Colors.white,
+          colorScheme: const ColorScheme.light(
+            primary: Color(0xFF22C55E),
+          ),
         ),
-      ),
 
-      /// 🌑 LIGHT
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF0F1218),
-        cardColor: const Color(0xFF151922),
-        colorScheme: const ColorScheme.dark(
-          primary: Color(0xFF22C55E),
+        darkTheme: ThemeData(
+          brightness: Brightness.dark,
+          scaffoldBackgroundColor: const Color(0xFF0F1218),
+          cardColor: const Color(0xFF151922),
+          colorScheme: const ColorScheme.dark(
+            primary: Color(0xFF22C55E),
+          ),
         ),
-      ),
 
-      themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
+        themeMode: ThemeMode.dark,
 
-      home: Builder(
-        builder: (context) {
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text("Demo"),
-              actions: [
-                IconButton(
-                  icon: Icon(
-                    isDark
-                        ? Icons.light_mode
-                        : Icons.dark_mode,
-                  ),
-                  onPressed: toggleTheme,
-                )
-              ],
-            ),
-            body: const Center(
-              child: Text("App Running"),
-            ),
-          );
-        },
+        initialRoute: Routes.splash,
+        onGenerateRoute: AppRouter().generateRoute,
       ),
     );
   }

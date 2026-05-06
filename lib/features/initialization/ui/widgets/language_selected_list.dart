@@ -39,7 +39,7 @@ class _LanguageSelectedListState
               border: Border.all(
                 color: isSelected
                     ? Theme.of(context).colorScheme.primary
-                    : Colors.grey.withOpacity(0.2),
+                    : Colors.grey.withValues(alpha: 0.2),
               ),
             ),
             child: Row(

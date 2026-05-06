@@ -57,8 +57,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       height: 45,
                       decoration: BoxDecoration(
                         color: isDark
-                            ? Colors.white.withOpacity(0.05)
-                            : Colors.black.withOpacity(0.05),
+                            ? Colors.white.withValues(alpha:0.05)
+                            : Colors.black.withValues(alpha:0.05),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -112,7 +112,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: isDark
-                          ? Colors.white.withOpacity(0.1)
+                          ? Colors.white.withValues(alpha:0.1)
                           : const Color(0xFFEAEFF5),
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -147,7 +147,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const Spacer(),
                     Switch(
                       value: isDark,
-                      activeColor: Colors.green,
+                      activeThumbColor: Colors.green,
                       onChanged: (value) {
                         setState(() {
                           isDark = value;
