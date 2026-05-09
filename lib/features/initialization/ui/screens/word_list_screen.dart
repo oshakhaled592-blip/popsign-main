@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:popsign/core/l10n/app_strings.dart';
 import 'package:popsign/core/routing/routes.dart';
 import 'package:popsign/core/theme/language_notifier.dart';
 import 'learn_new_words_screen.dart';
@@ -17,7 +18,7 @@ class WordModel {
 /// ================= WORD DATA =================
 const _wordData = <String, List<String>>{
   'en': ['mother','father','brother','sister','friend','house','water','food','love','time'],
-  'es': ['madre','padre','hermano','hermana','amigo','casa','agua','comida','amor','tiempo'],
+  'sp': ['madre','padre','hermano','hermana','amigo','casa','agua','comida','amor','tiempo'],
   'fr': ['mère','père','frère','sœur','ami','maison','eau','nourriture','amour','temps'],
   'ru': ['мать','отец','брат','сестра','друг','дом','вода','еда','любовь','время'],
   'ar': ['أم','أب','أخ','أخت','صديق','بيت','ماء','طعام','حب','وقت'],
@@ -111,7 +112,7 @@ class _WordListScreenState extends State<WordListScreen> {
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => const LearnNewWordsScreen(),
+        builder: (_) => LearnNewWordsScreen(passedWord: words[index].word),
       ),
     );
   }
@@ -234,21 +235,21 @@ class _WordListScreenState extends State<WordListScreen> {
                 ),
               ),
 
-              child: const Center(
+              child: Center(
                 child: Row(
                   mainAxisAlignment:
                       MainAxisAlignment.center,
 
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.refresh,
                       color: Colors.red,
                     ),
 
-                    SizedBox(width: 10),
+                    const SizedBox(width: 10),
 
                     Text(
-                      "Reset all progress",
+                      S.get('reset_all'),
 
                       style: TextStyle(
                         color: Colors.red,
@@ -266,7 +267,7 @@ class _WordListScreenState extends State<WordListScreen> {
 
           /// 📊 TEXT
           Text(
-            "$remaining new words left  •  $percent% complete",
+            "$remaining ${S.get('words_left')}  •  $percent% ${S.get('complete')}",
 
             style: TextStyle(
               color: subTextColor,
@@ -432,7 +433,7 @@ class WordCard extends StatelessWidget {
 
               child: Center(
                 child: Text(
-                  "Learn",
+                  S.get('learn'),
 
                   style: TextStyle(
                     color: isDone

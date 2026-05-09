@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/routing/routes.dart';
+import '../../../../../core/theme/language_notifier.dart';
 import '../../../../../core/theme/styles.dart';
 import '../../../../../core/widgets/linear_button.dart';
 import '../../../../../core/widgets/logo_and_name.dart';
@@ -21,59 +23,50 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
 
   @override
+  void initState() {
+    super.initState();
+    languageNotifier.addListener(_rebuild);
+  }
+
+  void _rebuild() => setState(() {});
+
+  @override
   void dispose() {
+    languageNotifier.removeListener(_rebuild);
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
-  /// 🔐 LOGIN
   void _login() {
     if (_formKey.currentState!.validate()) {
-      Navigator.pushReplacementNamed(
-        context,
-        Routes.startPage,
-      );
+      Navigator.pushReplacementNamed(context, Routes.startPage);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:
-          Theme.of(context).scaffoldBackgroundColor,
-
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(
-            horizontal: 24.w,
-          ),
-
+          padding: EdgeInsets.symmetric(horizontal: 24.w),
           child: Form(
             key: _formKey,
-
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
-
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(height: 60.h),
 
-                /// 🔥 LOGO
-                const Center(
-                  child: LogoAndName(
-                    compact: true,
-                  ),
-                ),
+                /// LOGO
+                const Center(child: LogoAndName(compact: true)),
 
                 SizedBox(height: 55.h),
 
-                /// 👋 TITLE
+                /// TITLE
                 Text(
-                  "Welcome Back",
-                  style:
-                      AppTextStyles.title(context)
-                          .copyWith(
+                  S.get('welcome'),
+                  style: AppTextStyles.title(context).copyWith(
                     fontSize: 28.sp,
                     fontWeight: FontWeight.w700,
                   ),
@@ -82,101 +75,69 @@ class _LoginScreenState extends State<LoginScreen> {
                 SizedBox(height: 8.h),
 
                 Text(
-                  "Login to continue learning",
-                  style:
-                      AppTextStyles.small(context)
-                          .copyWith(
-                    fontSize: 14.sp,
-                  ),
+                  S.get('login_sub'),
+                  style: AppTextStyles.small(context).copyWith(fontSize: 14.sp),
                 ),
 
                 SizedBox(height: 35.h),
 
-                /// 📧 EMAIL
+                /// EMAIL
                 TextFormWidget(
                   controller: _emailController,
-                  hintText: "Email",
+                  hintText: S.get('email'),
                   icon: Icons.email_outlined,
-                  keyboardType:
-                      TextInputType.emailAddress,
-
+                  keyboardType: TextInputType.emailAddress,
                   validator: (v) {
-                    if (v == null || v.isEmpty) {
-                      return "Please enter your email";
-                    }
-
-                    if (!v.contains('@') ||
-                        !v.contains('.')) {
+                    if (v == null || v.isEmpty) return "Please enter your email";
+                    if (!v.contains('@') || !v.contains('.')) {
                       return "Enter a valid email";
                     }
-
                     return null;
                   },
                 ),
 
                 SizedBox(height: 18.h),
 
-                /// 🔑 PASSWORD
+                /// PASSWORD
                 TextFormWidget(
                   controller: _passwordController,
-                  hintText: "Password",
+                  hintText: S.get('password'),
                   icon: Icons.lock_outline,
                   obscureText: true,
-
                   validator: (v) {
-                    if (v == null || v.isEmpty) {
-                      return "Please enter your password";
-                    }
-
-                    if (v.length < 6) {
-                      return "At least 6 characters";
-                    }
-
+                    if (v == null || v.isEmpty) return "Please enter your password";
+                    if (v.length < 6) return "At least 6 characters";
                     return null;
                   },
                 ),
 
                 SizedBox(height: 12.h),
 
-                /// 🔑 FORGET PASSWORD
+                /// FORGOT PASSWORD
                 Align(
                   alignment: Alignment.centerRight,
-
                   child: TextButton(
                     onPressed: () {
-                      /// 🔥 شاشة forgot password بعدين
+                      Navigator.pushNamed(context, Routes.forgotPassword);
                     },
-
                     child: Text(
-                      "Forgot Password?",
-                      style:
-                          AppTextStyles.small(
-                            context,
-                          ).copyWith(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .primary,
-                            fontWeight:
-                                FontWeight.w600,
-                          ),
+                      S.get('forgot'),
+                      style: AppTextStyles.small(context).copyWith(
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
 
                 SizedBox(height: 28.h),
 
-                /// 🚀 LOGIN BUTTON
-                LinearButton(
-                  text: "Login",
-                  onPressed: _login,
-                ),
+                /// LOGIN BUTTON
+                LinearButton(text: S.get('login'), onPressed: _login),
 
                 SizedBox(height: 28.h),
 
-                /// 📝 SIGN UP
-                const Center(
-                  child: DontHaveAccount(),
-                ),
+                const Center(child: DontHaveAccount()),
 
                 SizedBox(height: 30.h),
               ],

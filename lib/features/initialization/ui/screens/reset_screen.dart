@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'package:popsign/core/l10n/app_strings.dart';
 
 class ResetScreen extends StatefulWidget {
   const ResetScreen({super.key});
@@ -41,6 +41,12 @@ class _ResetScreenState extends State<ResetScreen>
     final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
     final subColor  = isDark ? Colors.white54 : Colors.grey.shade600;
     final divColor  = isDark ? Colors.white12 : Colors.grey.shade200;
+
+    // read strings at show-time so they match current language
+    final title    = S.get('reset_title');
+    final body     = S.get('reset_body');
+    final cancel   = S.get('cancel');
+    final resetLbl = S.get('reset_all');
 
     showDialog(
       context: context,
@@ -88,7 +94,7 @@ class _ResetScreenState extends State<ResetScreen>
                   const SizedBox(height: 18),
 
                   Text(
-                    "Reset Progress?",
+                    title,
                     style: GoogleFonts.poppins(
                       color: textColor,
                       fontSize: 18,
@@ -101,7 +107,7 @@ class _ResetScreenState extends State<ResetScreen>
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 28),
                     child: Text(
-                      "This will reset all your progress to 0%.\nThis action cannot be undone.",
+                      body,
                       textAlign: TextAlign.center,
                       style: GoogleFonts.poppins(
                         color: subColor,
@@ -117,7 +123,7 @@ class _ResetScreenState extends State<ResetScreen>
 
                   Row(
                     children: [
-                      // No
+                      // Cancel
                       Expanded(
                         child: InkWell(
                           onTap: () {
@@ -131,7 +137,7 @@ class _ResetScreenState extends State<ResetScreen>
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             child: Center(
                               child: Text(
-                                "Cancel",
+                                cancel,
                                 style: GoogleFonts.poppins(
                                   color: subColor,
                                   fontSize: 15,
@@ -145,7 +151,7 @@ class _ResetScreenState extends State<ResetScreen>
 
                       Container(width: 1, height: 52, color: divColor),
 
-                      // Yes
+                      // Reset
                       Expanded(
                         child: InkWell(
                           onTap: () {
@@ -159,7 +165,7 @@ class _ResetScreenState extends State<ResetScreen>
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             child: Center(
                               child: Text(
-                                "Reset",
+                                resetLbl,
                                 style: GoogleFonts.poppins(
                                   color: Colors.red,
                                   fontSize: 15,
@@ -183,9 +189,9 @@ class _ResetScreenState extends State<ResetScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       backgroundColor: Colors.transparent,
-      body: const SizedBox.shrink(),
+      body: SizedBox.shrink(),
     );
   }
 }

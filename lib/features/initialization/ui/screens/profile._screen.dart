@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/routing/routes.dart';
+import '../../../../core/theme/language_notifier.dart';
 import '../../../../core/theme/theme_notifier.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -19,6 +21,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     isDark = themeNotifier.value == ThemeMode.dark;
+    languageNotifier.addListener(_rebuild);
+  }
+
+  void _rebuild() => setState(() {});
+
+  @override
+  void dispose() {
+    languageNotifier.removeListener(_rebuild);
+    super.dispose();
   }
 
   void saveTheme(bool value) async {
@@ -39,18 +50,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // ── COLORS ────────────────────────────────────────────
-    final bgColor =
-        isDark ? const Color(0xFF0B1020) : const Color(0xFFF5F7FB);
-
-    final cardColor =
-        isDark ? const Color(0xFF171C2B) : Colors.white;
-
-    final textColor =
-        isDark ? Colors.white : const Color(0xFF1A1A2E);
-
-    final subText =
-        isDark ? Colors.white54 : const Color(0xFF9CA3AF);
+    final bgColor    = isDark ? const Color(0xFF0B1020) : const Color(0xFFF5F7FB);
+    final cardColor  = isDark ? const Color(0xFF171C2B) : Colors.white;
+    final textColor  = isDark ? Colors.white : const Color(0xFF1A1A2E);
+    final subText    = isDark ? Colors.white54 : const Color(0xFF9CA3AF);
 
     final cardShadow = isDark
         ? <BoxShadow>[]
@@ -108,7 +111,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 child: Row(
                   children: [
-                    // Avatar
                     Stack(
                       children: [
                         CircleAvatar(
@@ -127,11 +129,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               shape: BoxShape.circle,
                               border: Border.all(color: cardColor, width: 2),
                             ),
-                            child: Icon(
-                              Icons.check,
-                              color: Colors.white,
-                              size: 10.sp,
-                            ),
+                            child: Icon(Icons.check, color: Colors.white, size: 10.sp),
                           ),
                         ),
                       ],
@@ -153,17 +151,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           SizedBox(height: 4.h),
                           Text(
-                            "Verified Profile",
-                            style: TextStyle(
-                              color: subText,
-                              fontSize: 13.sp,
-                            ),
+                            S.get('verified'),
+                            style: TextStyle(color: subText, fontSize: 13.sp),
                           ),
                         ],
                       ),
                     ),
 
-                    // Badge
                     Container(
                       padding: EdgeInsets.symmetric(
                           horizontal: 12.w, vertical: 8.h),
@@ -188,7 +182,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               // ── SECTION LABEL ─────────────────────────────
               Text(
-                "Settings",
+                S.get('settings'),
                 style: TextStyle(
                   color: subText,
                   fontSize: 13.sp,
@@ -208,10 +202,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 child: Column(
                   children: [
-                    // Dark Mode
                     profileTile(
                       icon: Icons.dark_mode_outlined,
-                      title: "Dark Mode",
+                      title: S.get('dark_mode'),
                       textColor: textColor,
                       subText: subText,
                       isDivider: true,
@@ -235,25 +228,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                     profileTile(
                       icon: Icons.person_outline_rounded,
-                      title: "Account Information",
+                      title: S.get('account'),
                       textColor: textColor,
                       subText: subText,
                       isDivider: true,
-                      onTap: () => _showComingSoon("Account Information"),
+                      onTap: () => _showComingSoon(S.get('account')),
                     ),
 
                     profileTile(
                       icon: Icons.lock_outline_rounded,
-                      title: "Password",
+                      title: S.get('password'),
                       textColor: textColor,
                       subText: subText,
                       isDivider: true,
-                      onTap: () => _showComingSoon("Password"),
+                      onTap: () => _showComingSoon(S.get('password')),
                     ),
 
                     profileTile(
                       icon: Icons.language_rounded,
-                      title: "Translate",
+                      title: S.get('translate'),
                       textColor: textColor,
                       subText: subText,
                       isDivider: true,
@@ -263,7 +256,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                     profileTile(
                       icon: Icons.bar_chart_rounded,
-                      title: "My Progress",
+                      title: S.get('my_progress'),
                       textColor: textColor,
                       subText: subText,
                       isDivider: false,
@@ -291,20 +284,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   decoration: BoxDecoration(
                     color: Colors.red.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(16.r),
-                    border: Border.all(
-                        color: Colors.red.withValues(alpha: 0.25)),
+                    border:
+                        Border.all(color: Colors.red.withValues(alpha: 0.25)),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(
-                        Icons.logout_rounded,
-                        color: Colors.red,
-                        size: 20,
-                      ),
+                      const Icon(Icons.logout_rounded, color: Colors.red, size: 20),
                       SizedBox(width: 10.w),
                       Text(
-                        "Logout",
+                        S.get('logout'),
                         style: TextStyle(
                           color: Colors.red,
                           fontSize: 16.sp,
@@ -338,8 +327,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Column(
         children: [
           Padding(
-            padding:
-                EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
             child: Row(
               children: [
                 Container(
@@ -353,9 +341,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   child: Icon(
                     icon,
-                    color: isDark
-                        ? Colors.white70
-                        : const Color(0xFF22C55E),
+                    color: isDark ? Colors.white70 : const Color(0xFF22C55E),
                     size: 20.sp,
                   ),
                 ),
@@ -372,11 +358,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 if (trailing != null) trailing,
                 if (trailing == null)
-                  Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    color: subText,
-                    size: 14,
-                  ),
+                  Icon(Icons.arrow_forward_ios_rounded,
+                      color: subText, size: 14),
               ],
             ),
           ),

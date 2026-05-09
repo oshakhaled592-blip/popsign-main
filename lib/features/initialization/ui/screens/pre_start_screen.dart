@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:popsign/core/l10n/app_strings.dart';
 import 'package:popsign/core/routing/routes.dart';
+import 'package:popsign/core/theme/language_notifier.dart';
+import 'package:popsign/core/widgets/linear_button.dart';
 
 class PreStartScreen extends StatefulWidget {
-  const PreStartScreen({super.key});
+  final Map<String, dynamic>? selectedCategory;
+
+  const PreStartScreen({super.key, this.selectedCategory});
 
   @override
   State<PreStartScreen> createState() => _PreStartScreenState();
@@ -14,9 +20,15 @@ class _PreStartScreenState extends State<PreStartScreen>
   late Animation<double> _fade;
   late Animation<Offset> _slide;
 
+  static const _levels = [
+    {'level': 'A1', 'words': '1–100 words',  'percent': '80%', 'c1': Color(0xFF0BA58D), 'c2': Color(0xFF1EC9B4)},
+    {'level': 'A2', 'words': '101–1k words', 'percent': '44%', 'c1': Color(0xFF5E9E10), 'c2': Color(0xFF83D61B)},
+  ];
+
   @override
   void initState() {
     super.initState();
+    languageNotifier.addListener(_rebuild);
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 900),
@@ -29,18 +41,24 @@ class _PreStartScreenState extends State<PreStartScreen>
     _controller.forward();
   }
 
+  void _rebuild() => setState(() {});
+
   @override
   void dispose() {
+    languageNotifier.removeListener(_rebuild);
     _controller.dispose();
     super.dispose();
   }
+
+  String? get _selectedLevel =>
+      widget.selectedCategory?['level'] as String?;
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final bg        = isDark ? const Color(0xFF0B0F18) : const Color(0xFFD8DCE8);
-    final cardBg    = isDark ? const Color(0xFF141A29) : Colors.white;
+    final bg       = isDark ? const Color(0xFF0B0F18) : const Color(0xFFD8DCE8);
+    final cardBg   = isDark ? const Color(0xFF141A29) : Colors.white;
     final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
     final subColor  = isDark ? Colors.white38 : Colors.grey.shade500;
     final btnBg     = isDark ? const Color(0xFF1E2538) : Colors.white;
@@ -69,7 +87,7 @@ class _PreStartScreenState extends State<PreStartScreen>
                 children: [
                   const SizedBox(height: 14),
 
-                  // ── HEADER ────────────────────────────────────
+                  // ── HEADER ─────────────────────────────────────
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -78,7 +96,7 @@ class _PreStartScreenState extends State<PreStartScreen>
                           onTap: () => Navigator.pop(context)),
 
                       Text(
-                        "Pre-start",
+                        S.get('pre_start'),
                         style: TextStyle(
                           color: textColor,
                           fontSize: 18,
@@ -93,82 +111,62 @@ class _PreStartScreenState extends State<PreStartScreen>
                     ],
                   ),
 
-                  const SizedBox(height: 48),
+                  const SizedBox(height: 32),
 
-                  // ── LEVEL CARDS ────────────────────────────────
-                  _levelCard(
-                    isDark: isDark,
-                    cardBg: cardBg,
-                    shadow: cardShadow,
-                    textColor: textColor,
-                    subColor: subColor,
-                    color1: const Color(0xFF0BA58D),
-                    color2: const Color(0xFF1EC9B4),
-                    title: "A1",
-                    subtitle: "1–100 words",
-                    percent: "80%",
+                  // ── LEVEL CARDS ─────────────────────────────────
+                  Expanded(
+                    child: ListView.separated(
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: _levels.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      itemBuilder: (_, i) {
+                        final lvl = _levels[i];
+                        final isSelected =
+                            _selectedLevel == lvl['level'] as String;
+                        return _levelCard(
+                          isDark: isDark,
+                          cardBg: cardBg,
+                          shadow: cardShadow,
+                          textColor: textColor,
+                          subColor: subColor,
+                          color1: lvl['c1'] as Color,
+                          color2: lvl['c2'] as Color,
+                          title: lvl['level'] as String,
+                          subtitle: lvl['words'] as String,
+                          percent: lvl['percent'] as String,
+                          isSelected: isSelected,
+                        );
+                      },
+                    ),
                   ),
 
-                  const SizedBox(height: 14),
-
-                  _levelCard(
-                    isDark: isDark,
-                    cardBg: cardBg,
-                    shadow: cardShadow,
-                    textColor: textColor,
-                    subColor: subColor,
-                    color1: const Color(0xFF5E9E10),
-                    color2: const Color(0xFF83D61B),
-                    title: "A2",
-                    subtitle: "101–1k words",
-                    percent: "44%",
-                  ),
-
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
 
                   Text(
                     "Customize your progress if you wish",
                     style: TextStyle(color: subColor, fontSize: 14),
                   ),
 
-                  const Spacer(),
+                  const SizedBox(height: 20),
 
-                  // ── START BUTTON ───────────────────────────────
-                  SizedBox(
+                  // ── START BUTTON ────────────────────────────────
+                  LinearButton(
+                    text: S.get('start_learning'),
+                    icon: Icons.auto_stories_rounded,
                     width: double.infinity,
-                    height: 54,
-                    child: ElevatedButton(
-                      onPressed: () =>
-                          Navigator.pushNamed(context, Routes.wordList),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF22C55E),
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        shadowColor: Colors.transparent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      child: const Text(
-                        "Start learning",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
+                    height: 54.h,
+                    radius: 16.r,
+                    onPressed: () =>
+                        Navigator.pushNamed(context, Routes.wordList),
                   ),
 
                   const SizedBox(height: 28),
 
-                  // Home indicator bar
                   Container(
                     width: 120,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: isDark
-                          ? Colors.white24
-                          : Colors.grey.shade400,
+                      color: isDark ? Colors.white24 : Colors.grey.shade400,
                       borderRadius: BorderRadius.circular(30),
                     ),
                   ),
@@ -184,9 +182,7 @@ class _PreStartScreenState extends State<PreStartScreen>
   }
 
   Widget _btn(IconData icon,
-      {required Color bg,
-      required Color iconColor,
-      VoidCallback? onTap}) {
+      {required Color bg, required Color iconColor, VoidCallback? onTap}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -219,16 +215,22 @@ class _PreStartScreenState extends State<PreStartScreen>
     required String title,
     required String subtitle,
     required String percent,
+    bool isSelected = false,
   }) {
-    return Container(
+    const accent = Color(0xFF22C55E);
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
       decoration: BoxDecoration(
         color: cardBg,
         borderRadius: BorderRadius.circular(18),
         boxShadow: shadow,
-        border: isDark
-            ? Border.all(color: Colors.white.withValues(alpha: 0.05))
-            : null,
+        border: isSelected
+            ? Border.all(color: accent, width: 2)
+            : isDark
+                ? Border.all(color: Colors.white.withValues(alpha: 0.05))
+                : null,
       ),
       child: Row(
         children: [
@@ -265,18 +267,22 @@ class _PreStartScreenState extends State<PreStartScreen>
             ),
           ),
 
-          Text(
-            percent,
-            style: TextStyle(
-              color: subColor,
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
+          if (percent.isNotEmpty)
+            Text(
+              percent,
+              style: TextStyle(
+                color: subColor,
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-          ),
 
           const SizedBox(width: 8),
 
-          Icon(Icons.chevron_right_rounded, color: subColor, size: 20),
+          isSelected
+              ? const Icon(Icons.check_circle_rounded,
+                  color: accent, size: 20)
+              : Icon(Icons.chevron_right_rounded, color: subColor, size: 20),
         ],
       ),
     );

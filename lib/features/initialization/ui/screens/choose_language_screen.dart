@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/helpers/extension.dart';
 import '../../../../core/helpers/spacing.dart';
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/theme/language_notifier.dart';
 import '../../../../core/theme/styles.dart';
@@ -49,7 +50,8 @@ class _ChooseLanguageScreenState
   void initState() {
     super.initState();
 
-    // bouncing arrow animation
+    languageNotifier.addListener(_rebuild);
+
     _arrowController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 700),
@@ -68,8 +70,11 @@ class _ChooseLanguageScreenState
     });
   }
 
+  void _rebuild() => setState(() {});
+
   @override
   void dispose() {
+    languageNotifier.removeListener(_rebuild);
     _scrollController.dispose();
     _arrowController.dispose();
     super.dispose();
@@ -96,19 +101,14 @@ class _ChooseLanguageScreenState
         isDark ? Colors.white60 : Colors.grey.shade600;
 
     return Scaffold(
-      backgroundColor:
-          isDark ? const Color(0xFF0B0F1A) : Colors.white,
-
+      backgroundColor: isDark ? const Color(0xFF0B0F1A) : Colors.white,
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: 24.w,
-            vertical: 20.h,
-          ),
+          padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── BACK BUTTON ────────────────────────────────
+              // ── BACK BUTTON ──────────────────────────────
               Container(
                 width: 42.w,
                 height: 42.h,
@@ -128,12 +128,12 @@ class _ChooseLanguageScreenState
 
               verticalSpace(12),
 
-              // ── TITLE ──────────────────────────────────────
+              // ── TITLE ────────────────────────────────────
               Center(
                 child: SizedBox(
                   width: 300.w,
                   child: Text(
-                    "What language do you want to study?",
+                    S.get('select_lang'),
                     textAlign: TextAlign.center,
                     style: AppTextStyles.title(context).copyWith(
                       fontSize: 22.sp,
@@ -147,25 +147,22 @@ class _ChooseLanguageScreenState
 
               verticalSpace(20),
 
-              // ── LIST + ARROW ────────────────────────────────
+              // ── LIST + ARROW ──────────────────────────────
               Expanded(
                 child: Stack(
                   children: [
-                    // List
                     ListView.builder(
                       controller: _scrollController,
                       itemCount: languages.length,
                       itemBuilder: (context, index) {
                         final item = languages[index];
-                        final isSelected =
-                            selectedLanguageIndex == index;
+                        final isSelected = selectedLanguageIndex == index;
 
                         return GestureDetector(
-                          onTap: () => setState(
-                              () => selectedLanguageIndex = index),
+                          onTap: () =>
+                              setState(() => selectedLanguageIndex = index),
                           child: AnimatedContainer(
-                            duration:
-                                const Duration(milliseconds: 250),
+                            duration: const Duration(milliseconds: 250),
                             margin: EdgeInsets.only(bottom: 10.h),
                             padding: EdgeInsets.symmetric(
                               horizontal: 16.w,
@@ -173,13 +170,10 @@ class _ChooseLanguageScreenState
                             ),
                             decoration: BoxDecoration(
                               color: cardColor,
-                              borderRadius:
-                                  BorderRadius.circular(20.r),
+                              borderRadius: BorderRadius.circular(20.r),
                               border: Border.all(
                                 color: isSelected
-                                    ? Theme.of(context)
-                                        .colorScheme
-                                        .primary
+                                    ? Theme.of(context).colorScheme.primary
                                     : isDark
                                         ? const Color(0xFF263047)
                                         : Colors.grey.shade300,
@@ -188,10 +182,8 @@ class _ChooseLanguageScreenState
                               boxShadow: [
                                 BoxShadow(
                                   color: isDark
-                                      ? Colors.black
-                                          .withValues(alpha: 0.15)
-                                      : Colors.grey
-                                          .withValues(alpha: 0.08),
+                                      ? Colors.black.withValues(alpha: 0.15)
+                                      : Colors.grey.withValues(alpha: 0.08),
                                   blurRadius: 10,
                                   offset: const Offset(0, 4),
                                 ),
@@ -200,14 +192,12 @@ class _ChooseLanguageScreenState
                             child: Row(
                               children: [
                                 Text(item['flag']!,
-                                    style:
-                                        TextStyle(fontSize: 20.sp)),
+                                    style: TextStyle(fontSize: 20.sp)),
                                 horizontalSpace(12),
                                 Expanded(
                                   child: Text(
                                     item['name']!,
-                                    style: AppTextStyles.title(
-                                            context)
+                                    style: AppTextStyles.title(context)
                                         .copyWith(
                                       fontSize: 15.sp,
                                       fontWeight: FontWeight.w500,
@@ -216,30 +206,25 @@ class _ChooseLanguageScreenState
                                   ),
                                 ),
                                 AnimatedContainer(
-                                  duration: const Duration(
-                                      milliseconds: 250),
+                                  duration:
+                                      const Duration(milliseconds: 250),
                                   width: 26.w,
                                   height: 26.h,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     color: isSelected
-                                        ? Theme.of(context)
-                                            .colorScheme
-                                            .primary
+                                        ? Theme.of(context).colorScheme.primary
                                         : Colors.transparent,
                                     border: Border.all(
                                       color: isSelected
-                                          ? Theme.of(context)
-                                              .colorScheme
-                                              .primary
+                                          ? Theme.of(context).colorScheme.primary
                                           : Colors.grey,
                                       width: 1.5,
                                     ),
                                   ),
                                   child: isSelected
                                       ? const Icon(Icons.check,
-                                          color: Colors.white,
-                                          size: 16)
+                                          color: Colors.white, size: 16)
                                       : null,
                                 ),
                               ],
@@ -249,7 +234,7 @@ class _ChooseLanguageScreenState
                       },
                     ),
 
-                    // ── SCROLL DOWN ARROW ───────────────────
+                    // ── SCROLL DOWN ARROW ──────────────────
                     AnimatedOpacity(
                       opacity: _showArrow ? 1.0 : 0.0,
                       duration: const Duration(milliseconds: 300),
@@ -287,16 +272,15 @@ class _ChooseLanguageScreenState
 
               verticalSpace(20),
 
-              // ── CONTINUE BUTTON ─────────────────────────────
+              // ── CONTINUE BUTTON ───────────────────────────
               LinearButton(
-                text: "Continue",
+                text: S.get('continue'),
                 width: double.infinity,
                 height: 58.h,
                 radius: 18.r,
                 onPressed: () async {
                   if (selectedLanguageIndex == null) {
-                    showCustomSnackBar(
-                        context, "Please select a language");
+                    showCustomSnackBar(context, "Please select a language");
                   } else {
                     final selected = languages[selectedLanguageIndex!];
                     final info = LanguageInfo(

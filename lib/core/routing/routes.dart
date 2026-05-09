@@ -16,4 +16,5 @@ class Routes {
   static const String learnNewWords = '/learn-new-words';
   static const String profile = "/profile";
   static const String reset = '/reset';
+  static const String forgotPassword = '/forgot-password';
 }

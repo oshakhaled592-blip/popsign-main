@@ -10,6 +10,7 @@ import 'package:popsign/features/initialization/ui/screens/word_list_screen.dart
 import 'package:popsign/features/initialization/ui/screens/learn_new_words_screen.dart';
 import 'package:popsign/features/initialization/ui/screens/profile._screen.dart';
 import 'package:popsign/features/initialization/ui/screens/reset_screen.dart';
+import 'package:popsign/features/auth/login/ui/screen/forgot_password_screen.dart';
 import 'routes.dart';
 
 class AppRouter {
@@ -80,6 +81,12 @@ class AppRouter {
       case Routes.reset:
         return MaterialPageRoute(
           builder: (_) => const ResetScreen(),
+        );
+
+      /// 🔑 FORGOT PASSWORD
+      case Routes.forgotPassword:
+        return MaterialPageRoute(
+          builder: (_) => const ForgotPasswordScreen(),
         );
 
       /// ❌ DEFAULT
