@@ -8,7 +8,7 @@ class Routes {
   static const String home = '/home';
 
   // start and initialization 
-  static const String startPage = '/start-page';
+  static const String startPage = '/get-started';
   static const String selectLanguage = '/select-language';
   static const String selectCategories = '/select-categories';
   static const String preStart = '/pre-start';

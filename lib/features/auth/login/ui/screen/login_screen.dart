@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../../../core/routing/routes.dart';
+import '../../../../../core/theme/styles.dart';
 import '../../../../../core/widgets/linear_button.dart';
 import '../../../../../core/widgets/logo_and_name.dart';
 import '../../../../../core/widgets/text_form_widget.dart';
@@ -14,62 +16,169 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
-  final formKey = GlobalKey<FormState>();
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  /// 🔐 LOGIN
+  void _login() {
+    if (_formKey.currentState!.validate()) {
+      Navigator.pushReplacementNamed(
+        context,
+        Routes.startPage,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor:
+          Theme.of(context).scaffoldBackgroundColor,
+
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(20.w),
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(
+            horizontal: 24.w,
+          ),
+
           child: Form(
-            key: formKey,
+            key: _formKey,
+
             child: Column(
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
+
               children: [
-                const SizedBox(height: 20),
+                SizedBox(height: 60.h),
 
                 /// 🔥 LOGO
-                const LogoAndName(),
+                const Center(
+                  child: LogoAndName(
+                    compact: true,
+                  ),
+                ),
 
-                const SizedBox(height: 40),
+                SizedBox(height: 55.h),
 
-                /// EMAIL
+                /// 👋 TITLE
+                Text(
+                  "Welcome Back",
+                  style:
+                      AppTextStyles.title(context)
+                          .copyWith(
+                    fontSize: 28.sp,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+
+                SizedBox(height: 8.h),
+
+                Text(
+                  "Login to continue learning",
+                  style:
+                      AppTextStyles.small(context)
+                          .copyWith(
+                    fontSize: 14.sp,
+                  ),
+                ),
+
+                SizedBox(height: 35.h),
+
+                /// 📧 EMAIL
                 TextFormWidget(
-                  controller: emailController,
+                  controller: _emailController,
                   hintText: "Email",
                   icon: Icons.email_outlined,
-                  keyboardType: TextInputType.emailAddress,
-                ),
+                  keyboardType:
+                      TextInputType.emailAddress,
 
-                const SizedBox(height: 15),
-
-                /// PASSWORD
-                TextFormWidget(
-                  controller: passwordController,
-                  hintText: "Password",
-                  icon: Icons.lock_outline,
-                  obscureText: true,
-                ),
-
-                const SizedBox(height: 25),
-
-                /// LOGIN BUTTON
-                LinearButton(
-                  text: "Login",
-                  onPressed: () {
-                    if (formKey.currentState!.validate()) {
-                      // TODO: login logic
+                  validator: (v) {
+                    if (v == null || v.isEmpty) {
+                      return "Please enter your email";
                     }
+
+                    if (!v.contains('@') ||
+                        !v.contains('.')) {
+                      return "Enter a valid email";
+                    }
+
+                    return null;
                   },
                 ),
 
-                const SizedBox(height: 20),
+                SizedBox(height: 18.h),
 
-                /// DON'T HAVE ACCOUNT
-                const DontHaveAccount(),
+                /// 🔑 PASSWORD
+                TextFormWidget(
+                  controller: _passwordController,
+                  hintText: "Password",
+                  icon: Icons.lock_outline,
+                  obscureText: true,
+
+                  validator: (v) {
+                    if (v == null || v.isEmpty) {
+                      return "Please enter your password";
+                    }
+
+                    if (v.length < 6) {
+                      return "At least 6 characters";
+                    }
+
+                    return null;
+                  },
+                ),
+
+                SizedBox(height: 12.h),
+
+                /// 🔑 FORGET PASSWORD
+                Align(
+                  alignment: Alignment.centerRight,
+
+                  child: TextButton(
+                    onPressed: () {
+                      /// 🔥 شاشة forgot password بعدين
+                    },
+
+                    child: Text(
+                      "Forgot Password?",
+                      style:
+                          AppTextStyles.small(
+                            context,
+                          ).copyWith(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .primary,
+                            fontWeight:
+                                FontWeight.w600,
+                          ),
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: 28.h),
+
+                /// 🚀 LOGIN BUTTON
+                LinearButton(
+                  text: "Login",
+                  onPressed: _login,
+                ),
+
+                SizedBox(height: 28.h),
+
+                /// 📝 SIGN UP
+                const Center(
+                  child: DontHaveAccount(),
+                ),
+
+                SizedBox(height: 30.h),
               ],
             ),
           ),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 
 class ResetScreen extends StatefulWidget {
   const ResetScreen({super.key});
@@ -10,29 +12,21 @@ class ResetScreen extends StatefulWidget {
 class _ResetScreenState extends State<ResetScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-  late Animation<double> _fadeAnimation;
+  late Animation<double> _scale;
+  late Animation<double> _fade;
 
   @override
   void initState() {
     super.initState();
-
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 400),
+      duration: const Duration(milliseconds: 350),
     );
-
-    _scaleAnimation =
-        CurvedAnimation(parent: _controller, curve: Curves.easeOutBack);
-
-    _fadeAnimation =
-        CurvedAnimation(parent: _controller, curve: Curves.easeIn);
-
+    _scale = CurvedAnimation(parent: _controller, curve: Curves.easeOutBack);
+    _fade  = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
     _controller.forward();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      showResetDialog();
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _showDialog());
   }
 
   @override
@@ -41,126 +35,157 @@ class _ResetScreenState extends State<ResetScreen>
     super.dispose();
   }
 
-  void showResetDialog() {
+  void _showDialog() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardColor = isDark ? const Color(0xFF1C2333) : Colors.white;
+    final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
+    final subColor  = isDark ? Colors.white54 : Colors.grey.shade600;
+    final divColor  = isDark ? Colors.white12 : Colors.grey.shade200;
+
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) {
-        return FadeTransition(
-          opacity: _fadeAnimation,
-          child: ScaleTransition(
-            scale: _scaleAnimation,
-            child: Dialog(
-              backgroundColor: Colors.transparent,
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1C1C1E),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Image.asset(
-                      'assets/images/Reset all button.png',
-                      width: 40,
-                      height: 40,
+      barrierColor: Colors.black54,
+      builder: (_) => FadeTransition(
+        opacity: _fade,
+        child: ScaleTransition(
+          scale: _scale,
+          child: Dialog(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            child: Container(
+              decoration: BoxDecoration(
+                color: cardColor,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.18),
+                    blurRadius: 40,
+                    offset: const Offset(0, 12),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 28),
+
+                  // Icon
+                  Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(
+                      color: Colors.red.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
                     ),
+                    child: const Icon(
+                      Icons.refresh_rounded,
+                      color: Colors.red,
+                      size: 32,
+                    ),
+                  ),
 
-                    const SizedBox(height: 10),
+                  const SizedBox(height: 18),
 
-                    const Text(
-                      "Reset your progress?",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                  Text(
+                    "Reset Progress?",
+                    style: GoogleFonts.poppins(
+                      color: textColor,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 28),
+                    child: Text(
+                      "This will reset all your progress to 0%.\nThis action cannot be undone.",
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(
+                        color: subColor,
+                        fontSize: 13,
+                        height: 1.6,
                       ),
                     ),
+                  ),
 
-                    const SizedBox(height: 8),
+                  const SizedBox(height: 28),
 
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: Text(
-                        "This action will reset all your current progress to 0%",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
+                  Divider(height: 1, color: divColor),
 
-                    const SizedBox(height: 20),
-
-                    const Divider(color: Colors.grey, height: 1),
-
-                    Row(
-                      children: [
-                        Expanded(
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.pop(context);
-                              Navigator.pop(context, false);
-                            },
-                            child: const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 14),
-                              child: Center(
-                                child: Text(
-                                  "No",
-                                  style: TextStyle(
-                                    color: Colors.blue,
-                                    fontSize: 16,
-                                  ),
+                  Row(
+                    children: [
+                      // No
+                      Expanded(
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.pop(context);
+                            Navigator.pop(context, false);
+                          },
+                          borderRadius: const BorderRadius.only(
+                            bottomLeft: Radius.circular(24),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            child: Center(
+                              child: Text(
+                                "Cancel",
+                                style: GoogleFonts.poppins(
+                                  color: subColor,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ),
                           ),
                         ),
+                      ),
 
-                        Container(
-                          width: 1,
-                          height: 50,
-                          color: Colors.grey,
-                        ),
+                      Container(width: 1, height: 52, color: divColor),
 
-                        Expanded(
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.pop(context);
-                              Navigator.pop(context, true);
-                            },
-                            child: const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 14),
-                              child: Center(
-                                child: Text(
-                                  "Yes, reset",
-                                  style: TextStyle(
-                                    color: Colors.blue,
-                                    fontSize: 16,
-                                  ),
+                      // Yes
+                      Expanded(
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.pop(context);
+                            Navigator.pop(context, true);
+                          },
+                          borderRadius: const BorderRadius.only(
+                            bottomRight: Radius.circular(24),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            child: Center(
+                              child: Text(
+                                "Reset",
+                                style: GoogleFonts.poppins(
+                                  color: Colors.red,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      ],
-                    )
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Colors.black,
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: const SizedBox.shrink(),
     );
   }
 }

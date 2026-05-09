@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../../core/routing/routes.dart';
+import '../../../../core/theme/theme_notifier.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -9,174 +13,383 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  bool isDark = true;
+  late bool isDark;
 
   @override
   void initState() {
     super.initState();
-    loadTheme(); // 👈 تحميل الثيم
+    isDark = themeNotifier.value == ThemeMode.dark;
   }
 
-  /// 📥 LOAD THEME
-  void loadTheme() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      isDark = prefs.getBool('isDark') ?? true;
-    });
-  }
-
-  /// 💾 SAVE THEME
   void saveTheme(bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isDark', value);
   }
 
+  void _showComingSoon(String title) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("$title — coming soon"),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: const Color(0xFF22C55E),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    Color bgColor = isDark ? const Color(0xFF0D1117) : const Color(0xFFF5F7FA);
-    Color cardColor = isDark ? const Color(0xFF161B22) : Colors.white;
-    Color textColor = isDark ? Colors.white : const Color(0xFF1A1A1A);
-    Color subText = isDark ? Colors.white38 : Colors.grey.shade600;
+    // ── COLORS ────────────────────────────────────────────
+    final bgColor =
+        isDark ? const Color(0xFF0B1020) : const Color(0xFFF5F7FB);
+
+    final cardColor =
+        isDark ? const Color(0xFF171C2B) : Colors.white;
+
+    final textColor =
+        isDark ? Colors.white : const Color(0xFF1A1A2E);
+
+    final subText =
+        isDark ? Colors.white54 : const Color(0xFF9CA3AF);
+
+    final cardShadow = isDark
+        ? <BoxShadow>[]
+        : [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.07),
+              blurRadius: 16,
+              offset: const Offset(0, 4),
+            ),
+          ];
+
+    const accent = Color(0xFF22C55E);
 
     return Scaffold(
       backgroundColor: bgColor,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 22.w),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 10),
+              SizedBox(height: 16.h),
 
-              /// 🔙 BUTTON
-              Row(
-                children: [
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      width: 45,
-                      height: 45,
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? Colors.white.withValues(alpha:0.05)
-                            : Colors.black.withValues(alpha:0.05),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.menu_rounded,
-                        color: textColor,
-                      ),
-                    ),
+              // ── BACK BUTTON ──────────────────────────────
+              GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  width: 46.w,
+                  height: 46.h,
+                  decoration: BoxDecoration(
+                    color: cardColor,
+                    borderRadius: BorderRadius.circular(14.r),
+                    boxShadow: cardShadow,
                   ),
-                ],
+                  child: Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    color: textColor,
+                    size: 18.sp,
+                  ),
+                ),
               ),
 
-              const SizedBox(height: 20),
+              SizedBox(height: 28.h),
 
-              /// 👤 PROFILE
-              Row(
-                children: [
-                  const CircleAvatar(
-                    radius: 30,
-                    backgroundImage:
-                        AssetImage('assets/images/profile.png'),
-                  ),
-                  const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
+              // ── PROFILE CARD ─────────────────────────────
+              Container(
+                padding: EdgeInsets.all(18.w),
+                decoration: BoxDecoration(
+                  color: cardColor,
+                  borderRadius: BorderRadius.circular(22.r),
+                  boxShadow: cardShadow,
+                  border: isDark
+                      ? Border.all(color: Colors.white.withValues(alpha: 0.05))
+                      : Border.all(color: accent.withValues(alpha: 0.18)),
+                ),
+                child: Row(
+                  children: [
+                    // Avatar
+                    Stack(
+                      children: [
+                        CircleAvatar(
+                          radius: 34.r,
+                          backgroundImage:
+                              const AssetImage("assets/images/profile.png"),
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Container(
+                            width: 18.w,
+                            height: 18.h,
+                            decoration: BoxDecoration(
+                              color: accent,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: cardColor, width: 2),
+                            ),
+                            child: Icon(
+                              Icons.check,
+                              color: Colors.white,
+                              size: 10.sp,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    SizedBox(width: 14.w),
+
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             "Mrh Raju",
                             style: TextStyle(
                               color: textColor,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 20.sp,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
-                          const SizedBox(width: 5),
-                          const Icon(Icons.verified,
-                              color: Colors.green, size: 16),
+                          SizedBox(height: 4.h),
+                          Text(
+                            "Verified Profile",
+                            style: TextStyle(
+                              color: subText,
+                              fontSize: 13.sp,
+                            ),
+                          ),
                         ],
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        "Verified Profile",
-                        style: TextStyle(color: subText),
+                    ),
+
+                    // Badge
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 12.w, vertical: 8.h),
+                      decoration: BoxDecoration(
+                        color: accent.withValues(alpha: isDark ? 0.15 : 0.1),
+                        borderRadius: BorderRadius.circular(12.r),
                       ),
-                    ],
-                  ),
-                  const Spacer(),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? Colors.white.withValues(alpha:0.1)
-                          : const Color(0xFFEAEFF5),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      "3 Orders",
-                      style: TextStyle(color: textColor),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 25),
-
-              /// 🌗 DARK MODE
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: cardColor,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      isDark ? Icons.dark_mode : Icons.light_mode,
-                      color: textColor,
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      isDark ? "Dark Mode" : "Light Mode",
-                      style: TextStyle(color: textColor),
-                    ),
-                    const Spacer(),
-                    Switch(
-                      value: isDark,
-                      activeThumbColor: Colors.green,
-                      onChanged: (value) {
-                        setState(() {
-                          isDark = value;
-                        });
-                        saveTheme(value); // 💾 حفظ
-                      },
+                      child: Text(
+                        "3 Orders",
+                        style: TextStyle(
+                          color: accent,
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
 
-              const Spacer(),
+              SizedBox(height: 28.h),
 
-              /// 🔴 LOGOUT
-              Row(
-                children: const [
-                  Icon(Icons.logout, color: Colors.red),
-                  SizedBox(width: 8),
-                  Text(
-                    "Logout",
-                    style: TextStyle(color: Colors.red),
-                  )
-                ],
+              // ── SECTION LABEL ─────────────────────────────
+              Text(
+                "Settings",
+                style: TextStyle(
+                  color: subText,
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 1,
+                ),
               ),
 
-              const SizedBox(height: 20),
+              SizedBox(height: 12.h),
+
+              // ── SETTINGS CARD ─────────────────────────────
+              Container(
+                decoration: BoxDecoration(
+                  color: cardColor,
+                  borderRadius: BorderRadius.circular(22.r),
+                  boxShadow: cardShadow,
+                ),
+                child: Column(
+                  children: [
+                    // Dark Mode
+                    profileTile(
+                      icon: Icons.dark_mode_outlined,
+                      title: "Dark Mode",
+                      textColor: textColor,
+                      subText: subText,
+                      isDivider: true,
+                      trailing: Transform.scale(
+                        scale: 0.85,
+                        child: Switch(
+                          value: isDark,
+                          activeThumbColor: Colors.white,
+                          activeTrackColor: accent,
+                          inactiveThumbColor: Colors.white,
+                          inactiveTrackColor: Colors.grey.shade300,
+                          onChanged: (value) {
+                            setState(() => isDark = value);
+                            saveTheme(value);
+                            themeNotifier.value =
+                                value ? ThemeMode.dark : ThemeMode.light;
+                          },
+                        ),
+                      ),
+                    ),
+
+                    profileTile(
+                      icon: Icons.person_outline_rounded,
+                      title: "Account Information",
+                      textColor: textColor,
+                      subText: subText,
+                      isDivider: true,
+                      onTap: () => _showComingSoon("Account Information"),
+                    ),
+
+                    profileTile(
+                      icon: Icons.lock_outline_rounded,
+                      title: "Password",
+                      textColor: textColor,
+                      subText: subText,
+                      isDivider: true,
+                      onTap: () => _showComingSoon("Password"),
+                    ),
+
+                    profileTile(
+                      icon: Icons.language_rounded,
+                      title: "Translate",
+                      textColor: textColor,
+                      subText: subText,
+                      isDivider: true,
+                      onTap: () =>
+                          Navigator.pushNamed(context, Routes.selectLanguage),
+                    ),
+
+                    profileTile(
+                      icon: Icons.bar_chart_rounded,
+                      title: "My Progress",
+                      textColor: textColor,
+                      subText: subText,
+                      isDivider: false,
+                      onTap: () =>
+                          Navigator.pushNamed(context, Routes.wordList),
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 28.h),
+
+              // ── LOGOUT ───────────────────────────────────
+              GestureDetector(
+                onTap: () {
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    Routes.login,
+                    (route) => false,
+                  );
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.symmetric(vertical: 16.h),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(16.r),
+                    border: Border.all(
+                        color: Colors.red.withValues(alpha: 0.25)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.logout_rounded,
+                        color: Colors.red,
+                        size: 20,
+                      ),
+                      SizedBox(width: 10.w),
+                      Text(
+                        "Logout",
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              SizedBox(height: 32.h),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget profileTile({
+    required IconData icon,
+    required String title,
+    required Color textColor,
+    required Color subText,
+    required bool isDivider,
+    Widget? trailing,
+    VoidCallback? onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Padding(
+            padding:
+                EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+            child: Row(
+              children: [
+                Container(
+                  width: 38.w,
+                  height: 38.h,
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.06)
+                        : const Color(0xFF22C55E).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(11.r),
+                  ),
+                  child: Icon(
+                    icon,
+                    color: isDark
+                        ? Colors.white70
+                        : const Color(0xFF22C55E),
+                    size: 20.sp,
+                  ),
+                ),
+                SizedBox(width: 14.w),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                if (trailing != null) trailing,
+                if (trailing == null)
+                  Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    color: subText,
+                    size: 14,
+                  ),
+              ],
+            ),
+          ),
+          if (isDivider)
+            Divider(
+              height: 1,
+              indent: 68.w,
+              endIndent: 0,
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.07)
+                  : Colors.grey.shade200,
+            ),
+        ],
       ),
     );
   }

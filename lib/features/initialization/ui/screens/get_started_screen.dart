@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../../core/widgets/logo_and_name.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../../../../core/helpers/spacing.dart';
+import '../../../../core/routing/routes.dart';
+import '../../../../core/theme/styles.dart';
 import '../../../../core/widgets/linear_button.dart';
 
 class GetStartedScreen extends StatelessWidget {
@@ -8,26 +12,82 @@ class GetStartedScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor:
+          Theme.of(context).scaffoldBackgroundColor,
+
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            children: [
-              const Spacer(),
+        child: SizedBox(
+          width: double.infinity,
 
-              const LogoAndName(),
+          child: Padding(
+            padding:
+                EdgeInsets.symmetric(horizontal: 20.w),
 
-              const Spacer(),
+            child: Column(
+              crossAxisAlignment:
+                  CrossAxisAlignment.center,
 
-              LinearButton(
-                text: "Get Started",
-                onPressed: () {
-                  Navigator.pushNamed(context, "/chooseLanguage");
-                },
-              ),
+              children: [
+                verticalSpace(20),
 
-              const SizedBox(height: 20),
-            ],
+                /// 🖼️ IMAGE
+                Image.asset(
+                  "assets/images/start-image.png",
+                  width: 400.w,
+                  height: 400.h,
+                  fit: BoxFit.contain,
+                ),
+
+                verticalSpace(30),
+
+                /// 🧠 TITLE
+                Text(
+                  "Learn a Language easily with Cards",
+                  textAlign: TextAlign.center,
+
+                  style: AppTextStyles.title(context)
+                      .copyWith(
+                    fontSize: 32.sp,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                verticalSpace(14),
+
+                /// ✨ SUBTITLE
+                Text(
+                  "Learn words using cards,\nchoosing levels that are convenient for you",
+                  textAlign: TextAlign.center,
+
+                  style: AppTextStyles.small(context)
+                      .copyWith(
+                    height: 1.5,
+                    fontSize: 15.sp,
+                  ),
+                ),
+
+                const Spacer(),
+
+                /// 🚀 BUTTON
+                LinearButton(
+                  text: "Get Started",
+                  height: 55.h,
+                  width: double.infinity,
+                  icon: Icons.bolt,
+
+                  onPressed: () {
+                    Navigator.pushNamed(
+                      context,
+                      Routes.selectLanguage,
+                    );
+                  },
+
+                  radius: 16.r,
+                ),
+
+                verticalSpace(24),
+              ],
+            ),
           ),
         ),
       ),

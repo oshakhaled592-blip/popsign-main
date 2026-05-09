@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../theme/app_colors.dart';
-import '../theme/styles.dart';
 
 class LinearButton extends StatelessWidget {
   final IconData? icon;
@@ -31,24 +30,34 @@ class LinearButton extends StatelessWidget {
         height: height ?? 54.h,
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [
-              AppColors.gradient1,
-              AppColors.gradient2,
-            ],
+            colors: [AppColors.gradient1, AppColors.gradient2],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
           ),
-          borderRadius: BorderRadius.circular(radius ?? 30.r),
+          borderRadius: BorderRadius.circular(radius ?? 14.r),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primary.withValues(alpha: 0.35),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
+            ),
+          ],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (icon != null)
-              Icon(icon, color: Colors.white),
-
-            if (icon != null) SizedBox(width: 6.w),
-
+            if (icon != null) ...[
+              Icon(icon, color: Colors.white, size: 20.sp),
+              SizedBox(width: 8.w),
+            ],
             Text(
               text,
-              style: AppTextStyles.button(context),
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.3,
+              ),
             ),
           ],
         ),

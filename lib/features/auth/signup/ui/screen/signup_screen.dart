@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../../core/routing/routes.dart';
+import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/styles.dart';
 import '../../../../../core/widgets/linear_button.dart';
 import '../../../../../core/widgets/logo_and_name.dart';
@@ -47,7 +48,7 @@ class _SignupScreenState extends State<SignupScreen> {
               children: [
                 SizedBox(height: 16.h),
 
-                // ── Back button ───────────────────────────────────
+                // ── Back button ──────────────────────────────────
                 GestureDetector(
                   onTap: () => Navigator.pop(context),
                   child: Container(
@@ -60,14 +61,18 @@ class _SignupScreenState extends State<SignupScreen> {
                     child: Icon(
                       Icons.arrow_back_rounded,
                       size: 20.sp,
+                      color: Theme.of(context)
+                          .textTheme
+                          .bodyLarge!
+                          .color,
                     ),
                   ),
                 ),
 
-                SizedBox(height: 32.h),
+                SizedBox(height: 30.h),
 
-                // ── Logo ──────────────────────────────────────────
-                const Center(child: LogoAndName()),
+                // ── Logo ─────────────────────────────────────────
+                const Center(child: LogoAndName(compact: true)),
 
                 SizedBox(height: 36.h),
 
@@ -80,7 +85,8 @@ class _SignupScreenState extends State<SignupScreen> {
                 SizedBox(height: 6.h),
                 Text(
                   "Sign up to start learning words",
-                  style: AppTextStyles.small(context),
+                  style: AppTextStyles.small(context)
+                      .copyWith(fontSize: 14.sp),
                 ),
 
                 SizedBox(height: 28.h),
@@ -97,12 +103,14 @@ class _SignupScreenState extends State<SignupScreen> {
                     if (v == null || v.trim().isEmpty) {
                       return "Please enter your name";
                     }
-                    if (v.trim().length < 3) return "At least 3 characters";
+                    if (v.trim().length < 3) {
+                      return "At least 3 characters";
+                    }
                     return null;
                   },
                 ),
 
-                SizedBox(height: 16.h),
+                SizedBox(height: 18.h),
 
                 // ── Email ─────────────────────────────────────────
                 _label("Email", context),
@@ -123,7 +131,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   },
                 ),
 
-                SizedBox(height: 16.h),
+                SizedBox(height: 18.h),
 
                 // ── Password ──────────────────────────────────────
                 _label("Password", context),
@@ -135,13 +143,15 @@ class _SignupScreenState extends State<SignupScreen> {
                   keyboardType: TextInputType.visiblePassword,
                   obscureText: true,
                   validator: (v) {
-                    if (v == null || v.isEmpty) return "Please enter a password";
+                    if (v == null || v.isEmpty) {
+                      return "Please enter a password";
+                    }
                     if (v.length < 6) return "At least 6 characters";
                     return null;
                   },
                 ),
 
-                SizedBox(height: 36.h),
+                SizedBox(height: 38.h),
 
                 // ── Sign Up button ────────────────────────────────
                 LinearButton(
@@ -149,16 +159,30 @@ class _SignupScreenState extends State<SignupScreen> {
                   onPressed: _submit,
                 ),
 
-                SizedBox(height: 20.h),
+                SizedBox(height: 24.h),
 
                 // ── Login link ────────────────────────────────────
                 Center(
-                  child: TextButton(
-                    onPressed: () =>
-                        Navigator.pushReplacementNamed(context, Routes.login),
-                    child: Text(
-                      "Already have an account?  Login",
-                      style: AppTextStyles.small(context),
+                  child: GestureDetector(
+                    onTap: () => Navigator.pushReplacementNamed(
+                        context, Routes.login),
+                    child: RichText(
+                      text: TextSpan(
+                        style: AppTextStyles.small(context)
+                            .copyWith(fontSize: 14.sp),
+                        children: [
+                          const TextSpan(
+                              text: "Already have an account?  "),
+                          TextSpan(
+                            text: "Login",
+                            style: TextStyle(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14.sp,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -173,7 +197,7 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Widget _label(String text, BuildContext context) => Padding(
-        padding: EdgeInsets.only(left: 4.w),
+        padding: EdgeInsets.only(left: 2.w),
         child: Text(
           text,
           style: AppTextStyles.body(context).copyWith(

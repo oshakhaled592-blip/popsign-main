@@ -6,7 +6,11 @@
       "Bash(flutter build *)",
       "Bash(flutter pub *)",
       "Bash(taskkill /F /IM java.exe /T)",
-      "Bash(taskkill /F /IM gradle.exe /T)"
+      "Bash(taskkill /F /IM gradle.exe /T)",
+      "Bash(flutter analyze *)",
+      "Bash(Get-ChildItem -Path lib -Recurse -File)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(Sort-Object)"
     ]
   }
 }
