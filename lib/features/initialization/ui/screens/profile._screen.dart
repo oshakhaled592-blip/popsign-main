@@ -260,11 +260,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       textColor: textColor,
                       subText: subText,
                       isDivider: true,
-                      onTap: () => Navigator.pushNamed(
-                        context,
-                        Routes.selectLanguage,
-                        arguments: {'fromSettings': true},
-                      ),
+                      onTap: () => Navigator.pushNamed(context, Routes.lostPage),
                     ),
 
                     profileTile(

@@ -28,7 +28,7 @@ class _LearnNewWordsScreenState extends State<LearnNewWordsScreen>
 
   late AnimationController _tiltController;
   late Animation<double> _tiltAnim;
-  double _tiltDirection = 0; // +1 right, -1 left
+  double _tiltDirection = 0;
 
   int currentIndex = 0;
   late List<WordItem> words;
@@ -89,12 +89,10 @@ class _LearnNewWordsScreenState extends State<LearnNewWordsScreen>
     _tilt(1);
   }
 
-  // card gradient based on mode
   List<Color> get _cardColors {
     return [const Color(0xFF18202E), const Color(0xFF10141F)];
   }
 
-  // inner reveal box color
   Color get _revealBg => const Color(0xFF141A26);
 
   @override
@@ -198,7 +196,6 @@ class _LearnNewWordsScreenState extends State<LearnNewWordsScreen>
                     ),
                     child: Column(
                       children: [
-                        // Level badge
                         Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 4),
@@ -217,7 +214,6 @@ class _LearnNewWordsScreenState extends State<LearnNewWordsScreen>
 
                         const SizedBox(height: 14),
 
-                        // Word
                         Text(
                           word.word,
                           style: const TextStyle(
@@ -240,7 +236,6 @@ class _LearnNewWordsScreenState extends State<LearnNewWordsScreen>
 
                         const SizedBox(height: 20),
 
-                        // ── REVEAL AREA ────────────────────────────
                         Expanded(
                           child: GestureDetector(
                             onTap: _toggleTranslation,
@@ -277,7 +272,6 @@ class _LearnNewWordsScreenState extends State<LearnNewWordsScreen>
 
                         const SizedBox(height: 20),
 
-                        // ── BUTTONS ────────────────────────────────
                         ValueListenableBuilder<LanguageInfo>(
                           valueListenable: languageNotifier,
                           builder: (_, __, ___) => Row(

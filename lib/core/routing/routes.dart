@@ -17,4 +17,5 @@ class Routes {
   static const String profile = "/profile";
   static const String reset = '/reset';
   static const String forgotPassword = '/forgot-password';
+  static const String lostPage = '/lost-page';
 }
