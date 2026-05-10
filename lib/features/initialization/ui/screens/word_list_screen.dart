@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:popsign/core/data/word_data.dart';
 import 'package:popsign/core/l10n/app_strings.dart';
 import 'package:popsign/core/routing/routes.dart';
 import 'package:popsign/core/theme/language_notifier.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'learn_new_words_screen.dart';
 
 /// ================= MODEL =================
@@ -15,24 +17,6 @@ class WordModel {
   bool get isDone => progress == 3;
 }
 
-/// ================= WORD DATA =================
-const _wordData = <String, List<String>>{
-  'en': ['mother','father','brother','sister','friend','house','water','food','love','time'],
-  'sp': ['madre','padre','hermano','hermana','amigo','casa','agua','comida','amor','tiempo'],
-  'fr': ['mère','père','frère','sœur','ami','maison','eau','nourriture','amour','temps'],
-  'ru': ['мать','отец','брат','сестра','друг','дом','вода','еда','любовь','время'],
-  'ar': ['أم','أب','أخ','أخت','صديق','بيت','ماء','طعام','حب','وقت'],
-  'ge': ['Mutter','Vater','Bruder','Schwester','Freund','Haus','Wasser','Essen','Liebe','Zeit'],
-  'it': ['madre','padre','fratello','sorella','amico','casa','acqua','cibo','amore','tempo'],
-  'tu': ['anne','baba','erkek kardeş','kız kardeş','arkadaş','ev','su','yemek','aşk','zaman'],
-  'ja': ['母','父','兄弟','姉妹','友達','家','水','食べ物','愛','時間'],
-  'ch': ['母亲','父亲','兄弟','姐妹','朋友','房子','水','食物','爱','时间'],
-  'ko': ['어머니','아버지','형제','자매','친구','집','물','음식','사랑','시간'],
-  'po': ['mãe','pai','irmão','irmã','amigo','casa','água','comida','amor','tempo'],
-  'hi': ['माँ','पिता','भाई','बहन','दोस्त','घर','पानी','खाना','प्यार','समय'],
-  'du': ['moeder','vader','broer','zus','vriend','huis','water','eten','liefde','tijd'],
-};
-
 final _images = [
   'assets/images/mother.png','assets/images/day.png',
   'assets/images/you.png',   'assets/images/get.png',
@@ -41,8 +25,8 @@ final _images = [
   'assets/images/design.png','assets/images/mother.png',
 ];
 
-List<WordModel> _wordsForLang(String code) {
-  final list = _wordData[code] ?? _wordData['en']!;
+List<WordModel> _wordsForLang(String code, String level) {
+  final list = getWords(code, level);
   return List.generate(
     list.length,
     (i) => WordModel(list[i], 0, _images[i % _images.length]),
@@ -51,7 +35,9 @@ List<WordModel> _wordsForLang(String code) {
 
 /// ================= SCREEN =================
 class WordListScreen extends StatefulWidget {
-  const WordListScreen({super.key});
+  final String level;
+
+  const WordListScreen({super.key, this.level = 'A1'});
 
   @override
   State<WordListScreen> createState() => _WordListScreenState();
@@ -62,21 +48,45 @@ class _WordListScreenState extends State<WordListScreen> {
   late List<WordModel> words;
   late String _currentLangCode;
 
+  String get _progressKey => 'progress_${_currentLangCode}_${widget.level}';
+
   @override
   void initState() {
     super.initState();
     _currentLangCode = languageNotifier.value.code;
-    words = _wordsForLang(_currentLangCode);
+    words = _wordsForLang(_currentLangCode, widget.level);
     languageNotifier.addListener(_onLangChanged);
+    _loadProgress(_currentLangCode);
+  }
+
+  Future<void> _saveProgress() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_progressKey, words.map((w) => w.progress).join(','));
+  }
+
+  Future<void> _loadProgress(String langCode) async {
+    final prefs = await SharedPreferences.getInstance();
+    final key = 'progress_${langCode}_${widget.level}';
+    final saved = prefs.getString(key);
+    if (saved != null && mounted) {
+      final parts = saved.split(',');
+      setState(() {
+        for (int i = 0; i < words.length && i < parts.length; i++) {
+          words[i].progress = int.tryParse(parts[i]) ?? 0;
+        }
+      });
+    }
   }
 
   void _onLangChanged() {
     final newCode = languageNotifier.value.code;
     if (newCode != _currentLangCode) {
+      _saveProgress();
       setState(() {
         _currentLangCode = newCode;
-        words = _wordsForLang(newCode);
+        words = _wordsForLang(newCode, widget.level);
       });
+      _loadProgress(newCode);
     }
   }
 
@@ -87,50 +97,40 @@ class _WordListScreenState extends State<WordListScreen> {
     super.dispose();
   }
 
-  /// 🔢 LEFT WORDS
-  int get remaining =>
-      words.where((w) => w.progress < 3).length;
+  int get remaining => words.where((w) => w.progress < 3).length;
 
-  /// 📊 COMPLETE %
   int get percent {
-    int total = words.length * 3;
-
-    int done =
-        words.fold(0, (sum, w) => sum + w.progress);
-
+    final total = words.length * 3;
+    final done = words.fold(0, (sum, w) => sum + w.progress);
     return ((done / total) * 100).toInt();
   }
 
-  /// 🔥 LEARN
   void onLearn(int index) async {
     setState(() {
-      if (words[index].progress < 3) {
-        words[index].progress++;
-      }
+      if (words[index].progress < 3) words[index].progress++;
     });
+    _saveProgress();
 
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => LearnNewWordsScreen(passedWord: words[index].word),
+        builder: (_) => LearnNewWordsScreen(
+          passedWord: words[index].word,
+          level: widget.level,
+        ),
       ),
     );
   }
 
-  /// 🔴 RESET
   Future<void> showResetDialog() async {
-    final result = await Navigator.pushNamed(
-      context,
-      Routes.reset,
-    );
-
-    /// ✅ لو ضغط Yes, reset
+    final result = await Navigator.pushNamed(context, Routes.reset);
     if (result == true) {
       setState(() {
         for (var word in words) {
           word.progress = 0;
         }
       });
+      _saveProgress();
     }
   }
 
@@ -143,7 +143,6 @@ class _WordListScreenState extends State<WordListScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
 
-      /// 🔝 APP BAR
       appBar: AppBar(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
@@ -151,28 +150,16 @@ class _WordListScreenState extends State<WordListScreen> {
 
         leading: Padding(
           padding: const EdgeInsets.only(left: 12),
-
           child: GestureDetector(
-            onTap: () {
-              Navigator.pushNamed(
-                context,
-                Routes.profile,
-              );
-            },
-
+            onTap: () => Navigator.pushNamed(context, Routes.profile),
             child: Container(
               width: 44,
               height: 44,
-
               decoration: BoxDecoration(
                 color: textColor.withValues(alpha: 0.08),
                 shape: BoxShape.circle,
               ),
-
-              child: Icon(
-                Icons.menu,
-                color: textColor,
-              ),
+              child: Icon(Icons.menu, color: textColor),
             ),
           ),
         ),
@@ -192,66 +179,45 @@ class _WordListScreenState extends State<WordListScreen> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 14),
-
-            child: Container(
-              width: 44,
-              height: 44,
-
-              decoration: BoxDecoration(
-                color: textColor.withValues(alpha: 0.08),
-                shape: BoxShape.circle,
-              ),
-
-              child: Icon(
-                Icons.close,
-                color: textColor,
+            child: GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: textColor.withValues(alpha: 0.08),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.close, color: textColor),
               ),
             ),
           ),
         ],
       ),
 
-      /// 📱 BODY
       body: Column(
         children: [
           const SizedBox(height: 14),
 
-          /// 🔴 RESET BUTTON
           GestureDetector(
             onTap: showResetDialog,
-
             child: Container(
               height: 58,
-              margin:
-                  const EdgeInsets.symmetric(horizontal: 16),
-
+              margin: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
-
                 borderRadius: BorderRadius.circular(18),
-
-                border: Border.all(
-                  color: textColor.withValues(alpha: 0.08),
-                ),
+                border: Border.all(color: textColor.withValues(alpha: 0.08)),
               ),
-
               child: Center(
                 child: Row(
-                  mainAxisAlignment:
-                      MainAxisAlignment.center,
-
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
-                      Icons.refresh,
-                      color: Colors.red,
-                    ),
-
+                    const Icon(Icons.refresh, color: Colors.red),
                     const SizedBox(width: 10),
-
                     Text(
                       S.get('reset_all'),
-
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.red,
                         fontSize: 20,
                         fontWeight: FontWeight.w500,
@@ -265,19 +231,13 @@ class _WordListScreenState extends State<WordListScreen> {
 
           const SizedBox(height: 18),
 
-          /// 📊 TEXT
           Text(
             "$remaining ${S.get('words_left')}  •  $percent% ${S.get('complete')}",
-
-            style: TextStyle(
-              color: subTextColor,
-              fontSize: 16,
-            ),
+            style: TextStyle(color: subTextColor, fontSize: 16),
           ),
 
           const SizedBox(height: 18),
 
-          /// 📋 LIST
           Expanded(
             child: Scrollbar(
               controller: _scrollController,
@@ -287,10 +247,8 @@ class _WordListScreenState extends State<WordListScreen> {
               child: ListView.builder(
                 controller: _scrollController,
                 itemCount: words.length,
-
                 itemBuilder: (context, index) {
                   final item = words[index];
-
                   return WordCard(
                     word: item.word,
                     image: item.image,
@@ -334,59 +292,34 @@ class WordCard extends StatelessWidget {
 
     return Container(
       height: 72,
-
-      margin: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 7,
-      ),
-
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16,
-      ),
-
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
-
         borderRadius: BorderRadius.circular(20),
-
-        border: Border.all(
-          color: textColor.withValues(alpha: 0.08),
-        ),
+        border: Border.all(color: textColor.withValues(alpha: 0.08)),
       ),
-
       child: Row(
         children: [
-          /// 📝 WORD
           Expanded(
             child: Text(
               word,
-
               style: TextStyle(
-                color: isDone
-                    ? textColor.withValues(alpha: 0.38)
-                    : textColor,
-
+                color: isDone ? textColor.withValues(alpha: 0.38) : textColor,
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
               ),
             ),
           ),
 
-          /// 🔵 DOTS
           Row(
             children: List.generate(3, (i) {
-              bool active = i < progress;
-
               return Container(
-                margin:
-                    const EdgeInsets.symmetric(horizontal: 3),
-
+                margin: const EdgeInsets.symmetric(horizontal: 3),
                 width: 7,
                 height: 7,
-
                 decoration: BoxDecoration(
-                  color: active ? Colors.green : dimColor,
-
+                  color: i < progress ? Colors.green : dimColor,
                   shape: BoxShape.circle,
                 ),
               );
@@ -395,51 +328,37 @@ class WordCard extends StatelessWidget {
 
           const SizedBox(width: 14),
 
-          /// ✅ CHECK
           Container(
             width: 40,
             height: 40,
-
             decoration: BoxDecoration(
               color: isDone ? Colors.green : inactiveColor,
-
               borderRadius: BorderRadius.circular(12),
             ),
-
             child: Icon(
               Icons.check,
-
-              color: isDone
-                  ? Colors.white
-                  : textColor.withValues(alpha: 0.38),
+              color: isDone ? Colors.white : textColor.withValues(alpha: 0.38),
             ),
           ),
 
           const SizedBox(width: 12),
 
-          /// 🔘 LEARN BUTTON
           GestureDetector(
             onTap: isDone ? null : onTap,
-
             child: Container(
               width: 74,
               height: 40,
-
               decoration: BoxDecoration(
                 color: isDone ? inactiveColor : textColor,
-
                 borderRadius: BorderRadius.circular(12),
               ),
-
               child: Center(
                 child: Text(
                   S.get('learn'),
-
                   style: TextStyle(
                     color: isDone
                         ? textColor.withValues(alpha: 0.38)
                         : Theme.of(context).scaffoldBackgroundColor,
-
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),

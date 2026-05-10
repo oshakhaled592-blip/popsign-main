@@ -13,8 +13,9 @@ class WordItem {
 
 class LearnNewWordsScreen extends StatefulWidget {
   final String? passedWord;
+  final String level;
 
-  const LearnNewWordsScreen({super.key, this.passedWord});
+  const LearnNewWordsScreen({super.key, this.passedWord, this.level = 'A1'});
 
   @override
   State<LearnNewWordsScreen> createState() => _LearnNewWordsScreenState();
@@ -205,9 +206,9 @@ class _LearnNewWordsScreenState extends State<LearnNewWordsScreen>
                             color: Colors.white.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          child: const Text(
-                            "A1 Level",
-                            style: TextStyle(
+                          child: Text(
+                            "${widget.level} Level",
+                            style: const TextStyle(
                               color: Colors.white60,
                               fontSize: 12,
                             ),

@@ -294,10 +294,17 @@ class _ChooseLanguageScreenState
                     await prefs.setString('langName', info.name);
                     await prefs.setString('langFlag', info.flag);
                     if (context.mounted) {
-                      context.pushNamedAndRemoveUntil(
-                        Routes.selectCategories,
-                        predicate: (route) => false,
-                      );
+                      final args = ModalRoute.of(context)?.settings.arguments
+                          as Map?;
+                      final fromSettings = args?['fromSettings'] == true;
+                      if (fromSettings) {
+                        Navigator.pop(context);
+                      } else {
+                        context.pushNamedAndRemoveUntil(
+                          Routes.selectCategories,
+                          predicate: (route) => false,
+                        );
+                      }
                     }
                   }
                 },

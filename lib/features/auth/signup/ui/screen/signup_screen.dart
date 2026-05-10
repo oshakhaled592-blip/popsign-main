@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/routing/routes.dart';
@@ -40,9 +41,11 @@ class _SignupScreenState extends State<SignupScreen> {
     super.dispose();
   }
 
-  void _submit() {
+  void _submit() async {
     if (_formKey.currentState!.validate()) {
-      Navigator.pushReplacementNamed(context, Routes.login);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('userName', _nameController.text.trim());
+      if (mounted) Navigator.pushReplacementNamed(context, Routes.login);
     }
   }
 

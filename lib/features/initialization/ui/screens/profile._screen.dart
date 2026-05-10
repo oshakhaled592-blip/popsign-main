@@ -16,12 +16,19 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   late bool isDark;
+  String _userName = '';
 
   @override
   void initState() {
     super.initState();
     isDark = themeNotifier.value == ThemeMode.dark;
     languageNotifier.addListener(_rebuild);
+    _loadName();
+  }
+
+  Future<void> _loadName() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (mounted) setState(() => _userName = prefs.getString('userName') ?? 'User');
   }
 
   void _rebuild() => setState(() {});
@@ -142,7 +149,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Mrh Raju",
+                            _userName,
                             style: TextStyle(
                               color: textColor,
                               fontSize: 20.sp,
@@ -165,12 +172,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         color: accent.withValues(alpha: isDark ? 0.15 : 0.1),
                         borderRadius: BorderRadius.circular(12.r),
                       ),
-                      child: Text(
-                        "3 Orders",
-                        style: TextStyle(
-                          color: accent,
-                          fontSize: 13.sp,
-                          fontWeight: FontWeight.w600,
+                      child: ValueListenableBuilder<LanguageInfo>(
+                        valueListenable: languageNotifier,
+                        builder: (_, __, ___) => Text(
+                          S.get('my_progress'),
+                          style: TextStyle(
+                            color: accent,
+                            fontSize: 13.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),
@@ -250,8 +260,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       textColor: textColor,
                       subText: subText,
                       isDivider: true,
-                      onTap: () =>
-                          Navigator.pushNamed(context, Routes.selectLanguage),
+                      onTap: () => Navigator.pushNamed(
+                        context,
+                        Routes.selectLanguage,
+                        arguments: {'fromSettings': true},
+                      ),
                     ),
 
                     profileTile(
