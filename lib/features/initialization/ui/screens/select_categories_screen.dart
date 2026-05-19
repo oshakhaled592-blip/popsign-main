@@ -56,7 +56,6 @@ class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
             children: [
               verticalSpace(16),
 
-              /// TITLE
               Center(
                 child: SizedBox(
                   width: 290.w,
@@ -75,7 +74,6 @@ class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
 
               verticalSpace(20),
 
-              /// CATEGORY LIST
               Expanded(
                 child: Scrollbar(
                   controller: _scrollController,

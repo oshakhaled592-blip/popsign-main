@@ -45,6 +45,7 @@ class _SignupScreenState extends State<SignupScreen> {
     if (_formKey.currentState!.validate()) {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('userName', _nameController.text.trim());
+      await prefs.setString('userEmail', _emailController.text.trim());
       if (mounted) Navigator.pushReplacementNamed(context, Routes.login);
     }
   }
@@ -62,7 +63,6 @@ class _SignupScreenState extends State<SignupScreen> {
               children: [
                 SizedBox(height: 16.h),
 
-                // ── Back button ─────────────────────────────
                 GestureDetector(
                   onTap: () => Navigator.pop(context),
                   child: Container(
@@ -98,7 +98,6 @@ class _SignupScreenState extends State<SignupScreen> {
 
                 SizedBox(height: 28.h),
 
-                // ── Full Name ────────────────────────────────
                 _label(S.get('full_name'), context),
                 SizedBox(height: 8.h),
                 TextFormWidget(
@@ -115,7 +114,6 @@ class _SignupScreenState extends State<SignupScreen> {
 
                 SizedBox(height: 18.h),
 
-                // ── Email ────────────────────────────────────
                 _label(S.get('email'), context),
                 SizedBox(height: 8.h),
                 TextFormWidget(
@@ -134,7 +132,6 @@ class _SignupScreenState extends State<SignupScreen> {
 
                 SizedBox(height: 18.h),
 
-                // ── Password ─────────────────────────────────
                 _label(S.get('password'), context),
                 SizedBox(height: 8.h),
                 TextFormWidget(

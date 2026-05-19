@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/routing/routes.dart';
@@ -38,8 +39,12 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _login() {
+  void _login() async {
     if (_formKey.currentState!.validate()) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isLoggedIn', true);
+      await prefs.setString('userEmail', _emailController.text.trim());
+      if (!mounted) return;
       Navigator.pushReplacementNamed(context, Routes.startPage);
     }
   }
@@ -58,12 +63,10 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 SizedBox(height: 60.h),
 
-                /// LOGO
                 const Center(child: LogoAndName(compact: true)),
 
                 SizedBox(height: 55.h),
 
-                /// TITLE
                 Text(
                   S.get('welcome'),
                   style: AppTextStyles.title(context).copyWith(
@@ -81,7 +84,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 SizedBox(height: 35.h),
 
-                /// EMAIL
                 TextFormWidget(
                   controller: _emailController,
                   hintText: S.get('email'),
@@ -98,7 +100,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 SizedBox(height: 18.h),
 
-                /// PASSWORD
                 TextFormWidget(
                   controller: _passwordController,
                   hintText: S.get('password'),
@@ -113,7 +114,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 SizedBox(height: 12.h),
 
-                /// FORGOT PASSWORD
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
@@ -132,7 +132,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 SizedBox(height: 28.h),
 
-                /// LOGIN BUTTON
                 LinearButton(text: S.get('login'), onPressed: _login),
 
                 SizedBox(height: 28.h),

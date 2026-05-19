@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:popsign/core/routing/routes.dart';
 
@@ -16,7 +17,6 @@ class _LostPageState extends State<LostPage>
     with SingleTickerProviderStateMixin {
   _State _state = _State.idle;
   String _translation = '';
-  // ignore: unused_field
   File? _videoFile;
 
   late AnimationController _pulseController;
@@ -51,7 +51,6 @@ class _LostPageState extends State<LostPage>
       _translation = '';
     });
 
-    // TODO: send _videoFile to your sign-language model API and get translation
     await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
     setState(() {
@@ -81,20 +80,19 @@ class _LostPageState extends State<LostPage>
       backgroundColor: bg,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(20.w),
           child: Column(
             children: [
-              // ── HEADER ──────────────────────────────────────────
               Row(
                 children: [
                   GestureDetector(
                     onTap: () => Navigator.pop(context),
                     child: Container(
-                      width: 44,
-                      height: 44,
+                      width: 44.w,
+                      height: 44.h,
                       decoration: BoxDecoration(
                         color: btnBg,
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(14.r),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.06),
@@ -104,7 +102,7 @@ class _LostPageState extends State<LostPage>
                         ],
                       ),
                       child: Icon(Icons.arrow_back_ios_new_rounded,
-                          color: textColor, size: 18),
+                          color: textColor, size: 18.sp),
                     ),
                   ),
 
@@ -114,7 +112,7 @@ class _LostPageState extends State<LostPage>
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: textColor,
-                        fontSize: 18,
+                        fontSize: 18.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -123,11 +121,11 @@ class _LostPageState extends State<LostPage>
                   GestureDetector(
                     onTap: () => Navigator.pushNamed(context, Routes.profile),
                     child: Container(
-                      width: 44,
-                      height: 44,
+                      width: 44.w,
+                      height: 44.h,
                       decoration: BoxDecoration(
                         color: btnBg,
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(14.r),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.06),
@@ -137,7 +135,7 @@ class _LostPageState extends State<LostPage>
                         ],
                       ),
                       child: Icon(Icons.menu_rounded,
-                          color: textColor, size: 20),
+                          color: textColor, size: 20.sp),
                     ),
                   ),
                 ],
@@ -145,7 +143,6 @@ class _LostPageState extends State<LostPage>
 
               const Spacer(),
 
-              // ── MAIN CONTENT ─────────────────────────────────────
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 400),
                 child: switch (_state) {
@@ -157,7 +154,6 @@ class _LostPageState extends State<LostPage>
 
               const Spacer(),
 
-              // ── BOTTOM BUTTON ─────────────────────────────────────
               if (_state == _State.idle || _state == _State.result)
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 300),
@@ -176,18 +172,18 @@ class _LostPageState extends State<LostPage>
                         ),
                 ),
 
-              const SizedBox(height: 12),
+              SizedBox(height: 12.h),
 
               Container(
-                width: 120,
-                height: 4,
+                width: 120.w,
+                height: 4.h,
                 decoration: BoxDecoration(
                   color: isDark ? Colors.white24 : Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(30),
+                  borderRadius: BorderRadius.circular(30.r),
                 ),
               ),
 
-              const SizedBox(height: 8),
+              SizedBox(height: 8.h),
             ],
           ),
         ),
@@ -203,33 +199,33 @@ class _LostPageState extends State<LostPage>
         ScaleTransition(
           scale: _pulseAnim,
           child: Container(
-            width: 120,
-            height: 120,
+            width: 120.w,
+            height: 120.w,
             decoration: BoxDecoration(
               color: const Color(0xFF6C63FF).withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child: Icon(
               Icons.video_camera_back_rounded,
-              size: 52,
-              color: Color(0xFF6C63FF),
+              size: 52.sp,
+              color: const Color(0xFF6C63FF),
             ),
           ),
         ),
-        const SizedBox(height: 24),
+        SizedBox(height: 24.h),
         Text(
           'Upload your video',
           style: TextStyle(
             color: textColor,
-            fontSize: 22,
+            fontSize: 22.sp,
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10.h),
         Text(
           'Record or choose a sign-language\nvideo to get the translation',
           textAlign: TextAlign.center,
-          style: TextStyle(color: subColor, fontSize: 14, height: 1.6),
+          style: TextStyle(color: subColor, fontSize: 14.sp, height: 1.6),
         ),
       ],
     );
@@ -240,28 +236,28 @@ class _LostPageState extends State<LostPage>
       key: const ValueKey('loading'),
       mainAxisSize: MainAxisSize.min,
       children: [
-        const SizedBox(
-          width: 64,
-          height: 64,
+        SizedBox(
+          width: 64.w,
+          height: 64.w,
           child: CircularProgressIndicator(
             strokeWidth: 3,
-            color: Color(0xFF6C63FF),
+            color: const Color(0xFF6C63FF),
           ),
         ),
-        const SizedBox(height: 28),
+        SizedBox(height: 28.h),
         Text(
           'Analyzing video…',
           style: TextStyle(
             color: textColor,
-            fontSize: 20,
+            fontSize: 20.sp,
             fontWeight: FontWeight.w600,
           ),
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10.h),
         Text(
           'The model is processing\nyour sign language',
           textAlign: TextAlign.center,
-          style: TextStyle(color: subColor, fontSize: 14, height: 1.6),
+          style: TextStyle(color: subColor, fontSize: 14.sp, height: 1.6),
         ),
       ],
     );
@@ -274,10 +270,10 @@ class _LostPageState extends State<LostPage>
       children: [
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
+          padding: EdgeInsets.symmetric(vertical: 40.h, horizontal: 24.w),
           decoration: BoxDecoration(
             color: cardBg,
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(24.r),
             boxShadow: [
               BoxShadow(
                 color: const Color(0xFF6C63FF).withValues(alpha: 0.15),
@@ -293,28 +289,27 @@ class _LostPageState extends State<LostPage>
           child: Column(
             children: [
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
                 decoration: BoxDecoration(
                   color: const Color(0xFF6C63FF).withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(20.r),
                 ),
-                child: const Text(
+                child: Text(
                   'Translation',
                   style: TextStyle(
-                    color: Color(0xFF6C63FF),
-                    fontSize: 12,
+                    color: const Color(0xFF6C63FF),
+                    fontSize: 12.sp,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
               Text(
                 _translation,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: textColor,
-                  fontSize: 36,
+                  fontSize: 36.sp,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -336,9 +331,9 @@ class _LostPageState extends State<LostPage>
       onTap: onTap,
       child: Container(
         width: double.infinity,
-        height: 56,
+        height: 56.h,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(16.r),
           gradient: const LinearGradient(
             colors: [Color(0xFF6C63FF), Color(0xFF9C8FFF)],
           ),
@@ -353,13 +348,13 @@ class _LostPageState extends State<LostPage>
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: Colors.white, size: 22),
-            const SizedBox(width: 10),
+            Icon(icon, color: Colors.white, size: 22.sp),
+            SizedBox(width: 10.w),
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.white,
-                fontSize: 16,
+                fontSize: 16.sp,
                 fontWeight: FontWeight.w600,
               ),
             ),

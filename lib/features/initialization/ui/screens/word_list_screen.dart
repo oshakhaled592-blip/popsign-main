@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:popsign/core/data/word_data.dart';
 import 'package:popsign/core/l10n/app_strings.dart';
 import 'package:popsign/core/routing/routes.dart';
@@ -6,7 +7,6 @@ import 'package:popsign/core/theme/language_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'learn_new_words_screen.dart';
 
-/// ================= MODEL =================
 class WordModel {
   String word;
   int progress;
@@ -18,11 +18,11 @@ class WordModel {
 }
 
 final _images = [
-  'assets/images/mother.png','assets/images/day.png',
-  'assets/images/you.png',   'assets/images/get.png',
-  'assets/images/put.png',   'assets/images/race.png',
-  'assets/images/start.png', 'assets/images/finish.png',
-  'assets/images/design.png','assets/images/mother.png',
+  'assets/images/mother.png', 'assets/images/day.png',
+  'assets/images/you.png',    'assets/images/get.png',
+  'assets/images/put.png',    'assets/images/race.png',
+  'assets/images/start.png',  'assets/images/finish.png',
+  'assets/images/design.png', 'assets/images/mother.png',
 ];
 
 List<WordModel> _wordsForLang(String code, String level) {
@@ -33,7 +33,6 @@ List<WordModel> _wordsForLang(String code, String level) {
   );
 }
 
-/// ================= SCREEN =================
 class WordListScreen extends StatefulWidget {
   final String level;
 
@@ -149,17 +148,17 @@ class _WordListScreenState extends State<WordListScreen> {
         centerTitle: true,
 
         leading: Padding(
-          padding: const EdgeInsets.only(left: 12),
+          padding: EdgeInsets.only(left: 12.w),
           child: GestureDetector(
             onTap: () => Navigator.pushNamed(context, Routes.profile),
             child: Container(
-              width: 44,
-              height: 44,
+              width: 44.w,
+              height: 44.h,
               decoration: BoxDecoration(
                 color: textColor.withValues(alpha: 0.08),
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.menu, color: textColor),
+              child: Icon(Icons.menu, color: textColor, size: 22.sp),
             ),
           ),
         ),
@@ -171,24 +170,24 @@ class _WordListScreenState extends State<WordListScreen> {
             style: TextStyle(
               color: textColor,
               fontWeight: FontWeight.bold,
-              fontSize: 18,
+              fontSize: 18.sp,
             ),
           ),
         ),
 
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 14),
+            padding: EdgeInsets.only(right: 14.w),
             child: GestureDetector(
               onTap: () => Navigator.pop(context),
               child: Container(
-                width: 44,
-                height: 44,
+                width: 44.w,
+                height: 44.h,
                 decoration: BoxDecoration(
                   color: textColor.withValues(alpha: 0.08),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.close, color: textColor),
+                child: Icon(Icons.close, color: textColor, size: 22.sp),
               ),
             ),
           ),
@@ -197,16 +196,16 @@ class _WordListScreenState extends State<WordListScreen> {
 
       body: Column(
         children: [
-          const SizedBox(height: 14),
+          SizedBox(height: 14.h),
 
           GestureDetector(
             onTap: showResetDialog,
             child: Container(
-              height: 58,
-              margin: const EdgeInsets.symmetric(horizontal: 16),
+              height: 58.h,
+              margin: EdgeInsets.symmetric(horizontal: 16.w),
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(18.r),
                 border: Border.all(color: textColor.withValues(alpha: 0.08)),
               ),
               child: Center(
@@ -214,12 +213,12 @@ class _WordListScreenState extends State<WordListScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Icon(Icons.refresh, color: Colors.red),
-                    const SizedBox(width: 10),
+                    SizedBox(width: 10.w),
                     Text(
                       S.get('reset_all'),
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.red,
-                        fontSize: 20,
+                        fontSize: 20.sp,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -229,14 +228,14 @@ class _WordListScreenState extends State<WordListScreen> {
             ),
           ),
 
-          const SizedBox(height: 18),
+          SizedBox(height: 18.h),
 
           Text(
             "$remaining ${S.get('words_left')}  •  $percent% ${S.get('complete')}",
-            style: TextStyle(color: subTextColor, fontSize: 16),
+            style: TextStyle(color: subTextColor, fontSize: 16.sp),
           ),
 
-          const SizedBox(height: 18),
+          SizedBox(height: 18.h),
 
           Expanded(
             child: Scrollbar(
@@ -266,7 +265,6 @@ class _WordListScreenState extends State<WordListScreen> {
   }
 }
 
-/// ================= WORD CARD =================
 class WordCard extends StatelessWidget {
   final String word;
   final String image;
@@ -291,12 +289,12 @@ class WordCard extends StatelessWidget {
     final inactiveColor = isDark ? const Color(0xFF232938) : Colors.grey.shade200;
 
     return Container(
-      height: 72,
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      height: 72.h,
+      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 7.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20.r),
         border: Border.all(color: textColor.withValues(alpha: 0.08)),
       ),
       child: Row(
@@ -306,7 +304,7 @@ class WordCard extends StatelessWidget {
               word,
               style: TextStyle(
                 color: isDone ? textColor.withValues(alpha: 0.38) : textColor,
-                fontSize: 18,
+                fontSize: 18.sp,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -315,9 +313,9 @@ class WordCard extends StatelessWidget {
           Row(
             children: List.generate(3, (i) {
               return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 3),
-                width: 7,
-                height: 7,
+                margin: EdgeInsets.symmetric(horizontal: 3.w),
+                width: 7.w,
+                height: 7.w,
                 decoration: BoxDecoration(
                   color: i < progress ? Colors.green : dimColor,
                   shape: BoxShape.circle,
@@ -326,31 +324,32 @@ class WordCard extends StatelessWidget {
             }),
           ),
 
-          const SizedBox(width: 14),
+          SizedBox(width: 14.w),
 
           Container(
-            width: 40,
-            height: 40,
+            width: 40.w,
+            height: 40.w,
             decoration: BoxDecoration(
               color: isDone ? Colors.green : inactiveColor,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(12.r),
             ),
             child: Icon(
               Icons.check,
               color: isDone ? Colors.white : textColor.withValues(alpha: 0.38),
+              size: 20.sp,
             ),
           ),
 
-          const SizedBox(width: 12),
+          SizedBox(width: 12.w),
 
           GestureDetector(
             onTap: isDone ? null : onTap,
             child: Container(
-              width: 74,
-              height: 40,
+              width: 74.w,
+              height: 40.h,
               decoration: BoxDecoration(
                 color: isDone ? inactiveColor : textColor,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(12.r),
               ),
               child: Center(
                 child: Text(
@@ -359,7 +358,7 @@ class WordCard extends StatelessWidget {
                     color: isDone
                         ? textColor.withValues(alpha: 0.38)
                         : Theme.of(context).scaffoldBackgroundColor,
-                    fontSize: 16,
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.w500,
                   ),
                 ),

@@ -1,13 +1,11 @@
 class Routes {
   static const String splash = '/splash';
 
-  // auth
   static const String login = '/login';
   static const String signup = '/signup';
 
   static const String home = '/home';
 
-  // start and initialization 
   static const String startPage = '/get-started';
   static const String selectLanguage = '/select-language';
   static const String selectCategories = '/select-categories';
@@ -18,4 +16,5 @@ class Routes {
   static const String reset = '/reset';
   static const String forgotPassword = '/forgot-password';
   static const String lostPage = '/lost-page';
+  static const String accountInfo = '/account-info';
 }

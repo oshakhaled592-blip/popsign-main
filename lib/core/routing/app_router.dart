@@ -13,90 +13,82 @@ import 'package:popsign/features/initialization/ui/screens/learn_new_words_scree
 import 'package:popsign/features/initialization/ui/screens/reset_screen.dart';
 import '../../features/initialization/ui/screens/lost_page_screen.dart';
 import '../../features/initialization/ui/screens/profile._screen.dart';
+import '../../features/initialization/ui/screens/account_info_screen.dart';
 
 class AppRouter {
   Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
 
-      /// 🟡 SPLASH
       case Routes.splash:
         return MaterialPageRoute(
           builder: (_) => const SplashScreen(),
         );
 
-      /// 🔐 LOGIN
       case Routes.login:
         return MaterialPageRoute(
           builder: (_) => const LoginScreen(),
         );
 
-      /// 📝 SIGNUP
       case Routes.signup:
         return MaterialPageRoute(
           builder: (_) => const SignupScreen(),
         );
 
-      /// 🔑 FORGOT PASSWORD
       case Routes.forgotPassword:
         return MaterialPageRoute(
           builder: (_) => const ForgotPasswordScreen(),
         );
 
-      /// 🚀 GET STARTED
       case Routes.startPage:
         return MaterialPageRoute(
           builder: (_) => const GetStartedScreen(),
         );
 
-      /// 🌍 CHOOSE LANGUAGE
       case Routes.selectLanguage:
         return MaterialPageRoute(
           builder: (_) => const ChooseLanguageScreen(),
         );
 
-      /// 🧠 SELECT CATEGORIES
       case Routes.selectCategories:
         return MaterialPageRoute(
           builder: (_) => const SelectCategoriesScreen(),
         );
 
-      /// ⏳ PRE START
       case Routes.preStart:
         return MaterialPageRoute(
           builder: (_) => const PreStartScreen(),
         );
 
-      /// 📚 WORD LIST
       case Routes.wordList:
         return MaterialPageRoute(
           builder: (_) => const WordListScreen(),
         );
 
-      /// 🔥 LEARN NEW WORDS
       case Routes.learnNewWords:
         return MaterialPageRoute(
           builder: (_) => const LearnNewWordsScreen(),
         );
 
-      /// 👤 PROFILE
       case Routes.profile:
         return MaterialPageRoute(
           builder: (_) => const ProfileScreen(),
         );
 
-      /// 💔 LOST PAGE
       case Routes.lostPage:
         return MaterialPageRoute(
           builder: (_) => const LostPage(),
         );
 
-      /// 🔴 RESET
+      case Routes.accountInfo:
+        return MaterialPageRoute(
+          builder: (_) => const AccountInfoScreen(),
+        );
+
       case Routes.reset:
         return MaterialPageRoute(
           builder: (_) => const ResetScreen(),
         );
 
-      /// ❌ DEFAULT
       default:
         return MaterialPageRoute(
           builder: (_) => const Scaffold(

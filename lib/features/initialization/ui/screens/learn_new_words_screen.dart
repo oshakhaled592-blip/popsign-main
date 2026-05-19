@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:popsign/core/l10n/app_strings.dart';
 import 'package:popsign/core/theme/language_notifier.dart';
 
@@ -24,7 +25,7 @@ class LearnNewWordsScreen extends StatefulWidget {
 class _LearnNewWordsScreenState extends State<LearnNewWordsScreen>
     with SingleTickerProviderStateMixin {
   bool showTranslation = false;
-  String mode = "none"; // "none" | "know" | "learn"
+  String mode = "none";
 
   late AnimationController _tiltController;
   late Animation<double> _tiltAnim;
@@ -89,9 +90,8 @@ class _LearnNewWordsScreenState extends State<LearnNewWordsScreen>
     _tilt(1);
   }
 
-  List<Color> get _cardColors {
-    return [const Color(0xFF18202E), const Color(0xFF10141F)];
-  }
+  List<Color> get _cardColors =>
+      [const Color(0xFF18202E), const Color(0xFF10141F)];
 
   Color get _revealBg => const Color(0xFF141A26);
 
@@ -106,25 +106,24 @@ class _LearnNewWordsScreenState extends State<LearnNewWordsScreen>
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(18),
+          padding: EdgeInsets.all(18.w),
           child: Column(
             children: [
-              // ── HEADER ────────────────────────────────────────
               Row(
                 children: [
                   GestureDetector(
                     onTap: () => Navigator.pop(context),
                     child: Container(
-                      width: 44,
-                      height: 44,
+                      width: 44.w,
+                      height: 44.h,
                       decoration: BoxDecoration(
                         color: textColor.withValues(alpha: 0.08),
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(14.r),
                       ),
                       child: Icon(
                         Icons.arrow_back_ios_new_rounded,
                         color: textColor,
-                        size: 18,
+                        size: 18.sp,
                       ),
                     ),
                   ),
@@ -136,19 +135,18 @@ class _LearnNewWordsScreenState extends State<LearnNewWordsScreen>
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: textColor,
-                          fontSize: 18,
+                          fontSize: 18.sp,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 44),
+                  SizedBox(width: 44.w),
                 ],
               ),
 
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
 
-              // ── CARD ──────────────────────────────────────────
               Expanded(
                 child: AnimatedBuilder(
                   animation: _tiltAnim,
@@ -158,9 +156,9 @@ class _LearnNewWordsScreenState extends State<LearnNewWordsScreen>
                   ),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 350),
-                    padding: const EdgeInsets.all(20),
+                    padding: EdgeInsets.all(20.w),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(30),
+                      borderRadius: BorderRadius.circular(30.r),
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
@@ -197,44 +195,44 @@ class _LearnNewWordsScreenState extends State<LearnNewWordsScreen>
                     child: Column(
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 4),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 12.w, vertical: 4.h),
                           decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(20.r),
                           ),
                           child: Text(
                             "${widget.level} Level",
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.white60,
-                              fontSize: 12,
+                              fontSize: 12.sp,
                             ),
                           ),
                         ),
 
-                        const SizedBox(height: 14),
+                        SizedBox(height: 14.h),
 
                         Text(
                           word.word,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.white,
-                            fontSize: 32,
+                            fontSize: 32.sp,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
 
                         if (word.pronunciation.isNotEmpty) ...[
-                          const SizedBox(height: 6),
+                          SizedBox(height: 6.h),
                           Text(
                             "[${word.pronunciation}]",
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.white38,
-                              fontSize: 15,
+                              fontSize: 15.sp,
                             ),
                           ),
                         ],
 
-                        const SizedBox(height: 20),
+                        SizedBox(height: 20.h),
 
                         Expanded(
                           child: GestureDetector(
@@ -243,7 +241,7 @@ class _LearnNewWordsScreenState extends State<LearnNewWordsScreen>
                               duration: const Duration(milliseconds: 350),
                               decoration: BoxDecoration(
                                 color: _revealBg,
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(20.r),
                               ),
                               child: Center(
                                 child: AnimatedSwitcher(
@@ -252,17 +250,17 @@ class _LearnNewWordsScreenState extends State<LearnNewWordsScreen>
                                       ? Text(
                                           revealText,
                                           key: const ValueKey("text"),
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             color: Colors.white,
-                                            fontSize: 28,
+                                            fontSize: 28.sp,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         )
-                                      : const Icon(
+                                      : Icon(
                                           Icons.visibility_outlined,
-                                          key: ValueKey("icon"),
+                                          key: const ValueKey("icon"),
                                           color: Colors.white38,
-                                          size: 40,
+                                          size: 40.sp,
                                         ),
                                 ),
                               ),
@@ -270,7 +268,7 @@ class _LearnNewWordsScreenState extends State<LearnNewWordsScreen>
                           ),
                         ),
 
-                        const SizedBox(height: 20),
+                        SizedBox(height: 20.h),
 
                         ValueListenableBuilder<LanguageInfo>(
                           valueListenable: languageNotifier,
@@ -284,7 +282,7 @@ class _LearnNewWordsScreenState extends State<LearnNewWordsScreen>
                                   color: const Color(0xFF22C55E),
                                 ),
                               ),
-                              const SizedBox(width: 12),
+                              SizedBox(width: 12.w),
                               Expanded(
                                 child: _buildButton(
                                   label: S.get('learn'),
@@ -318,9 +316,9 @@ class _LearnNewWordsScreenState extends State<LearnNewWordsScreen>
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
-        height: 55,
+        height: 55.h,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(16.r),
           color: active ? color : Colors.transparent,
           border: Border.all(
             color: active ? color : Colors.white24,
@@ -329,10 +327,10 @@ class _LearnNewWordsScreenState extends State<LearnNewWordsScreen>
         child: Center(
           child: Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.w600,
-              fontSize: 15,
+              fontSize: 15.sp,
             ),
           ),
         ),

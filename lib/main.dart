@@ -10,11 +10,9 @@ void main() async {
 
   final prefs = await SharedPreferences.getInstance();
 
-  // theme
   final isDark = prefs.getBool('isDark') ?? true;
   themeNotifier.value = isDark ? ThemeMode.dark : ThemeMode.light;
 
-  // language
   final langCode = prefs.getString('langCode') ?? 'en';
   final langName = prefs.getString('langName') ?? 'English';
   final langFlag = prefs.getString('langFlag') ?? '🇺🇸';

@@ -83,7 +83,6 @@ class _PreStartScreenState extends State<PreStartScreen>
             position: _slide,
             child: Column(
               children: [
-                // ── HEADER ────────────────────────────────────────
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                   child: Row(
@@ -109,7 +108,6 @@ class _PreStartScreenState extends State<PreStartScreen>
                   ),
                 ),
 
-                // ── LEVEL INFO CARD ───────────────────────────────
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Container(
@@ -175,7 +173,6 @@ class _PreStartScreenState extends State<PreStartScreen>
 
                 const SizedBox(height: 16),
 
-                // ── WORD LIST ─────────────────────────────────────
                 Expanded(
                   child: ListView.separated(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -216,7 +213,6 @@ class _PreStartScreenState extends State<PreStartScreen>
                   ),
                 ),
 
-                // ── BOTTOM ────────────────────────────────────────
                 Container(
                   padding: const EdgeInsets.fromLTRB(24, 16, 24, 12),
                   child: Column(

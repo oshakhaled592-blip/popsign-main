@@ -63,7 +63,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               children: [
                 SizedBox(height: 24.h),
 
-                // ── BACK ─────────────────────────────────────
                 Container(
                   width: 42.w,
                   height: 42.h,
@@ -83,7 +82,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                 SizedBox(height: 32.h),
 
-                // ── ICON ─────────────────────────────────────
                 Center(
                   child: Container(
                     width: 80.w,
@@ -102,7 +100,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                 SizedBox(height: 24.h),
 
-                // ── TITLE ─────────────────────────────────────
                 Center(
                   child: Text(
                     "Reset Password",
@@ -127,7 +124,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 SizedBox(height: 40.h),
 
                 if (!_done) ...[
-                  // ── NEW PASSWORD ───────────────────────────
                   TextFormWidget(
                     controller: _newPasswordController,
                     hintText: S.get('new_password'),
@@ -142,7 +138,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                   SizedBox(height: 18.h),
 
-                  // ── CONFIRM PASSWORD ───────────────────────
                   TextFormWidget(
                     controller: _confirmController,
                     hintText: S.get('confirm_password'),
@@ -159,13 +154,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                   SizedBox(height: 36.h),
 
-                  // ── SUBMIT ─────────────────────────────────
                   LinearButton(
                     text: S.get('reset_password'),
                     onPressed: _submit,
                   ),
                 ] else ...[
-                  // ── SUCCESS STATE ──────────────────────────
                   Center(
                     child: Column(
                       children: [

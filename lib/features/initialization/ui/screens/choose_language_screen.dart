@@ -108,7 +108,6 @@ class _ChooseLanguageScreenState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── BACK BUTTON ──────────────────────────────
               Container(
                 width: 42.w,
                 height: 42.h,
@@ -128,7 +127,6 @@ class _ChooseLanguageScreenState
 
               verticalSpace(12),
 
-              // ── TITLE ────────────────────────────────────
               Center(
                 child: SizedBox(
                   width: 300.w,
@@ -147,7 +145,6 @@ class _ChooseLanguageScreenState
 
               verticalSpace(20),
 
-              // ── LIST + ARROW ──────────────────────────────
               Expanded(
                 child: Stack(
                   children: [
@@ -234,7 +231,6 @@ class _ChooseLanguageScreenState
                       },
                     ),
 
-                    // ── SCROLL DOWN ARROW ──────────────────
                     AnimatedOpacity(
                       opacity: _showArrow ? 1.0 : 0.0,
                       duration: const Duration(milliseconds: 300),
@@ -272,7 +268,6 @@ class _ChooseLanguageScreenState
 
               verticalSpace(20),
 
-              // ── CONTINUE BUTTON ───────────────────────────
               LinearButton(
                 text: S.get('continue'),
                 width: double.infinity,

@@ -84,7 +84,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               SizedBox(height: 16.h),
 
-              // ── BACK BUTTON ──────────────────────────────
               GestureDetector(
                 onTap: () => Navigator.pop(context),
                 child: Container(
@@ -105,7 +104,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               SizedBox(height: 28.h),
 
-              // ── PROFILE CARD ─────────────────────────────
               Container(
                 padding: EdgeInsets.all(18.w),
                 decoration: BoxDecoration(
@@ -190,7 +188,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               SizedBox(height: 28.h),
 
-              // ── SECTION LABEL ─────────────────────────────
               Text(
                 S.get('settings'),
                 style: TextStyle(
@@ -203,7 +200,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               SizedBox(height: 12.h),
 
-              // ── SETTINGS CARD ─────────────────────────────
               Container(
                 decoration: BoxDecoration(
                   color: cardColor,
@@ -242,7 +238,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       textColor: textColor,
                       subText: subText,
                       isDivider: true,
-                      onTap: () => _showComingSoon(S.get('account')),
+                      onTap: () => Navigator.pushNamed(context, Routes.accountInfo),
                     ),
 
                     profileTile(
@@ -278,14 +274,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               SizedBox(height: 28.h),
 
-              // ── LOGOUT ───────────────────────────────────
               GestureDetector(
-                onTap: () {
-                  Navigator.pushNamedAndRemoveUntil(
-                    context,
-                    Routes.login,
-                    (route) => false,
-                  );
+                onTap: () async {
+                  final nav = Navigator.of(context);
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.setBool('isLoggedIn', false);
+                  nav.pushNamedAndRemoveUntil(Routes.login, (route) => false);
                 },
                 child: Container(
                   width: double.infinity,

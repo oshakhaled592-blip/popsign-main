@@ -10,7 +10,8 @@
       "Bash(flutter analyze *)",
       "Bash(Get-ChildItem -Path lib -Recurse -File)",
       "Bash(Select-Object -ExpandProperty FullName)",
-      "Bash(Sort-Object)"
+      "Bash(Sort-Object)",
+      "Bash(python -c ' *)"
     ]
   }
 }

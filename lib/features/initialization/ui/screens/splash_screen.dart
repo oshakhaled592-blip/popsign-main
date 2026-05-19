@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:popsign/core/routing/routes.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -26,9 +28,15 @@ class _SplashScreenState extends State<SplashScreen>
     _fade = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
     _controller.forward();
 
-    Future.delayed(const Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 2), () async {
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, Routes.login);
+      final prefs = await SharedPreferences.getInstance();
+      final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(
+        context,
+        isLoggedIn ? Routes.selectCategories : Routes.login,
+      );
     });
   }
 
@@ -50,37 +58,37 @@ class _SplashScreenState extends State<SplashScreen>
             children: [
               Image.asset(
                 'assets/images/Logo.png',
-                width: 100,
-                height: 100,
-                errorBuilder: (_, __, ___) => const Icon(
+                width: 100.w,
+                height: 100.w,
+                errorBuilder: (_, __, ___) => Icon(
                   Icons.hearing,
                   color: Colors.white,
-                  size: 80,
+                  size: 80.sp,
                 ),
               ),
-              const SizedBox(height: 20),
-              const Text(
+              SizedBox(height: 20.h),
+              Text(
                 "I Hear You",
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 28,
+                  fontSize: 28.sp,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.5,
                 ),
               ),
-              const SizedBox(height: 8),
-              const Text(
+              SizedBox(height: 8.h),
+              Text(
                 "Learn a Language with Cards",
                 style: TextStyle(
                   color: Colors.white38,
-                  fontSize: 14,
+                  fontSize: 14.sp,
                 ),
               ),
-              const SizedBox(height: 60),
-              const SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
+              SizedBox(height: 60.h),
+              SizedBox(
+                width: 24.w,
+                height: 24.w,
+                child: const CircularProgressIndicator(
                   strokeWidth: 2,
                   color: Color(0xFFE9A6A6),
                 ),

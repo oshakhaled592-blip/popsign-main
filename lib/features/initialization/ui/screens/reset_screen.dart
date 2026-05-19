@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:popsign/core/l10n/app_strings.dart';
 
@@ -42,7 +43,6 @@ class _ResetScreenState extends State<ResetScreen>
     final subColor  = isDark ? Colors.white54 : Colors.grey.shade600;
     final divColor  = isDark ? Colors.white12 : Colors.grey.shade200;
 
-    // read strings at show-time so they match current language
     final title    = S.get('reset_title');
     final body     = S.get('reset_body');
     final cancel   = S.get('cancel');
@@ -62,7 +62,7 @@ class _ResetScreenState extends State<ResetScreen>
             child: Container(
               decoration: BoxDecoration(
                 color: cardColor,
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(24.r),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.18),
@@ -74,73 +74,71 @@ class _ResetScreenState extends State<ResetScreen>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const SizedBox(height: 28),
+                  SizedBox(height: 28.h),
 
-                  // Icon
                   Container(
-                    width: 64,
-                    height: 64,
+                    width: 64.w,
+                    height: 64.w,
                     decoration: BoxDecoration(
                       color: Colors.red.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.refresh_rounded,
                       color: Colors.red,
-                      size: 32,
+                      size: 32.sp,
                     ),
                   ),
 
-                  const SizedBox(height: 18),
+                  SizedBox(height: 18.h),
 
                   Text(
                     title,
                     style: GoogleFonts.poppins(
                       color: textColor,
-                      fontSize: 18,
+                      fontSize: 18.sp,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
 
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10.h),
 
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 28),
+                    padding: EdgeInsets.symmetric(horizontal: 28.w),
                     child: Text(
                       body,
                       textAlign: TextAlign.center,
                       style: GoogleFonts.poppins(
                         color: subColor,
-                        fontSize: 13,
+                        fontSize: 13.sp,
                         height: 1.6,
                       ),
                     ),
                   ),
 
-                  const SizedBox(height: 28),
+                  SizedBox(height: 28.h),
 
                   Divider(height: 1, color: divColor),
 
                   Row(
                     children: [
-                      // Cancel
                       Expanded(
                         child: InkWell(
                           onTap: () {
                             Navigator.pop(context);
                             Navigator.pop(context, false);
                           },
-                          borderRadius: const BorderRadius.only(
-                            bottomLeft: Radius.circular(24),
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(24.r),
                           ),
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            padding: EdgeInsets.symmetric(vertical: 16.h),
                             child: Center(
                               child: Text(
                                 cancel,
                                 style: GoogleFonts.poppins(
                                   color: subColor,
-                                  fontSize: 15,
+                                  fontSize: 15.sp,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -149,26 +147,25 @@ class _ResetScreenState extends State<ResetScreen>
                         ),
                       ),
 
-                      Container(width: 1, height: 52, color: divColor),
+                      Container(width: 1, height: 52.h, color: divColor),
 
-                      // Reset
                       Expanded(
                         child: InkWell(
                           onTap: () {
                             Navigator.pop(context);
                             Navigator.pop(context, true);
                           },
-                          borderRadius: const BorderRadius.only(
-                            bottomRight: Radius.circular(24),
+                          borderRadius: BorderRadius.only(
+                            bottomRight: Radius.circular(24.r),
                           ),
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            padding: EdgeInsets.symmetric(vertical: 16.h),
                             child: Center(
                               child: Text(
                                 resetLbl,
                                 style: GoogleFonts.poppins(
                                   color: Colors.red,
-                                  fontSize: 15,
+                                  fontSize: 15.sp,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),

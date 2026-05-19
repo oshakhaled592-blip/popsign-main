@@ -1,0 +1,272 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/theme/language_notifier.dart';
+
+class AccountInfoScreen extends StatefulWidget {
+  const AccountInfoScreen({super.key});
+
+  @override
+  State<AccountInfoScreen> createState() => _AccountInfoScreenState();
+}
+
+class _AccountInfoScreenState extends State<AccountInfoScreen> {
+  String _name = '';
+  String _email = '';
+
+  @override
+  void initState() {
+    super.initState();
+    languageNotifier.addListener(_rebuild);
+    _load();
+  }
+
+  Future<void> _load() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (mounted) {
+      setState(() {
+        _name  = prefs.getString('userName')  ?? '';
+        _email = prefs.getString('userEmail') ?? '';
+      });
+    }
+  }
+
+  void _rebuild() => setState(() {});
+
+  @override
+  void dispose() {
+    languageNotifier.removeListener(_rebuild);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark     = Theme.of(context).brightness == Brightness.dark;
+    final bgColor    = isDark ? const Color(0xFF0B1020) : const Color(0xFFF5F7FB);
+    final cardColor  = isDark ? const Color(0xFF171C2B) : Colors.white;
+    final textColor  = isDark ? Colors.white : const Color(0xFF1A1A2E);
+    final subText    = isDark ? Colors.white54 : const Color(0xFF9CA3AF);
+    const accent     = Color(0xFF22C55E);
+
+    final cardShadow = isDark
+        ? <BoxShadow>[]
+        : [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.07),
+              blurRadius: 16,
+              offset: const Offset(0, 4),
+            ),
+          ];
+
+    return Scaffold(
+      backgroundColor: bgColor,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 22.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 16.h),
+
+              GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  width: 46.w,
+                  height: 46.h,
+                  decoration: BoxDecoration(
+                    color: cardColor,
+                    borderRadius: BorderRadius.circular(14.r),
+                    boxShadow: cardShadow,
+                  ),
+                  child: Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    color: textColor,
+                    size: 18.sp,
+                  ),
+                ),
+              ),
+
+              SizedBox(height: 28.h),
+
+              ValueListenableBuilder<LanguageInfo>(
+                valueListenable: languageNotifier,
+                builder: (_, __, ___) => Text(
+                  S.get('account'),
+                  style: TextStyle(
+                    color: textColor,
+                    fontSize: 24.sp,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+
+              SizedBox(height: 28.h),
+
+              Center(
+                child: Stack(
+                  children: [
+                    CircleAvatar(
+                      radius: 52.r,
+                      backgroundImage:
+                          const AssetImage("assets/images/profile.png"),
+                    ),
+                    Positioned(
+                      bottom: 2,
+                      right: 2,
+                      child: Container(
+                        width: 22.w,
+                        height: 22.h,
+                        decoration: BoxDecoration(
+                          color: accent,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: bgColor, width: 2),
+                        ),
+                        child: Icon(Icons.check, color: Colors.white, size: 12.sp),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 12.h),
+
+              Center(
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 5.h),
+                  decoration: BoxDecoration(
+                    color: accent.withValues(alpha: isDark ? 0.15 : 0.1),
+                    borderRadius: BorderRadius.circular(20.r),
+                  ),
+                  child: ValueListenableBuilder<LanguageInfo>(
+                    valueListenable: languageNotifier,
+                    builder: (_, __, ___) => Text(
+                      S.get('verified'),
+                      style: TextStyle(
+                        color: accent,
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              SizedBox(height: 32.h),
+
+              Container(
+                decoration: BoxDecoration(
+                  color: cardColor,
+                  borderRadius: BorderRadius.circular(22.r),
+                  boxShadow: cardShadow,
+                  border: isDark
+                      ? Border.all(color: Colors.white.withValues(alpha: 0.05))
+                      : Border.all(color: accent.withValues(alpha: 0.15)),
+                ),
+                child: Column(
+                  children: [
+                    _infoTile(
+                      icon: Icons.person_outline_rounded,
+                      label: S.get('full_name'),
+                      value: _name.isNotEmpty ? _name : '—',
+                      textColor: textColor,
+                      subText: subText,
+                      accent: accent,
+                      isDark: isDark,
+                      hasDivider: true,
+                    ),
+                    _infoTile(
+                      icon: Icons.email_outlined,
+                      label: S.get('email'),
+                      value: _email.isNotEmpty ? _email : '—',
+                      textColor: textColor,
+                      subText: subText,
+                      accent: accent,
+                      isDark: isDark,
+                      hasDivider: false,
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 32.h),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _infoTile({
+    required IconData icon,
+    required String label,
+    required String value,
+    required Color textColor,
+    required Color subText,
+    required Color accent,
+    required bool isDark,
+    required bool hasDivider,
+  }) {
+    return Column(
+      children: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+          child: Row(
+            children: [
+              Container(
+                width: 40.w,
+                height: 40.h,
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.06)
+                      : accent.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Icon(
+                  icon,
+                  color: isDark ? Colors.white70 : accent,
+                  size: 20.sp,
+                ),
+              ),
+              SizedBox(width: 14.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: TextStyle(
+                        color: subText,
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    SizedBox(height: 3.h),
+                    Text(
+                      value,
+                      style: TextStyle(
+                        color: textColor,
+                        fontSize: 15.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (hasDivider)
+          Divider(
+            height: 1,
+            indent: 68.w,
+            endIndent: 0,
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.07)
+                : Colors.grey.shade200,
+          ),
+      ],
+    );
+  }
+}
