@@ -45,7 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
       await prefs.setBool('isLoggedIn', true);
       await prefs.setString('userEmail', _emailController.text.trim());
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, Routes.startPage);
+      Navigator.pushReplacementNamed(context, Routes.selectCategories);
     }
   }
 

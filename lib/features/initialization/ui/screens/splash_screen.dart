@@ -31,12 +31,17 @@ class _SplashScreenState extends State<SplashScreen>
     Future.delayed(const Duration(seconds: 2), () async {
       if (!mounted) return;
       final prefs = await SharedPreferences.getInstance();
+      final hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? false;
       final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
       if (!mounted) return;
-      Navigator.pushReplacementNamed(
-        context,
-        isLoggedIn ? Routes.selectCategories : Routes.login,
-      );
+      if (!hasSeenOnboarding) {
+        Navigator.pushReplacementNamed(context, Routes.onboarding);
+      } else {
+        Navigator.pushReplacementNamed(
+          context,
+          isLoggedIn ? Routes.selectCategories : Routes.login,
+        );
+      }
     });
   }
 

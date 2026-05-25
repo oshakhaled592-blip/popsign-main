@@ -27,7 +27,7 @@ class LogoAndName extends StatelessWidget {
           "I Hear You",
           style: compact
               ? AppTextStyles.title(context)
-              : AppTextStyles.title(context).copyWith(fontSize: 32),
+              : AppTextStyles.title(context).copyWith(fontSize: 32.sp),
         ),
       ],
     );

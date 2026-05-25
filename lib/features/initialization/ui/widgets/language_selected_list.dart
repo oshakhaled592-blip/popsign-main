@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/theme/styles.dart';
 
 class LanguageSelectedList extends StatefulWidget {
@@ -7,12 +8,10 @@ class LanguageSelectedList extends StatefulWidget {
   const LanguageSelectedList({super.key, required this.languages});
 
   @override
-  State<LanguageSelectedList> createState() =>
-      _LanguageSelectedListState();
+  State<LanguageSelectedList> createState() => _LanguageSelectedListState();
 }
 
-class _LanguageSelectedListState
-    extends State<LanguageSelectedList> {
+class _LanguageSelectedListState extends State<LanguageSelectedList> {
   String selected = "";
 
   @override
@@ -22,20 +21,15 @@ class _LanguageSelectedListState
         final isSelected = selected == lang;
 
         return GestureDetector(
-          onTap: () {
-            setState(() {
-              selected = lang;
-            });
-          },
+          onTap: () => setState(() => selected = lang),
           child: Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.symmetric(
-                horizontal: 16, vertical: 14),
+            margin: EdgeInsets.only(bottom: 12.h),
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
             decoration: BoxDecoration(
               color: isSelected
                   ? Theme.of(context).colorScheme.primary
                   : Theme.of(context).cardColor,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(16.r),
               border: Border.all(
                 color: isSelected
                     ? Theme.of(context).colorScheme.primary
@@ -45,15 +39,10 @@ class _LanguageSelectedListState
             child: Row(
               children: [
                 Expanded(
-                  child: Text(
-                    lang,
-                    style: AppTextStyles.body(context),
-                  ),
+                  child: Text(lang, style: AppTextStyles.body(context)),
                 ),
                 if (isSelected)
-                  Icon(Icons.check,
-                      color:
-                          Theme.of(context).colorScheme.onPrimary),
+                  Icon(Icons.check, color: Theme.of(context).colorScheme.onPrimary),
               ],
             ),
           ),

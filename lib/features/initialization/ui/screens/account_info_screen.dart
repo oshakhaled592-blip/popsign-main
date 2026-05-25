@@ -41,6 +41,59 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
     super.dispose();
   }
 
+  void _editName(BuildContext context, bool isDark, Color textColor, Color subText) {
+    final controller = TextEditingController(text: _name);
+    const accent = Color(0xFF22C55E);
+    final cardColor = isDark ? const Color(0xFF171C2B) : Colors.white;
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: cardColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
+        title: Text(
+          S.get('full_name'),
+          style: TextStyle(color: textColor, fontSize: 16.sp, fontWeight: FontWeight.w700),
+        ),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          style: TextStyle(color: textColor, fontSize: 15.sp),
+          cursorColor: accent,
+          decoration: InputDecoration(
+            hintText: S.get('full_name'),
+            hintStyle: TextStyle(color: subText, fontSize: 14.sp),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.grey.shade300),
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: accent, width: 2),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(S.get('cancel'), style: TextStyle(color: subText, fontSize: 14.sp)),
+          ),
+          TextButton(
+            onPressed: () async {
+              final newName = controller.text.trim();
+              if (newName.isEmpty) return;
+              final nav = Navigator.of(context);
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.setString('userName', newName);
+              if (!mounted) return;
+              setState(() => _name = newName);
+              nav.pop();
+            },
+            child: Text('Save', style: TextStyle(color: accent, fontSize: 14.sp, fontWeight: FontWeight.w700)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark     = Theme.of(context).brightness == Brightness.dark;
@@ -80,11 +133,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                     borderRadius: BorderRadius.circular(14.r),
                     boxShadow: cardShadow,
                   ),
-                  child: Icon(
-                    Icons.arrow_back_ios_new_rounded,
-                    color: textColor,
-                    size: 18.sp,
-                  ),
+                  child: Icon(Icons.arrow_back_ios_new_rounded, color: textColor, size: 18.sp),
                 ),
               ),
 
@@ -94,11 +143,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                 valueListenable: languageNotifier,
                 builder: (_, __, ___) => Text(
                   S.get('account'),
-                  style: TextStyle(
-                    color: textColor,
-                    fontSize: 24.sp,
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: TextStyle(color: textColor, fontSize: 24.sp, fontWeight: FontWeight.w700),
                 ),
               ),
 
@@ -109,8 +154,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                   children: [
                     CircleAvatar(
                       radius: 52.r,
-                      backgroundImage:
-                          const AssetImage("assets/images/profile.png"),
+                      backgroundImage: const AssetImage("assets/images/profile.png"),
                     ),
                     Positioned(
                       bottom: 2,
@@ -143,11 +187,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                     valueListenable: languageNotifier,
                     builder: (_, __, ___) => Text(
                       S.get('verified'),
-                      style: TextStyle(
-                        color: accent,
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: TextStyle(color: accent, fontSize: 13.sp, fontWeight: FontWeight.w600),
                     ),
                   ),
                 ),
@@ -175,6 +215,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                       accent: accent,
                       isDark: isDark,
                       hasDivider: true,
+                      onEdit: () => _editName(context, isDark, textColor, subText),
                     ),
                     _infoTile(
                       icon: Icons.email_outlined,
@@ -207,6 +248,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
     required Color accent,
     required bool isDark,
     required bool hasDivider,
+    VoidCallback? onEdit,
   }) {
     return Column(
       children: [
@@ -223,11 +265,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                       : accent.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12.r),
                 ),
-                child: Icon(
-                  icon,
-                  color: isDark ? Colors.white70 : accent,
-                  size: 20.sp,
-                ),
+                child: Icon(icon, color: isDark ? Colors.white70 : accent, size: 20.sp),
               ),
               SizedBox(width: 14.w),
               Expanded(
@@ -236,24 +274,31 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                   children: [
                     Text(
                       label,
-                      style: TextStyle(
-                        color: subText,
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w500,
-                      ),
+                      style: TextStyle(color: subText, fontSize: 12.sp, fontWeight: FontWeight.w500),
                     ),
                     SizedBox(height: 3.h),
                     Text(
                       value,
-                      style: TextStyle(
-                        color: textColor,
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: TextStyle(color: textColor, fontSize: 15.sp, fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
               ),
+              if (onEdit != null)
+                GestureDetector(
+                  onTap: onEdit,
+                  child: Container(
+                    width: 34.w,
+                    height: 34.h,
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.06)
+                          : accent.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10.r),
+                    ),
+                    child: Icon(Icons.edit_outlined, color: isDark ? Colors.white54 : accent, size: 16.sp),
+                  ),
+                ),
             ],
           ),
         ),

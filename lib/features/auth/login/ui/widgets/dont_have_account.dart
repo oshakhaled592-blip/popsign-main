@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/routing/routes.dart';
@@ -33,14 +34,12 @@ class _DontHaveAccountState extends State<DontHaveAccount> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(S.get('dont_have'), style: AppTextStyles.small(context)),
-        const SizedBox(width: 5),
+        SizedBox(width: 5.w),
         GestureDetector(
           onTap: () => Navigator.pushNamed(context, Routes.signup),
           child: Text(
             S.get('signup'),
-            style: AppTextStyles.body(context).copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            style: AppTextStyles.body(context).copyWith(fontWeight: FontWeight.bold),
           ),
         ),
       ],

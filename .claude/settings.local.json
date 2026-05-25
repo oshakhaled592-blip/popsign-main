@@ -11,7 +11,8 @@
       "Bash(Get-ChildItem -Path lib -Recurse -File)",
       "Bash(Select-Object -ExpandProperty FullName)",
       "Bash(Sort-Object)",
-      "Bash(python -c ' *)"
+      "Bash(python -c ' *)",
+      "Bash(adb shell *)"
     ]
   }
 }

@@ -14,6 +14,7 @@ import 'package:popsign/features/initialization/ui/screens/reset_screen.dart';
 import '../../features/initialization/ui/screens/lost_page_screen.dart';
 import '../../features/initialization/ui/screens/profile._screen.dart';
 import '../../features/initialization/ui/screens/account_info_screen.dart';
+import '../../features/initialization/ui/screens/onboarding_screen.dart';
 
 class AppRouter {
   Route<dynamic> generateRoute(RouteSettings settings) {
@@ -82,6 +83,11 @@ class AppRouter {
       case Routes.accountInfo:
         return MaterialPageRoute(
           builder: (_) => const AccountInfoScreen(),
+        );
+
+      case Routes.onboarding:
+        return MaterialPageRoute(
+          builder: (_) => const OnboardingScreen(),
         );
 
       case Routes.reset:

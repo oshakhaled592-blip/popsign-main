@@ -17,4 +17,5 @@ class Routes {
   static const String forgotPassword = '/forgot-password';
   static const String lostPage = '/lost-page';
   static const String accountInfo = '/account-info';
+  static const String onboarding = '/onboarding';
 }

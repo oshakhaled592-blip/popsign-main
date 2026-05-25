@@ -28,7 +28,69 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _loadName() async {
     final prefs = await SharedPreferences.getInstance();
-    if (mounted) setState(() => _userName = prefs.getString('userName') ?? 'User');
+    if (mounted) setState(() => _userName = prefs.getString('userName') ?? '');
+  }
+
+  void _editName() {
+    final controller = TextEditingController(text: _userName);
+    final isDark = themeNotifier.value == ThemeMode.dark;
+    const accent = Color(0xFF22C55E);
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF171C2B) : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
+        title: Text(
+          S.get('full_name'),
+          style: TextStyle(
+            color: isDark ? Colors.white : const Color(0xFF1A1A2E),
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          style: TextStyle(
+            color: isDark ? Colors.white : const Color(0xFF1A1A2E),
+            fontSize: 15.sp,
+          ),
+          cursorColor: accent,
+          decoration: InputDecoration(
+            hintText: S.get('full_name'),
+            hintStyle: TextStyle(color: isDark ? Colors.white38 : Colors.grey, fontSize: 14.sp),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.grey.shade300),
+            ),
+            focusedBorder: const UnderlineInputBorder(
+              borderSide: BorderSide(color: accent, width: 2),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(S.get('cancel'),
+                style: TextStyle(color: Colors.grey, fontSize: 14.sp)),
+          ),
+          TextButton(
+            onPressed: () async {
+              final name = controller.text.trim();
+              if (name.isEmpty) return;
+              final nav = Navigator.of(context);
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.setString('userName', name);
+              if (!mounted) return;
+              setState(() => _userName = name);
+              nav.pop();
+            },
+            child: Text('Save',
+                style: TextStyle(color: accent, fontSize: 14.sp, fontWeight: FontWeight.w700)),
+          ),
+        ],
+      ),
+    );
   }
 
   void _rebuild() => setState(() {});
@@ -143,23 +205,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     SizedBox(width: 14.w),
 
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _userName,
-                            style: TextStyle(
-                              color: textColor,
-                              fontSize: 20.sp,
-                              fontWeight: FontWeight.w700,
+                      child: GestureDetector(
+                        onTap: _editName,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    _userName.isNotEmpty ? _userName : 'Tap to set name',
+                                    style: TextStyle(
+                                      color: _userName.isNotEmpty ? textColor : subText,
+                                      fontSize: 18.sp,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                                Icon(Icons.edit_outlined, color: subText, size: 15.sp),
+                              ],
                             ),
-                          ),
-                          SizedBox(height: 4.h),
-                          Text(
-                            S.get('verified'),
-                            style: TextStyle(color: subText, fontSize: 13.sp),
-                          ),
-                        ],
+                            SizedBox(height: 4.h),
+                            Text(
+                              S.get('verified'),
+                              style: TextStyle(color: subText, fontSize: 13.sp),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
 
@@ -238,7 +310,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       textColor: textColor,
                       subText: subText,
                       isDivider: true,
-                      onTap: () => Navigator.pushNamed(context, Routes.accountInfo),
+                      onTap: () => Navigator.pushNamed(context, Routes.accountInfo).then((_) => _loadName()),
                     ),
 
                     profileTile(

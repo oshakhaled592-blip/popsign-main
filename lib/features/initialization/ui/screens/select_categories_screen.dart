@@ -79,7 +79,7 @@ class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
                   controller: _scrollController,
                   thumbVisibility: true,
                   thickness: 4,
-                  radius: const Radius.circular(8),
+                  radius: Radius.circular(8.r),
                   child: ListView.builder(
                     controller: _scrollController,
                     physics: const BouncingScrollPhysics(),
@@ -170,8 +170,8 @@ class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
                                   ),
                                 ),
                                 child: isSelected
-                                    ? const Icon(Icons.check,
-                                        color: Colors.white, size: 18)
+                                    ? Icon(Icons.check,
+                                        color: Colors.white, size: 18.sp)
                                     : null,
                               ),
                             ],

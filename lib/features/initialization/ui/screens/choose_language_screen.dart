@@ -220,8 +220,8 @@ class _ChooseLanguageScreenState
                                     ),
                                   ),
                                   child: isSelected
-                                      ? const Icon(Icons.check,
-                                          color: Colors.white, size: 16)
+                                      ? Icon(Icons.check,
+                                          color: Colors.white, size: 16.sp)
                                       : null,
                                 ),
                               ],

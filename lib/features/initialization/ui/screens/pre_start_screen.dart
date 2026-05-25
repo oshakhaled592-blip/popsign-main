@@ -60,9 +60,9 @@ class _PreStartScreenState extends State<PreStartScreen>
 
   @override
   Widget build(BuildContext context) {
-    final isDark   = Theme.of(context).brightness == Brightness.dark;
-    final bg       = isDark ? const Color(0xFF0B0F18) : const Color(0xFFF2F4FA);
-    final cardBg   = isDark ? const Color(0xFF141A29) : Colors.white;
+    final isDark    = Theme.of(context).brightness == Brightness.dark;
+    final bg        = isDark ? const Color(0xFF0B0F18) : const Color(0xFFF2F4FA);
+    final cardBg    = isDark ? const Color(0xFF141A29) : Colors.white;
     final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
     final subColor  = isDark ? Colors.white38 : Colors.grey.shade500;
     final btnBg     = isDark ? const Color(0xFF1E2538) : Colors.white;
@@ -84,7 +84,7 @@ class _PreStartScreenState extends State<PreStartScreen>
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                  padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 14.h),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -96,7 +96,7 @@ class _PreStartScreenState extends State<PreStartScreen>
                         S.get('pre_start'),
                         style: TextStyle(
                           color: textColor,
-                          fontSize: 18,
+                          fontSize: 18.sp,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -109,47 +109,47 @@ class _PreStartScreenState extends State<PreStartScreen>
                 ),
 
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  padding: EdgeInsets.symmetric(horizontal: 24.w),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: colors,
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(20.r),
                     ),
                     child: Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                          padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
                           decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.25),
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(10.r),
                           ),
                           child: Text(
                             _level,
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: 18,
+                              fontSize: 18.sp,
                             ),
                           ),
                         ),
-                        const SizedBox(width: 16),
+                        SizedBox(width: 16.w),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               '${words.length} words',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 16,
+                                fontSize: 16.sp,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
-                            const SizedBox(height: 2),
+                            SizedBox(height: 2.h),
                             Text(
                               const {
                                 'A1': '1 – 100 words',
@@ -161,7 +161,7 @@ class _PreStartScreenState extends State<PreStartScreen>
                               }[_level] ?? '',
                               style: TextStyle(
                                 color: Colors.white.withValues(alpha: 0.75),
-                                fontSize: 13,
+                                fontSize: 13.sp,
                               ),
                             ),
                           ],
@@ -171,27 +171,27 @@ class _PreStartScreenState extends State<PreStartScreen>
                   ),
                 ),
 
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
 
                 Expanded(
                   child: ListView.separated(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    padding: EdgeInsets.symmetric(horizontal: 24.w),
                     physics: const BouncingScrollPhysics(),
                     itemCount: words.length,
-                    separatorBuilder: (_, __) => Divider(height: 1, color: divColor),
+                    separatorBuilder: (_, __) => Divider(height: 1.h, color: divColor),
                     itemBuilder: (_, i) {
                       return Container(
                         color: cardBg,
-                        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                        padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 16.w),
                         child: Row(
                           children: [
                             SizedBox(
-                              width: 32,
+                              width: 32.w,
                               child: Text(
                                 (i + 1).toString().padLeft(2, '0'),
                                 style: TextStyle(
                                   color: subColor,
-                                  fontSize: 13,
+                                  fontSize: 13.sp,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -201,7 +201,7 @@ class _PreStartScreenState extends State<PreStartScreen>
                                 words[i],
                                 style: TextStyle(
                                   color: textColor,
-                                  fontSize: 16,
+                                  fontSize: 16.sp,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -213,8 +213,8 @@ class _PreStartScreenState extends State<PreStartScreen>
                   ),
                 ),
 
-                Container(
-                  padding: const EdgeInsets.fromLTRB(24, 16, 24, 12),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(24.w, 16.h, 24.w, 12.h),
                   child: Column(
                     children: [
                       LinearButton(
@@ -230,16 +230,16 @@ class _PreStartScreenState extends State<PreStartScreen>
                           ),
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12.h),
                       Container(
-                        width: 120,
-                        height: 4,
+                        width: 120.w,
+                        height: 4.h,
                         decoration: BoxDecoration(
                           color: isDark ? Colors.white24 : Colors.grey.shade400,
-                          borderRadius: BorderRadius.circular(30),
+                          borderRadius: BorderRadius.circular(30.r),
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      SizedBox(height: 8.h),
                     ],
                   ),
                 ),
@@ -256,11 +256,11 @@ class _PreStartScreenState extends State<PreStartScreen>
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 46,
-        height: 46,
+        width: 46.w,
+        height: 46.h,
         decoration: BoxDecoration(
           color: bg,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(14.r),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.06),
@@ -269,7 +269,7 @@ class _PreStartScreenState extends State<PreStartScreen>
             ),
           ],
         ),
-        child: Icon(icon, color: iconColor, size: 20),
+        child: Icon(icon, color: iconColor, size: 20.sp),
       ),
     );
   }
