@@ -18,6 +18,9 @@ class PredictionItem {
   }
 
   String get percent => '${(score * 100).toStringAsFixed(1)}%';
+
+  PredictionItem withScore(double newScore) =>
+      PredictionItem(label: label, labelAr: labelAr, score: newScore);
 }
 
 class PredictionResult {
@@ -37,6 +40,12 @@ class PredictionResult {
         .map((e) => PredictionItem.fromJson(e as Map<String, dynamic>))
         .toList();
 
-    return PredictionResult(predictions: list);
+    // normalize scores so they sum to 100%
+    final total = list.fold<double>(0, (sum, item) => sum + item.score);
+    final normalized = total > 0
+        ? list.map((item) => item.withScore(item.score / total)).toList()
+        : list;
+
+    return PredictionResult(predictions: normalized);
   }
 }

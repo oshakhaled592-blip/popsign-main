@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:popsign/core/routing/routes.dart';
-
+import 'package:video_player/video_player.dart';
 import '../../../../core/models/prediction_model.dart';
 import '../../../../core/state/translation_notifier.dart';
 
@@ -22,6 +21,9 @@ class _LostPageState extends State<LostPage>
   late AnimationController _pulseController;
   late Animation<double> _pulseAnim;
 
+  VideoPlayerController? _videoController;
+  bool _videoReady = false;
+
   @override
   void initState() {
     super.initState();
@@ -33,6 +35,8 @@ class _LostPageState extends State<LostPage>
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
     _notifier.addListener(_rebuild);
+    _notifier.checkHealth();
+    _notifier.loadClasses();
   }
 
   void _rebuild() {
@@ -44,10 +48,20 @@ class _LostPageState extends State<LostPage>
     _notifier.removeListener(_rebuild);
     _notifier.dispose();
     _pulseController.dispose();
+    _videoController?.dispose();
     super.dispose();
   }
 
-  Future<void> _pickVideo() async {
+  Future<void> _initVideo(File file) async {
+    await _videoController?.dispose();
+    _videoController = VideoPlayerController.file(file);
+    await _videoController!.initialize();
+    _videoController!.setLooping(true);
+    _videoController!.play();
+    if (mounted) setState(() => _videoReady = true);
+  }
+
+  Future<void> _pickVideo(ImageSource source) async {
     final status = await _requestVideoPermission();
     if (!status) {
       if (mounted) {
@@ -60,20 +74,106 @@ class _LostPageState extends State<LostPage>
       }
       return;
     }
-    final picked = await ImagePicker().pickVideo(source: ImageSource.gallery);
+    final picked = await ImagePicker().pickVideo(source: source);
     if (picked == null || !mounted) return;
-    await _notifier.predict(File(picked.path));
+    final file = File(picked.path);
+    setState(() => _videoReady = false);
+    await _initVideo(file);
+    await _notifier.predict(file);
   }
 
   Future<bool> _requestVideoPermission() async {
     if (await Permission.videos.isGranted) return true;
     if (await Permission.storage.isGranted) return true;
-
     final videos = await Permission.videos.request();
     if (videos.isGranted) return true;
-
     final storage = await Permission.storage.request();
     return storage.isGranted;
+  }
+
+  void _showSourcePicker() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: isDark ? const Color(0xFF141A29) : Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+      ),
+      builder: (_) => SafeArea(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 24.w),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40.w,
+                height: 4.h,
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.white24 : Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(4.r),
+                ),
+              ),
+              SizedBox(height: 20.h),
+              _sourceOption(
+                icon: Icons.video_library_rounded,
+                label: 'Choose from Gallery',
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickVideo(ImageSource.gallery);
+                },
+                isDark: isDark,
+              ),
+              SizedBox(height: 12.h),
+              _sourceOption(
+                icon: Icons.videocam_rounded,
+                label: 'Record a Video',
+                onTap: () {
+                  Navigator.pop(context);
+                  _pickVideo(ImageSource.camera);
+                },
+                isDark: isDark,
+              ),
+              SizedBox(height: 8.h),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _sourceOption({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    required bool isDark,
+  }) {
+    const purple = Color(0xFF6C63FF);
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+        decoration: BoxDecoration(
+          color: purple.withValues(alpha: isDark ? 0.1 : 0.07),
+          borderRadius: BorderRadius.circular(14.r),
+          border: Border.all(color: purple.withValues(alpha: 0.2)),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: purple, size: 22.sp),
+            SizedBox(width: 14.w),
+            Text(
+              label,
+              style: TextStyle(
+                color: isDark ? Colors.white : const Color(0xFF1A1A2E),
+                fontSize: 15.sp,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -88,55 +188,198 @@ class _LostPageState extends State<LostPage>
     return Scaffold(
       backgroundColor: bg,
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(20.w),
-          child: Column(
-            children: [
-              _buildHeader(textColor, btnBg),
-              const Spacer(),
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 400),
-                child: switch (_notifier.status) {
-                  TranslationStatus.idle    => _buildIdle(textColor, subColor),
-                  TranslationStatus.loading => _buildLoading(textColor, subColor),
-                  TranslationStatus.success => _buildResult(cardBg, textColor, subColor, isDark),
-                  TranslationStatus.error   => _buildError(textColor, subColor),
-                },
-              ),
-              const Spacer(),
-              if (!_notifier.isLoading) _buildActionButton(),
-              SizedBox(height: 12.h),
-              Container(
-                width: 120.w,
-                height: 4.h,
-                decoration: BoxDecoration(
-                  color: isDark ? Colors.white24 : Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(30.r),
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 0),
+              child: _buildHeader(textColor, btnBg),
+            ),
+
+            // sentence bar
+            if (_notifier.sentence.isNotEmpty)
+              _buildSentenceBar(cardBg, textColor, subColor, isDark),
+
+            Expanded(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 400),
+                  child: switch (_notifier.status) {
+                    TranslationStatus.idle    => _buildIdle(textColor, subColor),
+                    TranslationStatus.loading => _buildLoading(textColor, subColor, isDark),
+                    TranslationStatus.success => _buildResult(cardBg, textColor, subColor, isDark),
+                    TranslationStatus.error   => _buildError(textColor, subColor),
+                  },
                 ),
               ),
-              SizedBox(height: 8.h),
-            ],
-          ),
+            ),
+
+            Padding(
+              padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 20.h),
+              child: Column(
+                children: [
+                  if (!_notifier.isLoading) _buildActionButton(isDark),
+                  SizedBox(height: 12.h),
+                  Container(
+                    width: 120.w,
+                    height: 4.h,
+                    decoration: BoxDecoration(
+                      color: isDark ? Colors.white24 : Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(30.r),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
   Widget _buildHeader(Color textColor, Color btnBg) {
+    final serverColor = switch (_notifier.serverStatus) {
+      ServerStatus.online  => Colors.green,
+      ServerStatus.offline => Colors.red,
+      ServerStatus.unknown => Colors.orange,
+    };
+
     return Row(
       children: [
         _iconBtn(Icons.arrow_back_ios_new_rounded, btnBg, textColor,
             () => Navigator.pop(context)),
         Expanded(
-          child: Text(
-            'Translate',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: textColor, fontSize: 18.sp, fontWeight: FontWeight.bold),
+          child: Column(
+            children: [
+              Text(
+                'Translate',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: textColor, fontSize: 18.sp, fontWeight: FontWeight.bold),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 7.w,
+                    height: 7.w,
+                    decoration: BoxDecoration(color: serverColor, shape: BoxShape.circle),
+                  ),
+                  SizedBox(width: 5.w),
+                  Text(
+                    switch (_notifier.serverStatus) {
+                      ServerStatus.online  => 'Server online',
+                      ServerStatus.offline => 'Server offline',
+                      ServerStatus.unknown => 'Checking…',
+                    },
+                    style: TextStyle(color: serverColor, fontSize: 11.sp),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
-        _iconBtn(Icons.menu_rounded, btnBg, textColor,
-            () => Navigator.pushNamed(context, Routes.profile)),
+        _iconBtn(Icons.list_alt_rounded, btnBg, textColor, _showClasses),
       ],
+    );
+  }
+
+  void _showClasses() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: isDark ? const Color(0xFF141A29) : Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+      ),
+      builder: (_) {
+        final classes = _notifier.classes;
+        return DraggableScrollableSheet(
+          initialChildSize: 0.6,
+          maxChildSize: 0.9,
+          minChildSize: 0.4,
+          expand: false,
+          builder: (_, scrollController) => Column(
+            children: [
+              SizedBox(height: 12.h),
+              Container(
+                width: 40.w, height: 4.h,
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.white24 : Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(4.r),
+                ),
+              ),
+              SizedBox(height: 16.h),
+              Text(
+                'Supported Signs (${classes.length})',
+                style: TextStyle(
+                  color: isDark ? Colors.white : const Color(0xFF1A1A2E),
+                  fontSize: 16.sp, fontWeight: FontWeight.w700,
+                ),
+              ),
+              SizedBox(height: 12.h),
+              if (_notifier.classesLoading)
+                Padding(
+                  padding: EdgeInsets.all(32.w),
+                  child: const CircularProgressIndicator(color: Color(0xFF6C63FF), strokeWidth: 2),
+                )
+              else if (classes.isEmpty)
+                Padding(
+                  padding: EdgeInsets.all(32.w),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Could not load classes',
+                        style: TextStyle(color: isDark ? Colors.white38 : Colors.grey, fontSize: 14.sp),
+                      ),
+                      SizedBox(height: 12.h),
+                      GestureDetector(
+                        onTap: () => _notifier.loadClasses(),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF6C63FF).withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                          child: Text('Retry', style: TextStyle(color: const Color(0xFF6C63FF), fontSize: 14.sp)),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              else
+                Expanded(
+                  child: SingleChildScrollView(
+                    controller: scrollController,
+                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                    child: Wrap(
+                      spacing: 8.w,
+                      runSpacing: 8.h,
+                      children: classes.map((word) {
+                        return Container(
+                          padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF6C63FF).withValues(alpha: isDark ? 0.15 : 0.08),
+                            borderRadius: BorderRadius.circular(20.r),
+                            border: Border.all(color: const Color(0xFF6C63FF).withValues(alpha: 0.25)),
+                          ),
+                          child: Text(
+                            word,
+                            style: TextStyle(
+                              color: const Color(0xFF6C63FF),
+                              fontSize: 13.sp, fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+              SizedBox(height: 16.h),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -188,24 +431,62 @@ class _LostPageState extends State<LostPage>
     );
   }
 
-  Widget _buildLoading(Color textColor, Color subColor) {
+  Widget _buildVideoPreview(bool isDark) {
+    if (!_videoReady || _videoController == null) {
+      return Container(
+        width: double.infinity,
+        height: 180.h,
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1E2538) : Colors.black12,
+          borderRadius: BorderRadius.circular(16.r),
+        ),
+        child: const Center(
+          child: CircularProgressIndicator(color: Color(0xFF6C63FF), strokeWidth: 2),
+        ),
+      );
+    }
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16.r),
+      child: SizedBox(
+        width: double.infinity,
+        height: 200.h,
+        child: FittedBox(
+          fit: BoxFit.cover,
+          child: SizedBox(
+            width: _videoController!.value.size.width,
+            height: _videoController!.value.size.height,
+            child: VideoPlayer(_videoController!),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoading(Color textColor, Color subColor, bool isDark) {
     return Column(
       key: const ValueKey('loading'),
       mainAxisSize: MainAxisSize.min,
       children: [
-        SizedBox(
-          width: 64.w,
-          height: 64.w,
-          child: const CircularProgressIndicator(strokeWidth: 3, color: Color(0xFF6C63FF)),
+        _buildVideoPreview(isDark),
+        SizedBox(height: 24.h),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 20.w,
+              height: 20.w,
+              child: const CircularProgressIndicator(strokeWidth: 2.5, color: Color(0xFF6C63FF)),
+            ),
+            SizedBox(width: 12.w),
+            Text('Analyzing video…',
+                style: TextStyle(color: textColor, fontSize: 16.sp, fontWeight: FontWeight.w600)),
+          ],
         ),
-        SizedBox(height: 28.h),
-        Text('Analyzing video…',
-            style: TextStyle(color: textColor, fontSize: 20.sp, fontWeight: FontWeight.w600)),
-        SizedBox(height: 10.h),
+        SizedBox(height: 8.h),
         Text(
-          'The model is processing\nyour sign language',
+          'The model is processing your sign language',
           textAlign: TextAlign.center,
-          style: TextStyle(color: subColor, fontSize: 14.sp, height: 1.6),
+          style: TextStyle(color: subColor, fontSize: 13.sp),
         ),
       ],
     );
@@ -216,85 +497,88 @@ class _LostPageState extends State<LostPage>
     final top    = result.top;
     const purple = Color(0xFF6C63FF);
 
-    return Column(
+    return SingleChildScrollView(
       key: const ValueKey('result'),
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: double.infinity,
-          padding: EdgeInsets.symmetric(vertical: 32.h, horizontal: 24.w),
-          decoration: BoxDecoration(
-            color: cardBg,
-            borderRadius: BorderRadius.circular(24.r),
-            boxShadow: [
-              BoxShadow(color: purple.withValues(alpha: 0.15), blurRadius: 30, spreadRadius: 2),
-            ],
-            border: Border.all(color: purple.withValues(alpha: 0.25), width: 1.5),
-          ),
-          child: Column(
-            children: [
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
-                decoration: BoxDecoration(
-                  color: purple.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(20.r),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildVideoPreview(isDark),
+          SizedBox(height: 16.h),
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(vertical: 24.h, horizontal: 24.w),
+            decoration: BoxDecoration(
+              color: cardBg,
+              borderRadius: BorderRadius.circular(24.r),
+              boxShadow: [
+                BoxShadow(color: purple.withValues(alpha: 0.15), blurRadius: 30, spreadRadius: 2),
+              ],
+              border: Border.all(color: purple.withValues(alpha: 0.25), width: 1.5),
+            ),
+            child: Column(
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
+                  decoration: BoxDecoration(
+                    color: purple.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(20.r),
+                  ),
+                  child: Text('Translation',
+                      style: TextStyle(color: purple, fontSize: 12.sp, fontWeight: FontWeight.w600)),
                 ),
-                child: Text('Translation',
-                    style: TextStyle(color: purple, fontSize: 12.sp, fontWeight: FontWeight.w600)),
-              ),
-              SizedBox(height: 16.h),
-              Text(
-                top.label,
-                style: TextStyle(color: textColor, fontSize: 36.sp, fontWeight: FontWeight.bold),
-              ),
-              if (top.labelAr.isNotEmpty) ...[
-                SizedBox(height: 6.h),
+                SizedBox(height: 12.h),
                 Text(
-                  top.labelAr,
-                  style: TextStyle(color: subColor, fontSize: 22.sp, fontWeight: FontWeight.w500),
+                  top.label,
+                  style: TextStyle(color: textColor, fontSize: 32.sp, fontWeight: FontWeight.bold),
+                ),
+                if (top.labelAr.isNotEmpty) ...[
+                  SizedBox(height: 4.h),
+                  Text(
+                    top.labelAr,
+                    style: TextStyle(color: subColor, fontSize: 20.sp, fontWeight: FontWeight.w500),
+                  ),
+                ],
+                SizedBox(height: 12.h),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
+                  decoration: BoxDecoration(
+                    color: Colors.green.withValues(alpha: isDark ? 0.15 : 0.1),
+                    borderRadius: BorderRadius.circular(20.r),
+                  ),
+                  child: Text(
+                    'Confidence  ${top.percent}',
+                    style: TextStyle(color: Colors.green, fontSize: 13.sp, fontWeight: FontWeight.w600),
+                  ),
                 ),
               ],
-              SizedBox(height: 14.h),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
-                decoration: BoxDecoration(
-                  color: Colors.green.withValues(alpha: isDark ? 0.15 : 0.1),
-                  borderRadius: BorderRadius.circular(20.r),
-                ),
-                child: Text(
-                  'Confidence  ${top.percent}',
-                  style: TextStyle(color: Colors.green, fontSize: 13.sp, fontWeight: FontWeight.w600),
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-
-        if (result.predictions.length > 1) ...[
-          SizedBox(height: 20.h),
-          Text('Other possibilities', style: TextStyle(color: subColor, fontSize: 13.sp)),
-          SizedBox(height: 10.h),
-          Wrap(
-            spacing: 8.w,
-            runSpacing: 8.h,
-            alignment: WrapAlignment.center,
-            children: result.predictions.skip(1).map((PredictionItem p) {
-              return Container(
-                padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
-                decoration: BoxDecoration(
-                  color: purple.withValues(alpha: isDark ? 0.1 : 0.07),
-                  borderRadius: BorderRadius.circular(20.r),
-                  border: Border.all(color: purple.withValues(alpha: 0.2)),
-                ),
-                child: Text(
-                  '${p.label}  ${p.percent}',
-                  style: TextStyle(color: purple, fontSize: 13.sp, fontWeight: FontWeight.w500),
-                ),
-              );
-            }).toList(),
-          ),
+          if (result.predictions.length > 1) ...[
+            SizedBox(height: 16.h),
+            Text('Other possibilities', style: TextStyle(color: subColor, fontSize: 13.sp)),
+            SizedBox(height: 8.h),
+            Wrap(
+              spacing: 8.w,
+              runSpacing: 8.h,
+              alignment: WrapAlignment.center,
+              children: result.predictions.skip(1).map((PredictionItem p) {
+                return Container(
+                  padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
+                  decoration: BoxDecoration(
+                    color: purple.withValues(alpha: isDark ? 0.1 : 0.07),
+                    borderRadius: BorderRadius.circular(20.r),
+                    border: Border.all(color: purple.withValues(alpha: 0.2)),
+                  ),
+                  child: Text(
+                    '${p.label}  ${p.percent}',
+                    style: TextStyle(color: purple, fontSize: 13.sp, fontWeight: FontWeight.w500),
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
         ],
-      ],
+      ),
     );
   }
 
@@ -327,44 +611,151 @@ class _LostPageState extends State<LostPage>
     );
   }
 
-  Widget _buildActionButton() {
-    final isResult = _notifier.isSuccess || _notifier.isError;
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 300),
-      child: GestureDetector(
-        key: ValueKey(isResult),
-        onTap: isResult ? _notifier.reset : _pickVideo,
-        child: Container(
-          width: double.infinity,
-          height: 56.h,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16.r),
-            gradient: const LinearGradient(colors: [Color(0xFF6C63FF), Color(0xFF9C8FFF)]),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF6C63FF).withValues(alpha: 0.35),
-                blurRadius: 16,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                isResult ? Icons.video_call_rounded : Icons.upload_rounded,
-                color: Colors.white,
-                size: 22.sp,
-              ),
-              SizedBox(width: 10.w),
-              Text(
-                isResult ? 'Upload new video' : 'Upload your video',
-                style: TextStyle(color: Colors.white, fontSize: 16.sp, fontWeight: FontWeight.w600),
-              ),
-            ],
-          ),
-        ),
+  Widget _buildSentenceBar(Color cardBg, Color textColor, Color subColor, bool isDark) {
+    const purple = Color(0xFF6C63FF);
+    final sentence = _notifier.sentence;
+    return Container(
+      width: double.infinity,
+      margin: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 0),
+      padding: EdgeInsets.all(14.w),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(color: purple.withValues(alpha: 0.2)),
       ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text('Translation',
+                  style: TextStyle(color: purple, fontSize: 12.sp, fontWeight: FontWeight.w600)),
+              const Spacer(),
+              GestureDetector(
+                onTap: () {
+                  _videoController?.dispose();
+                  _videoController = null;
+                  setState(() => _videoReady = false);
+                  _notifier.clearSentence();
+                },
+                child: Text('Clear all',
+                    style: TextStyle(color: Colors.red.withValues(alpha: 0.8), fontSize: 12.sp)),
+              ),
+            ],
+          ),
+          SizedBox(height: 10.h),
+          Wrap(
+            spacing: 6.w,
+            runSpacing: 6.h,
+            children: sentence.asMap().entries.map((e) {
+              final i = e.key;
+              final word = e.value;
+              return GestureDetector(
+                onLongPress: () => _notifier.removeFromSentence(i),
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                  decoration: BoxDecoration(
+                    color: purple.withValues(alpha: isDark ? 0.15 : 0.08),
+                    borderRadius: BorderRadius.circular(20.r),
+                    border: Border.all(color: purple.withValues(alpha: 0.3)),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(word.label,
+                          style: TextStyle(color: purple, fontSize: 13.sp, fontWeight: FontWeight.w600)),
+                      if (word.labelAr.isNotEmpty)
+                        Text(word.labelAr,
+                            style: TextStyle(color: subColor, fontSize: 11.sp)),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+          SizedBox(height: 6.h),
+          Text('Long press a word to remove it',
+              style: TextStyle(color: subColor, fontSize: 10.sp)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButton(bool isDark) {
+    final isResult = _notifier.isSuccess || _notifier.isError;
+    const purple = Color(0xFF6C63FF);
+
+    return Column(
+      children: [
+        // Add Sign button — always visible after first result
+        if (isResult)
+          Padding(
+            padding: EdgeInsets.only(bottom: 10.h),
+            child: GestureDetector(
+              onTap: () {
+                _videoController?.dispose();
+                _videoController = null;
+                setState(() => _videoReady = false);
+                _notifier.reset();
+                _showSourcePicker();
+              },
+              child: Container(
+                width: double.infinity,
+                height: 52.h,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16.r),
+                  gradient: const LinearGradient(colors: [purple, Color(0xFF9C8FFF)]),
+                  boxShadow: [
+                    BoxShadow(
+                      color: purple.withValues(alpha: 0.35),
+                      blurRadius: 16,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.add_rounded, color: Colors.white, size: 22.sp),
+                    SizedBox(width: 8.w),
+                    Text('Add Sign',
+                        style: TextStyle(color: Colors.white, fontSize: 16.sp, fontWeight: FontWeight.w600)),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+        // Upload first video button (idle/error state)
+        if (!isResult)
+          GestureDetector(
+            onTap: _showSourcePicker,
+            child: Container(
+              width: double.infinity,
+              height: 52.h,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16.r),
+                gradient: const LinearGradient(colors: [purple, Color(0xFF9C8FFF)]),
+                boxShadow: [
+                  BoxShadow(
+                    color: purple.withValues(alpha: 0.35),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.upload_rounded, color: Colors.white, size: 22.sp),
+                  SizedBox(width: 8.w),
+                  Text('Upload your video',
+                      style: TextStyle(color: Colors.white, fontSize: 16.sp, fontWeight: FontWeight.w600)),
+                ],
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
