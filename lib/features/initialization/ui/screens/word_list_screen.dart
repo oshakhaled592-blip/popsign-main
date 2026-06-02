@@ -5,7 +5,6 @@ import 'package:popsign/core/l10n/app_strings.dart';
 import 'package:popsign/core/routing/routes.dart';
 import 'package:popsign/core/theme/language_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'learn_new_words_screen.dart';
 
 class WordModel {
   String word;
@@ -105,20 +104,18 @@ class _WordListScreenState extends State<WordListScreen> {
   }
 
   void onLearn(int index) async {
-    setState(() {
-      if (words[index].progress < 3) words[index].progress++;
-    });
-    _saveProgress();
-
-    await Navigator.push(
+    final result = await Navigator.pushNamed(
       context,
-      MaterialPageRoute(
-        builder: (_) => LearnNewWordsScreen(
-          passedWord: words[index].word,
-          level: widget.level,
-        ),
-      ),
+      Routes.signPractice,
+      arguments: words[index].word,
     );
+
+    if (result == true && mounted) {
+      setState(() {
+        if (words[index].progress < 3) words[index].progress++;
+      });
+      _saveProgress();
+    }
   }
 
   Future<void> showResetDialog() async {

@@ -9,12 +9,12 @@ import 'package:popsign/features/initialization/ui/screens/choose_language_scree
 import 'package:popsign/features/initialization/ui/screens/select_categories_screen.dart';
 import 'package:popsign/features/initialization/ui/screens/pre_start_screen.dart';
 import 'package:popsign/features/initialization/ui/screens/word_list_screen.dart';
-import 'package:popsign/features/initialization/ui/screens/learn_new_words_screen.dart';
 import 'package:popsign/features/initialization/ui/screens/reset_screen.dart';
 import '../../features/initialization/ui/screens/lost_page_screen.dart';
 import '../../features/initialization/ui/screens/profile._screen.dart';
 import '../../features/initialization/ui/screens/account_info_screen.dart';
 import '../../features/initialization/ui/screens/onboarding_screen.dart';
+import '../../features/initialization/ui/screens/sign_practice_screen.dart';
 
 class AppRouter {
   Route<dynamic> generateRoute(RouteSettings settings) {
@@ -65,10 +65,6 @@ class AppRouter {
           builder: (_) => const WordListScreen(),
         );
 
-      case Routes.learnNewWords:
-        return MaterialPageRoute(
-          builder: (_) => const LearnNewWordsScreen(),
-        );
 
       case Routes.profile:
         return MaterialPageRoute(
@@ -88,6 +84,12 @@ class AppRouter {
       case Routes.onboarding:
         return MaterialPageRoute(
           builder: (_) => const OnboardingScreen(),
+        );
+
+      case Routes.signPractice:
+        final word = settings.arguments as String;
+        return MaterialPageRoute(
+          builder: (_) => SignPracticeScreen(targetWord: word),
         );
 
       case Routes.reset:
