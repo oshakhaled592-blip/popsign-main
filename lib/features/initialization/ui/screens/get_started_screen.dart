@@ -44,11 +44,15 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
               children: [
                 verticalSpace(20),
 
-                Image.asset(
-                  "assets/images/start-image.png",
-                  width: 400.w,
-                  height: 400.h,
-                  fit: BoxFit.contain,
+                ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height * 0.42,
+                    maxWidth: double.infinity,
+                  ),
+                  child: Image.asset(
+                    "assets/images/start-image.png",
+                    fit: BoxFit.contain,
+                  ),
                 ),
 
                 verticalSpace(30),

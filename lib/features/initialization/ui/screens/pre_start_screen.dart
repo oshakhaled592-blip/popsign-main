@@ -76,6 +76,31 @@ class _PreStartScreenState extends State<PreStartScreen>
 
     return Scaffold(
       backgroundColor: bg,
+      floatingActionButton: GestureDetector(
+        onTap: () => Navigator.pushNamed(context, Routes.chatScreen),
+        child: Container(
+          width: 60.w,
+          height: 60.w,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.15),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Center(
+            child: Icon(
+              Icons.smart_toy_rounded,
+              color: const Color(0xFF1A1A2E),
+              size: 30.sp,
+            ),
+          ),
+        ),
+      ),
       body: SafeArea(
         child: FadeTransition(
           opacity: _fade,

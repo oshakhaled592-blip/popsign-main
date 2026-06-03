@@ -18,4 +18,5 @@ class Routes {
   static const String accountInfo = '/account-info';
   static const String onboarding = '/onboarding';
   static const String signPractice = '/sign-practice';
+  static const String chatScreen = '/chat';
 }

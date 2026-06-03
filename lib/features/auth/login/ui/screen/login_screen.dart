@@ -43,9 +43,20 @@ class _LoginScreenState extends State<LoginScreen> {
     if (_formKey.currentState!.validate()) {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('isLoggedIn', true);
-      await prefs.setString('userEmail', _emailController.text.trim());
+      final email = _emailController.text.trim();
+      await prefs.setString('userEmail', email);
+      // لو مفيش اسم محفوظ من قبل، نشيله من الإيميل تلقائياً
+      final existingName = prefs.getString('userName') ?? '';
+      if (existingName.isEmpty) {
+        final nameFromEmail = email.split('@').first.replaceAll('.', ' ').replaceAll('_', ' ');
+        await prefs.setString('userName', nameFromEmail);
+      }
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, Routes.selectCategories);
+      final hasChosenLanguage = prefs.getString('langCode') != null;
+      Navigator.pushReplacementNamed(
+        context,
+        hasChosenLanguage ? Routes.selectCategories : Routes.startPage,
+      );
     }
   }
 
@@ -56,6 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: 24.w),
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           child: Form(
             key: _formKey,
             child: Column(

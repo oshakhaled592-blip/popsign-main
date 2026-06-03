@@ -87,7 +87,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
               setState(() => _name = newName);
               nav.pop();
             },
-            child: Text('Save', style: TextStyle(color: accent, fontSize: 14.sp, fontWeight: FontWeight.w700)),
+            child: Text(S.get('save'), style: TextStyle(color: accent, fontSize: 14.sp, fontWeight: FontWeight.w700)),
           ),
         ],
       ),

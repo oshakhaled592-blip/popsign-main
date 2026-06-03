@@ -45,6 +45,7 @@ class S {
       'new_password':     'New Password',
       'confirm_password': 'Confirm Password',
       'cancel':           'Cancel',
+      'save':             'Save',
       'reset_title':      'Reset Progress?',
       'reset_body':       'All progress will be reset.\nThis cannot be undone.',
     },

@@ -15,6 +15,7 @@ import '../../features/initialization/ui/screens/profile._screen.dart';
 import '../../features/initialization/ui/screens/account_info_screen.dart';
 import '../../features/initialization/ui/screens/onboarding_screen.dart';
 import '../../features/initialization/ui/screens/sign_practice_screen.dart';
+import '../../features/initialization/ui/screens/chat_screen.dart';
 
 class AppRouter {
   Route<dynamic> generateRoute(RouteSettings settings) {
@@ -95,6 +96,11 @@ class AppRouter {
       case Routes.reset:
         return MaterialPageRoute(
           builder: (_) => const ResetScreen(),
+        );
+
+      case Routes.chatScreen:
+        return MaterialPageRoute(
+          builder: (_) => const ChatScreen(),
         );
 
       default:

@@ -36,10 +36,13 @@ class _SplashScreenState extends State<SplashScreen>
       if (!mounted) return;
       if (!hasSeenOnboarding) {
         Navigator.pushReplacementNamed(context, Routes.onboarding);
+      } else if (!isLoggedIn) {
+        Navigator.pushReplacementNamed(context, Routes.login);
       } else {
+        final hasChosenLanguage = prefs.getString('langCode') != null;
         Navigator.pushReplacementNamed(
           context,
-          isLoggedIn ? Routes.selectCategories : Routes.login,
+          hasChosenLanguage ? Routes.selectCategories : Routes.startPage,
         );
       }
     });

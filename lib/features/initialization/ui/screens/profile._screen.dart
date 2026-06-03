@@ -28,7 +28,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _loadName() async {
     final prefs = await SharedPreferences.getInstance();
-    if (mounted) setState(() => _userName = prefs.getString('userName') ?? '');
+    String name = prefs.getString('userName') ?? '';
+    if (name.isEmpty) {
+      final email = prefs.getString('userEmail') ?? '';
+      name = email.isNotEmpty
+          ? email.split('@').first.replaceAll('.', ' ').replaceAll('_', ' ')
+          : '';
+    }
+    if (mounted) setState(() => _userName = name);
   }
 
   void _editName() {
@@ -85,7 +92,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               setState(() => _userName = name);
               nav.pop();
             },
-            child: Text('Save',
+            child: Text(S.get('save'),
                 style: TextStyle(color: accent, fontSize: 14.sp, fontWeight: FontWeight.w700)),
           ),
         ],
@@ -338,7 +345,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       subText: subText,
                       isDivider: false,
                       onTap: () =>
-                          Navigator.pushNamed(context, Routes.wordList),
+                          Navigator.pushNamed(context, Routes.selectCategories),
                     ),
                   ],
                 ),
@@ -351,6 +358,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   final nav = Navigator.of(context);
                   final prefs = await SharedPreferences.getInstance();
                   await prefs.setBool('isLoggedIn', false);
+                  await prefs.remove('userName');
+                  await prefs.remove('userEmail');
+                  await prefs.remove('langCode');
+                  await prefs.remove('langName');
+                  await prefs.remove('langFlag');
                   nav.pushNamedAndRemoveUntil(Routes.login, (route) => false);
                 },
                 child: Container(

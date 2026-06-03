@@ -247,16 +247,13 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
 
                     // video preview
                     if (_videoReady && _videoController != null)
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(16.r),
+                      Center(
                         child: SizedBox(
-                          width: double.infinity,
-                          height: 200.h,
-                          child: FittedBox(
-                            fit: BoxFit.cover,
-                            child: SizedBox(
-                              width: _videoController!.value.size.width,
-                              height: _videoController!.value.size.height,
+                          width: 220.w,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(16.r),
+                            child: AspectRatio(
+                              aspectRatio: _videoController!.value.aspectRatio,
                               child: VideoPlayer(_videoController!),
                             ),
                           ),
