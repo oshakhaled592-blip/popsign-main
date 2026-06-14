@@ -57,7 +57,6 @@ class DefaultFirebaseOptions {
     projectId: 'popsign-main',
     storageBucket: 'popsign-main.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyCvPqkJJAR_F0auS1zdbj3j_7Pklhgyhsg',
     appId: '1:266459797324:ios:0d982da93a9d0bdfeba1e9',
@@ -66,7 +65,6 @@ class DefaultFirebaseOptions {
     storageBucket: 'popsign-main.firebasestorage.app',
     iosBundleId: 'com.example.popsign',
   );
-
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyCvPqkJJAR_F0auS1zdbj3j_7Pklhgyhsg',
     appId: '1:266459797324:ios:0d982da93a9d0bdfeba1e9',

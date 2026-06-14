@@ -10,6 +10,10 @@ class TextFormWidget extends StatefulWidget {
   final bool? obscureText;
   final bool? autofocus;
   final TextInputType? keyboardType;
+
+  // إضافة validator
+  final String? Function(String?)? validator;
+
   const TextFormWidget({
     super.key,
     required this.controller,
@@ -18,6 +22,7 @@ class TextFormWidget extends StatefulWidget {
     this.icon,
     this.obscureText,
     this.autofocus,
+    this.validator,
   });
 
   @override
@@ -26,10 +31,12 @@ class TextFormWidget extends StatefulWidget {
 
 class _TextFormWidgetState extends State<TextFormWidget> {
   bool _isObscured = true;
+
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: widget.controller,
+      validator: widget.validator,
       style: AppTextStyles.font13RegularGray,
       keyboardType: widget.keyboardType,
       autofocus: widget.autofocus ?? false,
@@ -38,13 +45,22 @@ class _TextFormWidgetState extends State<TextFormWidget> {
         filled: true,
         fillColor: AppColors.darkGray,
         prefixIcon: widget.icon != null
-            ? Icon(widget.icon, color: AppColors.grayText)
+            ? Icon(
+                widget.icon,
+                color: AppColors.grayText,
+              )
             : null,
         suffixIcon: widget.obscureText == true
             ? IconButton(
-                onPressed: () => setState(() => _isObscured = !_isObscured),
+                onPressed: () {
+                  setState(() {
+                    _isObscured = !_isObscured;
+                  });
+                },
                 icon: Icon(
-                  _isObscured ? Icons.visibility : Icons.visibility_off,
+                  _isObscured
+                      ? Icons.visibility
+                      : Icons.visibility_off,
                   color: AppColors.grayText,
                 ),
               )
@@ -54,6 +70,22 @@ class _TextFormWidgetState extends State<TextFormWidget> {
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30.r),
           borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30.r),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30.r),
+          borderSide: BorderSide.none,
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30.r),
+          borderSide: const BorderSide(color: Colors.red),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30.r),
+          borderSide: const BorderSide(color: Colors.red),
         ),
       ),
     );

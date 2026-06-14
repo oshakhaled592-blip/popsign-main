@@ -39,6 +39,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   void _submit() {
     if (_formKey.currentState!.validate()) {
       setState(() => _done = true);
+
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) Navigator.pop(context);
       });
@@ -56,7 +57,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: 24.w),
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          keyboardDismissBehavior:
+              ScrollViewKeyboardDismissBehavior.onDrag,
           child: Form(
             key: _formKey,
             child: Column(
@@ -88,7 +90,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     width: 80.w,
                     height: 80.h,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF22C55E).withValues(alpha: 0.12),
+                      color: const Color(0xFF22C55E).withOpacity(0.12),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -104,9 +106,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 Center(
                   child: Text(
                     "Reset Password",
-                    style: AppTextStyles.title(context).copyWith(
+                    style: AppTextStyles.font24BoldWhite.copyWith(
                       fontSize: 26.sp,
-                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),
@@ -116,7 +117,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 Center(
                   child: Text(
                     "Enter your new password below",
-                    style: AppTextStyles.small(context).copyWith(
+                    style: AppTextStyles.font13RegularGray.copyWith(
                       fontSize: 14.sp,
                     ),
                   ),
@@ -130,11 +131,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     hintText: S.get('new_password'),
                     icon: Icons.lock_outline,
                     obscureText: true,
-                    validator: (v) {
-                      if (v == null || v.isEmpty) return "Enter a new password";
-                      if (v.length < 6) return "At least 6 characters";
-                      return null;
-                    },
                   ),
 
                   SizedBox(height: 18.h),
@@ -144,13 +140,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     hintText: S.get('confirm_password'),
                     icon: Icons.lock_outline,
                     obscureText: true,
-                    validator: (v) {
-                      if (v == null || v.isEmpty) return "Confirm your password";
-                      if (v != _newPasswordController.text) {
-                        return "Passwords do not match";
-                      }
-                      return null;
-                    },
                   ),
 
                   SizedBox(height: 36.h),
@@ -181,9 +170,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                         Text(
                           "Password reset!",
-                          style: AppTextStyles.title(context).copyWith(
+                          style: AppTextStyles.font24BoldWhite.copyWith(
                             fontSize: 22.sp,
-                            fontWeight: FontWeight.w700,
                             color: const Color(0xFF22C55E),
                           ),
                         ),
@@ -192,7 +180,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
                         Text(
                           "Taking you back to login...",
-                          style: AppTextStyles.small(context).copyWith(
+                          style: AppTextStyles.font13RegularGray.copyWith(
                             fontSize: 14.sp,
                           ),
                         ),

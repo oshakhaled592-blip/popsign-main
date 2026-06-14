@@ -60,7 +60,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                 Text(
                   "Learn a Language easily with Cards",
                   textAlign: TextAlign.center,
-                  style: AppTextStyles.title(context).copyWith(
+                  style: AppTextStyles.font24BoldWhite.copyWith(
                     fontSize: 32.sp,
                     fontWeight: FontWeight.bold,
                   ),
@@ -71,7 +71,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                 Text(
                   "Learn words using cards,\nchoosing levels that are convenient for you",
                   textAlign: TextAlign.center,
-                  style: AppTextStyles.small(context).copyWith(
+                  style: AppTextStyles.font13RegularGray.copyWith(
                     height: 1.5,
                     fontSize: 15.sp,
                   ),
@@ -85,7 +85,10 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                   width: double.infinity,
                   icon: Icons.bolt,
                   onPressed: () {
-                    Navigator.pushNamed(context, Routes.selectLanguage);
+                    Navigator.pushNamed(
+                      context,
+                      Routes.selectLanguage,
+                    );
                   },
                   radius: 16.r,
                 ),
