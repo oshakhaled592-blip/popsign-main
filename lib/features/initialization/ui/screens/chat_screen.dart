@@ -23,20 +23,15 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   final List<_ChatMessage> _messages = [];
   bool _isTyping = false;
 
-  // اتجاه الكتابة بدون setState عشان مش يفقد الـ focus
-  final _inputDirNotifier = ValueNotifier<TextDirection>(TextDirection.rtl);
 
 
-  // أنيميشن الظهور للشاشة الأولى
   late AnimationController _pageController;
   late Animation<double> _pageFade;
 
-  // Speech-to-text
   final stt.SpeechToText _speech = stt.SpeechToText();
   bool _isListening = false;
   bool _speechAvailable = false;
 
-  // الأسئلة الثابتة الثلاثة
   final List<String> questions = [
     "ما هي مميزات التطبيق؟",
     "كيف أتواصل مع شخص أصم؟",
@@ -57,7 +52,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   Future<void> _initSpeech() async {
     try {
-      // اطلب إذن الميكروفون أولاً
+   
       final status = await Permission.microphone.request();
       if (!status.isGranted) {
         _speechAvailable = false;
@@ -139,11 +134,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     _pageController.dispose();
     _inputController.dispose();
     _scrollController.dispose();
-    _inputDirNotifier.dispose();
     super.dispose();
   }
 
-  // ─── محرك الردود الذكية ────────────────────────────────
   String _getResponse(String input) {
     final q = input.trim().toLowerCase();
 
@@ -237,7 +230,6 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       _isTyping = true;
     });
     _inputController.clear();
-    _inputDirNotifier.value = TextDirection.rtl;
     _scrollToBottom();
 
     final delay = 700 + min(text.length * 18, 1000).toInt();
@@ -263,9 +255,6 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     });
   }
 
-  // ══════════════════════════════════════════════════════
-  //  BUILD
-  // ══════════════════════════════════════════════════════
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -297,7 +286,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     );
   }
 
-  // ─── هيدر — نفس تصميم الأصل ──────────────────────────
+ 
   Widget _buildHeader() {
     return FadeTransition(
       opacity: _pageFade,
@@ -344,7 +333,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     );
   }
 
-  // ─── الأسئلة الشائعة — نفس تصميم الأصل تماماً ─────────
+
   Widget _buildCommonQuestions() {
     return FadeTransition(
       opacity: _pageFade,
@@ -371,7 +360,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
           const SizedBox(height: 18),
 
-          // الأسئلة الثلاثة الثابتة
+          
           ...List.generate(
             questions.length,
             (index) => _buildQuestionCard(questions[index], index),
@@ -381,7 +370,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     );
   }
 
-  // بطاقة السؤال — نفس الشكل الأصلي مع إمكانية الضغط
+  
   Widget _buildQuestionCard(String title, int index) {
     final slideAnim = Tween<Offset>(
       begin: const Offset(0, 1),
@@ -435,7 +424,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     );
   }
 
-  // ─── قائمة الرسائل ─────────────────────────────────────
+ 
   Widget _buildMessageList() {
     return ListView.builder(
       controller: _scrollController,
@@ -493,7 +482,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     );
   }
 
-  // ─── مؤشر الكتابة ─────────────────────────────────────
+ 
   Widget _buildTypingIndicator() {
     return Padding(
       padding: const EdgeInsets.only(left: 20, bottom: 4),
@@ -519,7 +508,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     );
   }
 
-  // ─── شريط الإدخال — نفس تصميم الأصل ──────────────────
+  
   Widget _buildInputBar() {
     return FadeTransition(
       opacity: _pageFade,
@@ -534,45 +523,31 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         child: Row(
           children: [
             Expanded(
-              child: ValueListenableBuilder<TextDirection>(
-                valueListenable: _inputDirNotifier,
-                builder: (_, dir, __) => TextField(
-                  controller: _inputController,
-                  cursorColor: Colors.white,
-                  cursorWidth: 2,
-                  textDirection: dir,
-                  textAlign: dir == TextDirection.rtl
-                      ? TextAlign.right
-                      : TextAlign.left,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    height: 1.4,
-                  ),
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    isCollapsed: true,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 8),
-                    hintText: 'اكتب رسالتك...',
-                    hintStyle: const TextStyle(
-                      color: Colors.white38,
-                      fontSize: 15,
-                    ),
-                    hintTextDirection: dir,
-                  ),
-                  onChanged: (text) {
-                    if (text.isEmpty) {
-                      _inputDirNotifier.value = TextDirection.rtl;
-                      return;
-                    }
-                    final code = text.trimLeft().runes.firstOrNull ?? 0;
-                    // عربي: 0x0600–0x06FF
-                    _inputDirNotifier.value = (code >= 0x0600 && code <= 0x06FF)
-                        ? TextDirection.rtl
-                        : TextDirection.ltr;
-                  },
-                  onSubmitted: (_) => _sendMessage(),
+              child: TextField(
+                controller: _inputController,
+                cursorColor: Colors.white,
+                cursorWidth: 2,
+                textDirection: TextDirection.rtl,
+                textAlign: TextAlign.right,
+                keyboardType: TextInputType.multiline,
+                maxLines: 1,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  height: 1.4,
                 ),
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  isCollapsed: true,
+                  contentPadding: EdgeInsets.symmetric(vertical: 8),
+                  hintText: 'اكتب رسالتك...',
+                  hintStyle: TextStyle(
+                    color: Colors.white38,
+                    fontSize: 15,
+                  ),
+                  hintTextDirection: TextDirection.rtl,
+                ),
+                onSubmitted: (_) => _sendMessage(),
               ),
             ),
             GestureDetector(
@@ -620,7 +595,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   }
 }
 
-// ─── أيقونة الروبوت المخصصة ───────────────────────────
+
 class RobotIcon extends StatelessWidget {
   final double size;
   const RobotIcon({super.key, this.size = 40});
@@ -637,7 +612,7 @@ class RobotIcon extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // الرأس الدائري الأزرق
+         
           Container(
             width: size * 0.72,
             height: size * 0.62,
@@ -646,7 +621,7 @@ class RobotIcon extends StatelessWidget {
               borderRadius: BorderRadius.circular(size * 0.18),
             ),
           ),
-          // الهوائي (antenna)
+          
           Positioned(
             top: size * 0.06,
             child: Column(
@@ -707,7 +682,7 @@ class RobotIcon extends StatelessWidget {
       );
 }
 
-// ─── أنيميشن نقاط الكتابة ─────────────────────────────
+
 class _TypingDots extends StatefulWidget {
   @override
   State<_TypingDots> createState() => _TypingDotsState();

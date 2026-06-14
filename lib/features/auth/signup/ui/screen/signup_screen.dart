@@ -1,203 +1,107 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:popsign/core/helpers/extension.dart';
+import 'package:popsign/core/routing/routes.dart';
 
-import '../../../../../core/l10n/app_strings.dart';
-import '../../../../../core/routing/routes.dart';
-import '../../../../../core/theme/app_colors.dart';
-import '../../../../../core/theme/language_notifier.dart';
+import '../../../../../core/helpers/spacing.dart';
 import '../../../../../core/theme/styles.dart';
 import '../../../../../core/widgets/linear_button.dart';
 import '../../../../../core/widgets/logo_and_name.dart';
 import '../../../../../core/widgets/text_form_widget.dart';
+import '../../../login/ui/widgets/dont_have_account.dart';
 
-class SignupScreen extends StatefulWidget {
+class SignupScreen extends StatelessWidget {
   const SignupScreen({super.key});
 
   @override
-  State<SignupScreen> createState() => _SignupScreenState();
-}
-
-class _SignupScreenState extends State<SignupScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    languageNotifier.addListener(_rebuild);
-  }
-
-  void _rebuild() => setState(() {});
-
-  @override
-  void dispose() {
-    languageNotifier.removeListener(_rebuild);
-    _nameController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  void _submit() async {
-    if (_formKey.currentState!.validate()) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('userName', _nameController.text.trim());
-      await prefs.setString('userEmail', _emailController.text.trim());
-      if (mounted) Navigator.pushReplacementNamed(context, Routes.login);
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Scaffold(
-      body: SafeArea(
+    final TextEditingController usernameController = TextEditingController();
+    final TextEditingController emailController = TextEditingController();
+    final TextEditingController passwordController = TextEditingController();
+    final TextEditingController confirmPasswordController =
+        TextEditingController();
+    return Scaffold(
+      // resizeToAvoidBottomInset: false,
+      body: Form(
         child: SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 24.w),
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-          child: Form(
-            key: _formKey,
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 35.w),
+            width: double.infinity.w,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(height: 16.h),
-
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Container(
-                    width: 44.w,
-                    height: 44.h,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardColor,
-                      borderRadius: BorderRadius.circular(14.r),
-                    ),
-                    child: Icon(
-                      Icons.arrow_back_rounded,
-                      size: 20.sp,
-                      color: Theme.of(context).textTheme.bodyLarge!.color,
-                    ),
-                  ),
-                ),
-
-                SizedBox(height: 30.h),
-
-                const Center(child: LogoAndName(compact: true)),
-
-                SizedBox(height: 36.h),
-
+                verticalSpace(110),
+                LogoAndName(),
+                verticalSpace(36),
+                Text("Sign Up", style: AppTextStyles.font24BoldWhite),
                 Text(
-                  S.get('create_account'),
-                  style: AppTextStyles.title(context).copyWith(fontSize: 26.sp),
+                  "create an account to continue",
+                  style: AppTextStyles.font13RegularWhite,
                 ),
-                SizedBox(height: 6.h),
-                Text(
-                  S.get('signup_sub'),
-                  style: AppTextStyles.small(context).copyWith(fontSize: 14.sp),
-                ),
-
-                SizedBox(height: 28.h),
-
-                _label(S.get('full_name'), context),
-                SizedBox(height: 8.h),
-                TextFormWidget(
-                  controller: _nameController,
-                  hintText: S.get('full_name'),
-                  icon: Icons.person_outline_rounded,
-                  keyboardType: TextInputType.name,
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) return "Please enter your name";
-                    if (v.trim().length < 3) return "At least 3 characters";
-                    return null;
-                  },
-                ),
-
-                SizedBox(height: 18.h),
-
-                _label(S.get('email'), context),
-                SizedBox(height: 8.h),
-                TextFormWidget(
-                  controller: _emailController,
-                  hintText: S.get('email'),
-                  icon: Icons.email_outlined,
-                  keyboardType: TextInputType.emailAddress,
-                  validator: (v) {
-                    if (v == null || v.isEmpty) return "Please enter your email";
-                    if (!v.contains('@') || !v.contains('.')) {
-                      return "Enter a valid email";
-                    }
-                    return null;
-                  },
-                ),
-
-                SizedBox(height: 18.h),
-
-                _label(S.get('password'), context),
-                SizedBox(height: 8.h),
-                TextFormWidget(
-                  controller: _passwordController,
-                  hintText: S.get('password'),
-                  icon: Icons.lock_outline_rounded,
-                  keyboardType: TextInputType.visiblePassword,
-                  obscureText: true,
-                  validator: (v) {
-                    if (v == null || v.isEmpty) return "Please enter a password";
-                    if (v.length < 6) return "At least 6 characters";
-                    return null;
-                  },
-                ),
-
-                SizedBox(height: 38.h),
-
-                LinearButton(text: S.get('signup'), onPressed: _submit),
-
-                SizedBox(height: 24.h),
-
-                Center(
-                  child: GestureDetector(
-                    onTap: () =>
-                        Navigator.pushReplacementNamed(context, Routes.login),
-                    child: RichText(
-                      text: TextSpan(
-                        style: AppTextStyles.small(context)
-                            .copyWith(fontSize: 14.sp),
-                        children: [
-                          TextSpan(text: "${S.get('already_have')}  "),
-                          TextSpan(
-                            text: S.get('login'),
-                            style: TextStyle(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14.sp,
-                            ),
-                          ),
-                        ],
+                verticalSpace(28),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    TextFormWidget(
+                      autofocus: true,
+                      controller: usernameController,
+                      hintText: "username",
+                      icon: Icons.person_2_outlined,
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+                    verticalSpace(20),
+                    TextFormWidget(
+                      autofocus: true,
+                      controller: emailController,
+                      hintText: "email",
+                      icon: Icons.email_outlined,
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+                    verticalSpace(20),
+                    TextFormWidget(
+                      controller: passwordController,
+                      keyboardType: TextInputType.visiblePassword,
+                      hintText: "Password",
+                      obscureText: true,
+                      icon: Icons.lock_outline,
+                    ),
+                    verticalSpace(20),
+                    TextFormWidget(
+                      controller: confirmPasswordController,
+                      keyboardType: TextInputType.visiblePassword,
+                      hintText: "confirm password",
+                      obscureText: true,
+                      icon: Icons.lock_outline,
+                    ),
+                    verticalSpace(7),
+                    Container(
+                      alignment: Alignment.centerRight,
+                      child: Text(
+                        "Forgot Password?",
+                        style: AppTextStyles.font13Regularpink,
                       ),
                     ),
-                  ),
+                    verticalSpace(17),
+                    LinearButton(text: "Sign Up", onPressed: () {
+                      context.pushNamed(Routes.login);
+                    }),
+                    verticalSpace(17),
+                    DontHaveAccount(
+                      text: "Already have an account? Go to the",
+                      actionText: 'Login Page',
+                      onTap: () {
+                        context.pushNamed(Routes.login);
+                      },
+                    ),
+                  ],
                 ),
-
-                SizedBox(height: 28.h),
               ],
             ),
           ),
         ),
       ),
-      ),
     );
   }
-
-  Widget _label(String text, BuildContext context) => Padding(
-        padding: EdgeInsets.only(left: 2.w),
-        child: Text(
-          text,
-          style: AppTextStyles.body(context).copyWith(
-            fontSize: 13.sp,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      );
 }

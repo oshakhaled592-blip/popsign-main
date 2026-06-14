@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "266459797324",
+    "project_id": "popsign-main",
+    "storage_bucket": "popsign-main.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:266459797324:android:9e3abdafbe17f27eeba1e9",
+        "android_client_info": {
+          "package_name": "com.example.popsign"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNm_0znNSOT9Ga_EM1EX7A3Th-RT0f6c8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:popsign/core/data/word_data.dart';
 import 'package:popsign/core/l10n/app_strings.dart';
 import 'package:popsign/core/routing/routes.dart';
+import 'package:popsign/core/services/progress_service.dart';
 import 'package:popsign/core/theme/language_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -111,10 +112,14 @@ class _WordListScreenState extends State<WordListScreen> {
     );
 
     if (result == true && mounted) {
+      final wasNotDone = words[index].progress < 3;
       setState(() {
-        if (words[index].progress < 3) words[index].progress++;
+        if (wasNotDone) words[index].progress++;
       });
-      _saveProgress();
+      await _saveProgress();
+      if (wasNotDone && words[index].progress == 3) {
+        ProgressService.onWordLearned();
+      }
     }
   }
 

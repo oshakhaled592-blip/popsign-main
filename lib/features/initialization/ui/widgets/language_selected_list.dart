@@ -1,53 +1,67 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../../core/theme/styles.dart';
+import 'package:popsign/core/helpers/spacing.dart';
+import 'package:popsign/core/theme/app_colors.dart';
+import 'package:popsign/core/theme/styles.dart';
 
-class LanguageSelectedList extends StatefulWidget {
-  final List<String> languages;
+class LanguageSelectList extends StatelessWidget {
+  const LanguageSelectList({
+    super.key,
+    required this.languages,
+    required this.selectedLanguageIndex,
+    required this.onLanguageSelected,
+  });
 
-  const LanguageSelectedList({super.key, required this.languages});
-
-  @override
-  State<LanguageSelectedList> createState() => _LanguageSelectedListState();
-}
-
-class _LanguageSelectedListState extends State<LanguageSelectedList> {
-  String selected = "";
+  final List<Map<String, String>> languages;
+  final int? selectedLanguageIndex;
+  final Function(int) onLanguageSelected;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: widget.languages.map((lang) {
-        final isSelected = selected == lang;
-
-        return GestureDetector(
-          onTap: () => setState(() => selected = lang),
-          child: Container(
-            margin: EdgeInsets.only(bottom: 12.h),
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-            decoration: BoxDecoration(
-              color: isSelected
-                  ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).cardColor,
-              borderRadius: BorderRadius.circular(16.r),
-              border: Border.all(
-                color: isSelected
-                    ? Theme.of(context).colorScheme.primary
-                    : Colors.grey.withValues(alpha: 0.2),
+    return SizedBox(
+      height:
+          languages.length * 12.h * 2 +
+          languages.length * 12.h * 2 +
+          languages.length * 48.h,
+      child: ListView.separated(
+        // shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: languages.length,
+        separatorBuilder: (context, index) => verticalSpace(10),
+        itemBuilder: (context, index) {
+          final isSelected = selectedLanguageIndex == index;
+          return GestureDetector(
+            onTap: () => onLanguageSelected(index),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+              decoration: BoxDecoration(
+                color: isSelected ? AppColors.darkGray : Colors.transparent,
+                borderRadius: BorderRadius.circular(16.r),
+                border: Border.all(color: AppColors.darkGray, width: 2.w),
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    languages[index]['flag']!,
+                    style: AppTextStyles.font24BoldWhite,
+                  ),
+                  horizontalSpace(16),
+                  Text(
+                    languages[index]['name']!,
+                    style: AppTextStyles.font18RegularWhiteInter.copyWith(
+                      color: Colors.white,
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.w400,
+                    ),
+                  ),
+                ],
               ),
             ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(lang, style: AppTextStyles.body(context)),
-                ),
-                if (isSelected)
-                  Icon(Icons.check, color: Theme.of(context).colorScheme.onPrimary),
-              ],
-            ),
-          ),
-        );
-      }).toList(),
+          );
+        },
+      ),
     );
   }
 }
