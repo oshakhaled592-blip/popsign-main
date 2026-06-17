@@ -12,7 +12,19 @@
       "Bash(Select-Object -ExpandProperty FullName)",
       "Bash(Sort-Object)",
       "Bash(python -c ' *)",
-      "Bash(adb shell *)"
+      "Bash(adb shell *)",
+      "Skill(run)",
+      "Skill(run:*)",
+      "Bash(dir /s \"c:\\\\Users\\\\Osha\\\\Downloads\\\\popsign-main \\(1\\)\\\\popsign-main\\\\lib\")",
+      "PowerShell(head -60)",
+      "Bash(curl -sS -m 30 -X DELETE -w \"\\\\nHTTP_STATUS:%{http_code}\\\\n\" https://allamxmax-sign-language-chatbot.hf.space/chat/history/5598ede5-e13b-4a2f-ab2d-7a64db8e1039)",
+      "Bash(curl -sS -m 20 -k http://91.108.113.135/api/docs/swagger.json -o /tmp/openapi.json -w \"STATUS:%{http_code}\\\\n\")",
+      "Read(//tmp/**)",
+      "Bash(curl -sS -m 20 -k http://91.108.113.135/api-docs/swagger.json -w \"\\\\nSTATUS2:%{http_code}\\\\n\" -o /tmp/openapi2.json)",
+      "Bash(curl -sS -m 20 -k http://91.108.113.135/api/docs/swagger-ui-init.js -o /tmp/swagger-init.js)",
+      "Bash(curl -sS -m 20 -k -X POST -H \"Content-Type: application/json\" -d '{\"user_id\":\"probe\"}' -w \"\\\\nSTATUS:%{http_code}\\\\n\" http://91.108.113.135/api/chat/new-session)",
+      "Bash(cd \"/c/Users/Osha/Downloads/popsign-main \\(1\\)/popsign-main\" && echo \"=== TEXT WITHOUT FLEXIBLE IN ROW/COLUMN ===\" && grep -B 3 \"children: \\\\[\" lib/features/auth/login/ui/widgets/dont_have_account.dart | tail -10)",
+      "Read(//c/c/Users/Osha/Downloads/popsign-main \\(1\\)/popsign-main/lib/features/auth/login/ui/widgets/**)"
     ]
   }
 }

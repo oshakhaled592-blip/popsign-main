@@ -203,7 +203,7 @@ class _PreStartScreenState extends State<PreStartScreen>
                     padding: EdgeInsets.symmetric(horizontal: 24.w),
                     physics: const BouncingScrollPhysics(),
                     itemCount: words.length,
-                    separatorBuilder: (_, __) => Divider(height: 1.h, color: divColor),
+                    separatorBuilder: (context, index) => Divider(height: 1.h, color: divColor),
                     itemBuilder: (_, i) {
                       return Container(
                         color: cardBg,

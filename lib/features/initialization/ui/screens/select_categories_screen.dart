@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:popsign/core/helpers/spacing.dart';
+import 'package:popsign/core/l10n/app_strings.dart';
+import 'package:popsign/core/routing/routes.dart';
+import 'package:popsign/core/theme/language_notifier.dart';
 import 'package:popsign/core/theme/styles.dart';
 import 'package:popsign/core/widgets/linear_button.dart';
-import 'package:popsign/features/initialization/ui/screens/dashboard_screen.dart';
 import '../../../../core/theme/app_colors.dart';
 
 
@@ -21,6 +22,20 @@ class SelectCategoriesScreen extends StatefulWidget {
 class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
   String? selectedLevel;
   bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    languageNotifier.addListener(_rebuild);
+  }
+
+  void _rebuild() => setState(() {});
+
+  @override
+  void dispose() {
+    languageNotifier.removeListener(_rebuild);
+    super.dispose();
+  }
 
   final List<Map<String, dynamic>> categories = [
     {'category': 'A1', 'quantity': '1-100 words', 'color': AppColors.a1Color},
@@ -37,38 +52,16 @@ class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
     setState(() => isLoading = true);
 
     try {
-      final user = FirebaseAuth.instance.currentUser;
-
-      // ❗ حماية لو المستخدم مش عامل login
-      if (user == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("User not logged in")),
-        );
-        return;
-      }
-
-      String uid = user.uid;
-
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .set({
-        "level": selectedLevel,
-        "completedLevels": [],
-        "learnedWords": 0,
-      }, SetOptions(merge: true));
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('userLevel', selectedLevel!);
+      await prefs.setBool('hasSelectedLevel', true);
 
       if (!mounted) return;
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const DashboardScreen(),
-        ),
-      );
+      Navigator.pushReplacementNamed(context, Routes.dashboard);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: $e")),
+        SnackBar(content: Text('${S.get('error_prefix')}: $e')),
       );
     } finally {
       if (mounted) {
@@ -87,7 +80,7 @@ class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
           child: Column(
             children: [
               Text(
-                'Select categories for\nlearning language',
+                S.get('select_level'),
                 style: AppTextStyles.font24BoldWhite,
                 textAlign: TextAlign.center,
               ),
@@ -97,7 +90,7 @@ class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
               Expanded(
                 child: ListView.separated(
                   itemCount: categories.length,
-                  separatorBuilder: (_, __) => verticalSpace(12),
+                  separatorBuilder: (context, index) => verticalSpace(12),
                   itemBuilder: (context, index) {
                     final item = categories[index];
                     final isSelected =
@@ -112,7 +105,7 @@ class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
                       child: Container(
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? Colors.green.withOpacity(0.3)
+                              ? Colors.green.withValues(alpha: 0.3)
                               : AppColors.darkGray,
                           borderRadius: BorderRadius.circular(16.r),
                         ),
@@ -162,14 +155,14 @@ class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
               verticalSpace(10),
 
               Text(
-                '5,000 words cover 97% of the English language',
+                S.get('words_coverage_note'),
                 style: AppTextStyles.font13RegularWhiteInter,
               ),
 
               verticalSpace(20),
 
               LinearButton(
-                text: isLoading ? "Loading..." : "Continue",
+                text: isLoading ? S.get('loading') : S.get('continue'),
                 onPressed:
                     (selectedLevel == null || isLoading)
                         ? null

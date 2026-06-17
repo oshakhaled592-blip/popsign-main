@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/services/auth_service.dart';
 import '../../../../core/theme/language_notifier.dart';
 
 class AccountInfoScreen extends StatefulWidget {
@@ -25,10 +26,11 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
 
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
+    final email = await AuthService().getEmail();
     if (mounted) {
       setState(() {
-        _name  = prefs.getString('userName')  ?? '';
-        _email = prefs.getString('userEmail') ?? '';
+        _name  = prefs.getString('userName') ?? '';
+        _email = email ?? '';
       });
     }
   }
@@ -141,7 +143,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
 
               ValueListenableBuilder<LanguageInfo>(
                 valueListenable: languageNotifier,
-                builder: (_, __, ___) => Text(
+                builder: (context, value, child) => Text(
                   S.get('account'),
                   style: TextStyle(color: textColor, fontSize: 24.sp, fontWeight: FontWeight.w700),
                 ),
@@ -185,7 +187,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                   ),
                   child: ValueListenableBuilder<LanguageInfo>(
                     valueListenable: languageNotifier,
-                    builder: (_, __, ___) => Text(
+                    builder: (context, value, child) => Text(
                       S.get('verified'),
                       style: TextStyle(color: accent, fontSize: 13.sp, fontWeight: FontWeight.w600),
                     ),

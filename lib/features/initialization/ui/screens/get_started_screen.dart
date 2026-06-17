@@ -58,7 +58,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                 verticalSpace(30),
 
                 Text(
-                  "Learn a Language easily with Cards",
+                  S.get('learn_lang_title'),
                   textAlign: TextAlign.center,
                   style: AppTextStyles.font24BoldWhite.copyWith(
                     fontSize: 32.sp,
@@ -69,7 +69,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                 verticalSpace(14),
 
                 Text(
-                  "Learn words using cards,\nchoosing levels that are convenient for you",
+                  S.get('learn_lang_subtitle'),
                   textAlign: TextAlign.center,
                   style: AppTextStyles.font13RegularGray.copyWith(
                     height: 1.5,

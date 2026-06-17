@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:popsign/core/helpers/extension.dart';
+import 'package:popsign/core/services/auth_service.dart';
 import '../../../../../core/helpers/spacing.dart';
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/routing/routes.dart';
+import '../../../../../core/theme/language_notifier.dart';
 import '../../../../../core/theme/styles.dart';
 import '../../../../../core/widgets/linear_button.dart';
 import '../../../../../core/widgets/logo_and_name.dart';
@@ -22,31 +25,49 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
+  @override
+  void initState() {
+    super.initState();
+    languageNotifier.addListener(_rebuild);
+  }
+
+  void _rebuild() => setState(() {});
+
   Future<void> login() async {
-    try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
-      );
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
 
-      if (!mounted) return;
-
-      context.pushNamed(Routes.startPage);
-    } on FirebaseAuthException catch (e) {
-      String message = "Something went wrong";
-
-      if (e.code == 'user-not-found') {
-        message = "No user found for this email";
-      } else if (e.code == 'wrong-password') {
-        message = "Wrong password";
-      } else if (e.code == 'invalid-email') {
-        message = "Invalid email";
-      }
-
+    if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
+        SnackBar(content: Text(S.get('enter_email_password'))),
       );
+      return;
     }
+
+    final result = await AuthService().login(email: email, password: password);
+
+    if (!result.success) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result.message)),
+      );
+      return;
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', true);
+
+    if (!mounted) return;
+
+    final hasChosenLanguage = prefs.getString('langCode') != null;
+    final hasSelectedLevel = prefs.getBool('hasSelectedLevel') ?? false;
+    final destination = !hasChosenLanguage
+        ? Routes.startPage
+        : !hasSelectedLevel
+            ? Routes.selectCategories
+            : Routes.dashboard;
+
+    context.pushNamedAndRemoveUntil(destination, predicate: (route) => false);
   }
 
   @override
@@ -61,9 +82,9 @@ class _LoginScreenState extends State<LoginScreen> {
             const LogoAndName(),
             verticalSpace(36),
 
-            Text("Login", style: AppTextStyles.font24BoldWhite),
+            Text(S.get('login'), style: AppTextStyles.font24BoldWhite),
             Text(
-              "please sign in to continue",
+              S.get('login_subtitle'),
               style: AppTextStyles.font13RegularWhite,
             ),
 
@@ -71,7 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
             TextFormWidget(
               controller: emailController,
-              hintText: "email",
+              hintText: S.get('email'),
               icon: Icons.email_outlined,
               keyboardType: TextInputType.emailAddress,
             ),
@@ -80,7 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
             TextFormWidget(
               controller: passwordController,
-              hintText: "Password",
+              hintText: S.get('password'),
               icon: Icons.lock_outline,
               obscureText: true,
               keyboardType: TextInputType.visiblePassword,
@@ -90,24 +111,27 @@ class _LoginScreenState extends State<LoginScreen> {
 
             Align(
               alignment: Alignment.centerRight,
-              child: Text(
-                "Forgot Password?",
-                style: AppTextStyles.font13Regularpink,
+              child: GestureDetector(
+                onTap: () => context.pushNamed(Routes.forgotPassword),
+                child: Text(
+                  S.get('forgot'),
+                  style: AppTextStyles.font13Regularpink,
+                ),
               ),
             ),
 
             verticalSpace(17),
 
             LinearButton(
-              text: "Login",
+              text: S.get('login'),
               onPressed: login,
             ),
 
             verticalSpace(17),
 
             DontHaveAccount(
-              text: "Don't have an account? please ",
-              actionText: 'Sign Up',
+              text: S.get('dont_have'),
+              actionText: S.get('signup'),
               onTap: () {
                 context.pushNamed(Routes.signup);
               },
@@ -120,6 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
+    languageNotifier.removeListener(_rebuild);
     emailController.dispose();
     passwordController.dispose();
     super.dispose();

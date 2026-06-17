@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/routing/routes.dart';
+import '../../../../core/services/auth_service.dart';
 import '../../../../core/theme/language_notifier.dart';
 import '../../../../core/theme/theme_notifier.dart';
 
@@ -30,7 +31,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final prefs = await SharedPreferences.getInstance();
     String name = prefs.getString('userName') ?? '';
     if (name.isEmpty) {
-      final email = prefs.getString('userEmail') ?? '';
+      final email = await AuthService().getEmail() ?? '';
       name = email.isNotEmpty
           ? email.split('@').first.replaceAll('.', ' ').replaceAll('_', ' ')
           : '';
@@ -116,7 +117,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _showComingSoon(String title) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text("$title — coming soon"),
+        content: Text('$title — ${S.get('coming_soon')}'),
         behavior: SnackBarBehavior.floating,
         backgroundColor: const Color(0xFF22C55E),
         duration: const Duration(seconds: 2),
@@ -221,7 +222,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    _userName.isNotEmpty ? _userName : 'Tap to set name',
+                                    _userName.isNotEmpty ? _userName : S.get('tap_to_set_name'),
                                     style: TextStyle(
                                       color: _userName.isNotEmpty ? textColor : subText,
                                       fontSize: 18.sp,
@@ -251,7 +252,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       child: ValueListenableBuilder<LanguageInfo>(
                         valueListenable: languageNotifier,
-                        builder: (_, __, ___) => Text(
+                        builder: (context, value, child) => Text(
                           S.get('my_progress'),
                           style: TextStyle(
                             color: accent,
@@ -356,13 +357,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
               GestureDetector(
                 onTap: () async {
                   final nav = Navigator.of(context);
+                  await AuthService().logout();
                   final prefs = await SharedPreferences.getInstance();
                   await prefs.setBool('isLoggedIn', false);
                   await prefs.remove('userName');
-                  await prefs.remove('userEmail');
                   await prefs.remove('langCode');
                   await prefs.remove('langName');
                   await prefs.remove('langFlag');
+                  await prefs.remove('hasSelectedLevel');
+                  await prefs.remove('userLevel');
+                  await prefs.remove('userPriorKnowledge');
+                  await prefs.remove('userPurpose');
+                  await prefs.remove('userMinutesPerDay');
                   nav.pushNamedAndRemoveUntil(Routes.login, (route) => false);
                 },
                 child: Container(
@@ -377,7 +383,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.logout_rounded, color: Colors.red, size: 20),
+                      Icon(Icons.logout_rounded, color: Colors.red, size: 20.sp),
                       SizedBox(width: 10.w),
                       Text(
                         S.get('logout'),
@@ -443,10 +449,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                 ),
-                if (trailing != null) trailing,
-                if (trailing == null)
-                  Icon(Icons.arrow_forward_ios_rounded,
-                      color: subText, size: 14),
+                trailing ??
+                    Icon(Icons.arrow_forward_ios_rounded,
+                        color: subText, size: 14.sp),
               ],
             ),
           ),

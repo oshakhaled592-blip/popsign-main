@@ -6,6 +6,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:video_player/video_player.dart';
 import '../../../../core/models/prediction_model.dart';
 import '../../../../core/state/translation_notifier.dart';
+import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/theme/language_notifier.dart';
 
 class LostPage extends StatefulWidget {
   const LostPage({super.key});
@@ -27,6 +29,7 @@ class _LostPageState extends State<LostPage>
   @override
   void initState() {
     super.initState();
+    languageNotifier.addListener(_rebuild);
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 900),
@@ -45,6 +48,7 @@ class _LostPageState extends State<LostPage>
 
   @override
   void dispose() {
+    languageNotifier.removeListener(_rebuild);
     _notifier.removeListener(_rebuild);
     _notifier.dispose();
     _pulseController.dispose();
@@ -66,8 +70,8 @@ class _LostPageState extends State<LostPage>
     if (!status) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Storage permission is required to pick a video'),
+          SnackBar(
+            content: Text(S.get('storage_permission_required')),
             backgroundColor: Colors.red,
           ),
         );
@@ -116,7 +120,7 @@ class _LostPageState extends State<LostPage>
               SizedBox(height: 20.h),
               _sourceOption(
                 icon: Icons.video_library_rounded,
-                label: 'Choose from Gallery',
+                label: S.get('choose_gallery'),
                 onTap: () {
                   Navigator.pop(context);
                   _pickVideo(ImageSource.gallery);
@@ -126,7 +130,7 @@ class _LostPageState extends State<LostPage>
               SizedBox(height: 12.h),
               _sourceOption(
                 icon: Icons.videocam_rounded,
-                label: 'Record a Video',
+                label: S.get('record_video'),
                 onTap: () {
                   Navigator.pop(context);
                   _pickVideo(ImageSource.camera);
@@ -252,7 +256,7 @@ class _LostPageState extends State<LostPage>
           child: Column(
             children: [
               Text(
-                'Translate',
+                S.get('translate'),
                 textAlign: TextAlign.center,
                 style: TextStyle(color: textColor, fontSize: 18.sp, fontWeight: FontWeight.bold),
               ),
@@ -267,9 +271,9 @@ class _LostPageState extends State<LostPage>
                   SizedBox(width: 5.w),
                   Text(
                     switch (_notifier.serverStatus) {
-                      ServerStatus.online  => 'Server online',
-                      ServerStatus.offline => 'Server offline',
-                      ServerStatus.unknown => 'Checking…',
+                      ServerStatus.online  => S.get('server_online'),
+                      ServerStatus.offline => S.get('server_offline'),
+                      ServerStatus.unknown => S.get('checking'),
                     },
                     style: TextStyle(color: serverColor, fontSize: 11.sp),
                   ),
@@ -311,7 +315,7 @@ class _LostPageState extends State<LostPage>
               ),
               SizedBox(height: 16.h),
               Text(
-                'Supported Signs (${classes.length})',
+                '${S.get('supported_signs')} (${classes.length})',
                 style: TextStyle(
                   color: isDark ? Colors.white : const Color(0xFF1A1A2E),
                   fontSize: 16.sp, fontWeight: FontWeight.w700,
@@ -329,7 +333,7 @@ class _LostPageState extends State<LostPage>
                   child: Column(
                     children: [
                       Text(
-                        'Could not load classes',
+                        S.get('could_not_load_classes'),
                         style: TextStyle(color: isDark ? Colors.white38 : Colors.grey, fontSize: 14.sp),
                       ),
                       SizedBox(height: 12.h),
@@ -341,7 +345,7 @@ class _LostPageState extends State<LostPage>
                             color: const Color(0xFF6C63FF).withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(12.r),
                           ),
-                          child: Text('Retry', style: TextStyle(color: const Color(0xFF6C63FF), fontSize: 14.sp)),
+                          child: Text(S.get('retry'), style: TextStyle(color: const Color(0xFF6C63FF), fontSize: 14.sp)),
                         ),
                       ),
                     ],
@@ -419,11 +423,11 @@ class _LostPageState extends State<LostPage>
           ),
         ),
         SizedBox(height: 24.h),
-        Text('Upload your video',
+        Text(S.get('upload_your_video'),
             style: TextStyle(color: textColor, fontSize: 22.sp, fontWeight: FontWeight.bold)),
         SizedBox(height: 10.h),
         Text(
-          'Record or choose a sign-language\nvideo to get the translation',
+          S.get('record_or_choose_video'),
           textAlign: TextAlign.center,
           style: TextStyle(color: subColor, fontSize: 14.sp, height: 1.6),
         ),
@@ -475,13 +479,13 @@ class _LostPageState extends State<LostPage>
               child: const CircularProgressIndicator(strokeWidth: 2.5, color: Color(0xFF6C63FF)),
             ),
             SizedBox(width: 12.w),
-            Text('Analyzing video…',
+            Text(S.get('analyzing_video'),
                 style: TextStyle(color: textColor, fontSize: 16.sp, fontWeight: FontWeight.w600)),
           ],
         ),
         SizedBox(height: 8.h),
         Text(
-          'The model is processing your sign language',
+          S.get('model_processing'),
           textAlign: TextAlign.center,
           style: TextStyle(color: subColor, fontSize: 13.sp),
         ),
@@ -520,7 +524,7 @@ class _LostPageState extends State<LostPage>
                     color: purple.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(20.r),
                   ),
-                  child: Text('Translation',
+                  child: Text(S.get('translation_label'),
                       style: TextStyle(color: purple, fontSize: 12.sp, fontWeight: FontWeight.w600)),
                 ),
                 SizedBox(height: 12.h),
@@ -543,7 +547,7 @@ class _LostPageState extends State<LostPage>
                     borderRadius: BorderRadius.circular(20.r),
                   ),
                   child: Text(
-                    'Confidence  ${top.percent}',
+                    '${S.get('confidence_label')}  ${top.percent}',
                     style: TextStyle(color: Colors.green, fontSize: 13.sp, fontWeight: FontWeight.w600),
                   ),
                 ),
@@ -552,7 +556,7 @@ class _LostPageState extends State<LostPage>
           ),
           if (result.predictions.length > 1) ...[
             SizedBox(height: 16.h),
-            Text('Other possibilities', style: TextStyle(color: subColor, fontSize: 13.sp)),
+            Text(S.get('other_possibilities'), style: TextStyle(color: subColor, fontSize: 13.sp)),
             SizedBox(height: 8.h),
             Wrap(
               spacing: 8.w,
@@ -594,7 +598,7 @@ class _LostPageState extends State<LostPage>
           child: Icon(Icons.error_outline_rounded, color: Colors.red, size: 40.sp),
         ),
         SizedBox(height: 20.h),
-        Text('Something went wrong',
+        Text(S.get('something_wrong'),
             style: TextStyle(color: textColor, fontSize: 18.sp, fontWeight: FontWeight.w600)),
         SizedBox(height: 8.h),
         Text(
@@ -625,7 +629,7 @@ class _LostPageState extends State<LostPage>
         children: [
           Row(
             children: [
-              Text('Translation',
+              Text(S.get('translation_label'),
                   style: TextStyle(color: purple, fontSize: 12.sp, fontWeight: FontWeight.w600)),
               const Spacer(),
               GestureDetector(
@@ -635,7 +639,7 @@ class _LostPageState extends State<LostPage>
                   setState(() => _videoReady = false);
                   _notifier.clearSentence();
                 },
-                child: Text('Clear all',
+                child: Text(S.get('clear_all'),
                     style: TextStyle(color: Colors.red.withValues(alpha: 0.8), fontSize: 12.sp)),
               ),
             ],
@@ -671,7 +675,7 @@ class _LostPageState extends State<LostPage>
             }).toList(),
           ),
           SizedBox(height: 6.h),
-          Text('Long press a word to remove it',
+          Text(S.get('long_press_remove'),
               style: TextStyle(color: subColor, fontSize: 10.sp)),
         ],
       ),
@@ -715,7 +719,7 @@ class _LostPageState extends State<LostPage>
                   children: [
                     Icon(Icons.add_rounded, color: Colors.white, size: 22.sp),
                     SizedBox(width: 8.w),
-                    Text('Add Sign',
+                    Text(S.get('add_sign'),
                         style: TextStyle(color: Colors.white, fontSize: 16.sp, fontWeight: FontWeight.w600)),
                   ],
                 ),
@@ -746,7 +750,7 @@ class _LostPageState extends State<LostPage>
                 children: [
                   Icon(Icons.upload_rounded, color: Colors.white, size: 22.sp),
                   SizedBox(width: 8.w),
-                  Text('Upload your video',
+                  Text(S.get('upload_your_video'),
                       style: TextStyle(color: Colors.white, fontSize: 16.sp, fontWeight: FontWeight.w600)),
                 ],
               ),

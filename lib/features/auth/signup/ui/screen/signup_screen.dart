@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:popsign/core/helpers/extension.dart';
 import 'package:popsign/core/routing/routes.dart';
+import 'package:popsign/core/services/auth_service.dart';
 
 import '../../../../../core/helpers/spacing.dart';
+import '../../../../../core/l10n/app_strings.dart';
+import '../../../../../core/theme/language_notifier.dart';
 import '../../../../../core/theme/styles.dart';
 import '../../../../../core/widgets/linear_button.dart';
 import '../../../../../core/widgets/logo_and_name.dart';
@@ -28,42 +31,73 @@ class _SignupScreenState extends State<SignupScreen> {
 
   bool isLoading = false;
 
+  @override
+  void initState() {
+    super.initState();
+    languageNotifier.addListener(_rebuild);
+  }
+
+  void _rebuild() => setState(() {});
+
   Future<void> signUp() async {
     if (passwordController.text != confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Passwords do not match")),
+        SnackBar(content: Text(S.get('passwords_no_match'))),
       );
       return;
     }
 
     setState(() => isLoading = true);
 
-    try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
-      );
+    final email = emailController.text.trim();
+    final result = await AuthService().signup(
+      email: email,
+      password: passwordController.text.trim(),
+    );
 
+    if (!result.success) {
       if (!mounted) return;
-
-      context.pushNamed(Routes.login);
-    } on FirebaseAuthException catch (e) {
-      String message = "Something went wrong";
-
-      if (e.code == 'email-already-in-use') {
-        message = "Email already in use";
-      } else if (e.code == 'invalid-email') {
-        message = "Invalid email";
-      } else if (e.code == 'weak-password') {
-        message = "Password is too weak";
-      }
-
+      setState(() => isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
+        SnackBar(content: Text(result.message)),
       );
-    } finally {
-      if (mounted) setState(() => isLoading = false);
+      return;
     }
+
+    final prefs = await SharedPreferences.getInstance();
+    final username = usernameController.text.trim();
+    if (username.isNotEmpty) {
+      await prefs.setString('userName', username);
+    }
+
+    // The backend has no endpoint to persist these yet, so they're kept
+    // locally instead (matching how learning progress is already stored).
+    final priorKnowledge = prefs.getString('onb_priorKnowledge');
+    final purpose = prefs.getString('onb_purpose');
+    final level = prefs.getString('onb_level');
+    final minutesPerDay = prefs.getInt('onb_minutesPerDay');
+
+    if (priorKnowledge != null) await prefs.setString('userPriorKnowledge', priorKnowledge);
+    if (purpose != null) await prefs.setString('userPurpose', purpose);
+    if (level != null) {
+      await prefs.setString('userLevel', level);
+      await prefs.setBool('hasSelectedLevel', true);
+    }
+    if (minutesPerDay != null) await prefs.setInt('userMinutesPerDay', minutesPerDay);
+
+    await prefs.remove('onb_priorKnowledge');
+    await prefs.remove('onb_purpose');
+    await prefs.remove('onb_level');
+    await prefs.remove('onb_minutesPerDay');
+
+    if (!mounted) return;
+    setState(() => isLoading = false);
+
+    context.pushNamedAndRemoveUntil(
+      Routes.checkEmail,
+      arguments: email,
+      predicate: (route) => false,
+    );
   }
 
   @override
@@ -79,9 +113,9 @@ class _SignupScreenState extends State<SignupScreen> {
               const LogoAndName(),
               verticalSpace(36),
 
-              Text("Sign Up", style: AppTextStyles.font24BoldWhite),
+              Text(S.get('signup'), style: AppTextStyles.font24BoldWhite),
               Text(
-                "create an account to continue",
+                S.get('signup_subtitle'),
                 style: AppTextStyles.font13RegularWhite,
               ),
 
@@ -89,7 +123,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
               TextFormWidget(
                 controller: usernameController,
-                hintText: "username",
+                hintText: S.get('username'),
                 icon: Icons.person_2_outlined,
               ),
 
@@ -97,7 +131,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
               TextFormWidget(
                 controller: emailController,
-                hintText: "email",
+                hintText: S.get('email'),
                 icon: Icons.email_outlined,
                 keyboardType: TextInputType.emailAddress,
               ),
@@ -106,7 +140,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
               TextFormWidget(
                 controller: passwordController,
-                hintText: "password",
+                hintText: S.get('password'),
                 icon: Icons.lock_outline,
                 obscureText: true,
               ),
@@ -115,7 +149,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
               TextFormWidget(
                 controller: confirmPasswordController,
-                hintText: "confirm password",
+                hintText: S.get('confirm_password'),
                 icon: Icons.lock_outline,
                 obscureText: true,
               ),
@@ -123,15 +157,15 @@ class _SignupScreenState extends State<SignupScreen> {
               verticalSpace(17),
 
               LinearButton(
-                text: isLoading ? "Loading..." : "Sign Up",
+                text: S.get('signup'),
                 onPressed: isLoading ? null : signUp,
               ),
 
               verticalSpace(17),
 
               DontHaveAccount(
-                text: "Already have an account? Go to the",
-                actionText: 'Login Page',
+                text: S.get('already_have'),
+                actionText: S.get('login_page'),
                 onTap: () {
                   context.pushNamed(Routes.login);
                 },
@@ -145,6 +179,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   void dispose() {
+    languageNotifier.removeListener(_rebuild);
     usernameController.dispose();
     emailController.dispose();
     passwordController.dispose();

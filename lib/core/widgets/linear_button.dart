@@ -14,6 +14,7 @@ class LinearButton extends StatelessWidget {
   final void Function()? onPressed;
   final String text;
   const LinearButton({
+    super.key,
     this.icon,
     this.radius,
     this.width,
@@ -36,6 +37,7 @@ class LinearButton extends StatelessWidget {
           ),
           borderRadius: BorderRadius.circular(radius ?? 30.r),
         ),
+        padding: EdgeInsets.symmetric(horizontal: 8.w),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -43,7 +45,15 @@ class LinearButton extends StatelessWidget {
                 ? Icon(icon, color: AppColors.darkBackground)
                 : SizedBox.shrink(),
             icon != null ? horizontalSpace(5) : SizedBox.shrink(),
-            Text(text, style: AppTextStyles.font14Boldblack),
+            Flexible(
+              child: Text(
+                text,
+                style: AppTextStyles.font14Boldblack,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+              ),
+            ),
           ],
         ),
       ),

@@ -1,14 +1,18 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+
+import '../../../../core/services/chat_service.dart';
 
 class _ChatMessage {
   final String text;
   final bool isUser;
   _ChatMessage({required this.text, required this.isUser});
 }
+
+enum _ServerStatus { connecting, online, offline }
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -23,7 +27,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   final List<_ChatMessage> _messages = [];
   bool _isTyping = false;
 
-
+  final _service = ChatService();
+  String? _sessionId;
+  Future<String>? _sessionFuture;
+  _ServerStatus _serverStatus = _ServerStatus.connecting;
 
   late AnimationController _pageController;
   late Animation<double> _pageFade;
@@ -33,9 +40,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   bool _speechAvailable = false;
 
   final List<String> questions = [
-    "ما هي مميزات التطبيق؟",
-    "كيف أتواصل مع شخص أصم؟",
-    "كيف أقول مرحبا بلغة الإشارة؟",
+    "What are the app's features?",
+    "How do I communicate with a deaf person?",
+    "How do I say hello in sign language?",
   ];
 
   @override
@@ -48,6 +55,27 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     _pageFade = CurvedAnimation(parent: _pageController, curve: Curves.easeOut);
     _pageController.forward();
     _initSpeech();
+    _checkServerHealth();
+    _sessionFuture = _startSession();
+  }
+
+  Future<void> _checkServerHealth() async {
+    final online = await _service.checkHealth();
+    if (mounted) {
+      setState(() => _serverStatus = online ? _ServerStatus.online : _ServerStatus.offline);
+    }
+  }
+
+  Future<String> _startSession() async {
+    final id = await _service.newSession();
+    _sessionId = id;
+    return id;
+  }
+
+  Future<String> _ensureSession() {
+    if (_sessionId != null) return Future.value(_sessionId);
+    _sessionFuture ??= _startSession();
+    return _sessionFuture!;
   }
 
   Future<void> _initSpeech() async {
@@ -79,7 +107,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   Future<void> _toggleListening() async {
     if (!_speechAvailable) {
-      _showSnack('أوقف التطبيق وأعِد تشغيله لتفعيل الميكروفون');
+      _showSnack('Please restart the app to enable the microphone');
       return;
     }
 
@@ -112,7 +140,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         );
       } catch (_) {
         setState(() => _isListening = false);
-        _showSnack('تعذّر تشغيل الميكروفون، أعِد تشغيل التطبيق');
+        _showSnack('Could not start the microphone, please restart the app');
       }
     }
   }
@@ -137,91 +165,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  String _getResponse(String input) {
-    final q = input.trim().toLowerCase();
-
-    if (_matches(q, ['مرحبا', 'هاي', 'اهلا', 'السلام', 'صباح', 'مساء', 'hi', 'hello'])) {
-      return 'أهلاً وسهلاً بك! 😊\nأنا هنا لمساعدتك في كل ما يتعلق بتطبيق PopSign وتعلم لغة الإشارة. ما الذي تريد معرفته؟';
-    }
-    if (_matches(q, ['مميزات', 'ميزة', 'features', 'يعمل', 'فيه ايه', 'بيعمل'])) {
-      return 'تطبيق PopSign يتميز بثلاث مميزات رئيسية:\n\n'
-          '🤟 1. تحليل لغة الإشارة\nيستخدم الذكاء الاصطناعي لتحليل إشارات لغة الإشارة في الوقت الفعلي.\n\n'
-          '🌍 2. الترجمة\nيترجم بين لغة الإشارة والنص المكتوب مع دعم 14 لغة مختلفة.\n\n'
-          '📚 3. التعلم التدريجي\nنظام تعليمي بـ 6 مستويات (A1 إلى C2) لتعلم الإشارات خطوة بخطوة.\n\n'
-          'هل تريد معرفة المزيد عن أي ميزة منهم؟';
-    }
-    if (_matches(q, ['اتواصل', 'تواصل', 'شخص اصم', 'أصم', 'deaf', 'سمع'])) {
-      return 'للتواصل مع شخص أصم باستخدام PopSign! ❤️\n\n'
-          '1️⃣ افتح ميزة "الترجمة" من الملف الشخصي\n'
-          '2️⃣ سجّل فيديو للإشارة التي يؤديها\n'
-          '3️⃣ التطبيق يترجمها فوراً إلى نص\n'
-          '4️⃣ يمكنك تجميع عدة إشارات لتكوين جملة كاملة\n\n'
-          'التواصل الحقيقي يبدأ بتعلم لغة الآخرين 🌟';
-    }
-    if (_matches(q, ['مرحبا بلغة', 'اقول مرحبا', 'إشارة مرحبا', 'hello sign', 'كيف اقول'])) {
-      return 'لقول "مرحباً" بلغة الإشارة 🤟\n\n'
-          'الطريقة الشائعة في لغة الإشارة الأمريكية (ASL):\n'
-          '• افتح يدك بالكامل\n'
-          '• ضع أصابعك بجانب رأسك\n'
-          '• حرّك يدك للأمام بشكل تحية عسكرية\n\n'
-          'يمكنك التدرب على هذه الإشارة في قسم "التعلم" في التطبيق! 📱';
-    }
-    if (_matches(q, ['كيف اتعلم', 'طريقة', 'تعلم', 'ابدا', 'ابدأ', 'learn'])) {
-      return 'طريقة التعلم في PopSign سهلة جداً! 📖\n\n'
-          '1️⃣ اختر لغتك من 14 لغة متاحة\n'
-          '2️⃣ اختر مستواك (A1 للمبتدئين)\n'
-          '3️⃣ اضغط "تعلم" على أي كلمة\n'
-          '4️⃣ سجّل فيديو وأنت تؤدي الإشارة\n'
-          '5️⃣ الذكاء الاصطناعي يحكم: صح أم غلط ✓\n\n'
-          'كل كلمة تحتاج 3 مراجعات ناجحة! 🎯';
-    }
-    if (_matches(q, ['مستوى', 'مستويات', 'level', 'a1', 'a2', 'b1', 'b2', 'c1', 'c2'])) {
-      return 'التطبيق يدعم 6 مستويات حسب نظام CEFR 🎓\n\n'
-          '🟢 A1 - مبتدئ تماماً\n'
-          '🟩 A2 - أساسي\n'
-          '🟡 B1 - متوسط\n'
-          '🟠 B2 - فوق المتوسط\n'
-          '🔴 C1 - متقدم\n'
-          '🔵 C2 - متقن\n\n'
-          'ننصح بالبدء من A1! 💪';
-    }
-    if (_matches(q, ['ترجمة', 'ترجم', 'translate', 'مترجم'])) {
-      return 'ميزة الترجمة في PopSign 🔄\n\n'
-          '① من الملف الشخصي → اضغط "الترجمة"\n'
-          '② ارفع فيديو لأي إشارة\n'
-          '③ الذكاء الاصطناعي يترجمها فوراً\n\n'
-          '✨ يمكنك بناء جملة كاملة من عدة إشارات!';
-    }
-    if (_matches(q, ['لغة', 'لغات', 'language', 'languages'])) {
-      return 'التطبيق يدعم 14 لغة! 🌍\n\n'
-          '🇸🇦 العربية  •  🇺🇸 الإنجليزية  •  🇫🇷 الفرنسية\n'
-          '🇪🇸 الإسبانية  •  🇷🇺 الروسية  •  🇩🇪 الألمانية\n'
-          '🇮🇹 الإيطالية  •  🇹🇷 التركية  •  🇯🇵 اليابانية\n'
-          '🇨🇳 الصينية  •  🇰🇷 الكورية  •  🇧🇷 البرتغالية\n'
-          '🇮🇳 الهندية  •  🇳🇱 الهولندية';
-    }
-    if (_matches(q, ['شكرا', 'شكراً', 'thanks', 'ممتاز', 'تمام', 'كويس'])) {
-      return 'العفو! يسعدني مساعدتك دائماً 😊\nهل هناك أي شيء آخر تريد معرفته؟';
-    }
-    return _defaultResponse();
-  }
-
-  String _defaultResponse() {
-    final responses = [
-      'سؤال رائع! 🤔\nأنا متخصص في الإجابة عن أسئلة تطبيق PopSign ولغة الإشارة.\n\nجرب أن تسألني عن:\n• مميزات التطبيق\n• كيفية التعلم\n• المستويات المتاحة',
-      'شكراً على سؤالك! 💬\nيمكنني مساعدتك في:\n✅ كيفية استخدام التطبيق\n✅ تعلم لغة الإشارة\n✅ المستويات والمميزات',
-    ];
-    return responses[Random().nextInt(responses.length)];
-  }
-
-  bool _matches(String input, List<String> keywords) {
-    for (final k in keywords) {
-      if (input.contains(k)) return true;
-    }
-    return false;
-  }
-
-  // ─── إرسال رسالة ──────────────────────────────────────
+  // ─── Send a message ──────────────────────────────────────
   void _sendMessage([String? override]) async {
     final text = override ?? _inputController.text.trim();
     if (text.isEmpty) return;
@@ -232,15 +176,34 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     _inputController.clear();
     _scrollToBottom();
 
-    final delay = 700 + min(text.length * 18, 1000).toInt();
-    await Future.delayed(Duration(milliseconds: delay));
+    String reply;
+    try {
+      final sessionId = await _ensureSession();
+      reply = await _service.sendMessage(sessionId: sessionId, message: text);
+    } catch (_) {
+      reply = "Sorry, I couldn't reach the server. Please check your connection and try again.";
+    }
     if (!mounted) return;
 
     setState(() {
       _isTyping = false;
-      _messages.add(_ChatMessage(text: _getResponse(text), isUser: false));
+      _messages.add(_ChatMessage(text: reply, isUser: false));
     });
     _scrollToBottom();
+  }
+
+  Future<void> _clearChat() async {
+    final sessionId = _sessionId;
+    setState(() {
+      _messages.clear();
+      _sessionId = null;
+    });
+    if (sessionId != null) {
+      try {
+        await _service.deleteHistory(sessionId);
+      } catch (_) {}
+    }
+    _sessionFuture = _startSession();
   }
 
   void _scrollToBottom() {
@@ -291,41 +254,56 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     return FadeTransition(
       opacity: _pageFade,
       child: Padding(
-        padding: const EdgeInsets.only(top: 16, left: 4, right: 20, bottom: 12),
+        padding: EdgeInsets.only(top: 16.h, left: 4.w, right: 20.w, bottom: 12.h),
         child: Row(
           children: [
             IconButton(
               onPressed: () => Navigator.pop(context),
-              icon: const Icon(Icons.arrow_back_ios_new,
-                  color: Colors.white38, size: 20),
+              icon: Icon(Icons.arrow_back_ios_new,
+                  color: Colors.white38, size: 20.sp),
             ),
-            const SizedBox(width: 2),
+            SizedBox(width: 2.w),
 
-            const RobotIcon(size: 40),
+            RobotIcon(size: 40.w),
 
-            const SizedBox(width: 10),
+            SizedBox(width: 10.w),
 
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'ChatGPT',
-                  style: TextStyle(
-                    color: Color(0xFF3D73FF),
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Sign Assistant',
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: const Color(0xFF3D73FF),
+                      fontSize: 22.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                TweenAnimationBuilder<double>(
-                  tween: Tween(begin: 0.4, end: 1.0),
-                  duration: const Duration(seconds: 1),
-                  builder: (_, v, child) => Opacity(opacity: v, child: child),
-                  child: const Text(
-                    '• Online',
-                    style: TextStyle(color: Colors.green, fontSize: 15),
+                  Text(
+                    switch (_serverStatus) {
+                      _ServerStatus.online => '• Online',
+                      _ServerStatus.offline => '• Offline',
+                      _ServerStatus.connecting => '• Connecting…',
+                    },
+                    style: TextStyle(
+                      color: switch (_serverStatus) {
+                        _ServerStatus.online => Colors.green,
+                        _ServerStatus.offline => Colors.red,
+                        _ServerStatus.connecting => Colors.orange,
+                      },
+                      fontSize: 15.sp,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
+            ),
+
+            IconButton(
+              onPressed: _messages.isEmpty ? null : _clearChat,
+              icon: Icon(Icons.refresh_rounded,
+                  color: _messages.isEmpty ? Colors.white12 : Colors.white38, size: 22.sp),
             ),
           ],
         ),
@@ -339,26 +317,26 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       opacity: _pageFade,
       child: Column(
         children: [
-          const SizedBox(height: 28),
+          SizedBox(height: 28.h),
 
           Icon(
             Icons.edit_outlined,
             color: Colors.white.withValues(alpha: 0.15),
-            size: 30,
+            size: 30.sp,
           ),
 
-          const SizedBox(height: 6),
+          SizedBox(height: 6.h),
 
           Text(
             'Common Question',
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.15),
-              fontSize: 24,
+              fontSize: 24.sp,
               fontWeight: FontWeight.w500,
             ),
           ),
 
-          const SizedBox(height: 18),
+          SizedBox(height: 18.h),
 
           
           ...List.generate(
@@ -402,19 +380,25 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         child: GestureDetector(
           onTap: () => _sendMessage(title),
           child: Container(
-            height: 52,
-            margin: const EdgeInsets.symmetric(horizontal: 28, vertical: 6),
+            height: 52.h,
+            margin: EdgeInsets.symmetric(horizontal: 28.w, vertical: 6.h),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(30),
+              borderRadius: BorderRadius.circular(30.r),
             ),
             child: Center(
-              child: Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black87,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12.w),
+                child: Text(
+                  title,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black87,
+                  ),
                 ),
               ),
             ),
@@ -428,7 +412,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   Widget _buildMessageList() {
     return ListView.builder(
       controller: _scrollController,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       itemCount: _messages.length,
       itemBuilder: (_, i) => _buildBubble(_messages[i]),
     );
@@ -436,7 +420,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   Widget _buildBubble(_ChatMessage msg) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
+      padding: EdgeInsets.symmetric(vertical: 5.h),
       child: Row(
         mainAxisAlignment:
             msg.isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
@@ -444,25 +428,25 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         children: [
           if (!msg.isUser) ...[
             Container(
-              width: 28, height: 28,
+              width: 28.w, height: 28.w,
               decoration: BoxDecoration(
                 color: const Color(0xFF1A2030),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(8.r),
               ),
-              child: const RobotIcon(size: 28),
+              child: RobotIcon(size: 28.w),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 8.w),
           ],
           Flexible(
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
               decoration: BoxDecoration(
                 color: msg.isUser ? const Color(0xFF3D73FF) : Colors.white,
                 borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(18),
-                  topRight: const Radius.circular(18),
-                  bottomLeft: Radius.circular(msg.isUser ? 18 : 4),
-                  bottomRight: Radius.circular(msg.isUser ? 4 : 18),
+                  topLeft: Radius.circular(18.r),
+                  topRight: Radius.circular(18.r),
+                  bottomLeft: Radius.circular(msg.isUser ? 18.r : 4.r),
+                  bottomRight: Radius.circular(msg.isUser ? 4.r : 18.r),
                 ),
               ),
               child: Text(
@@ -470,37 +454,37 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 softWrap: true,
                 style: TextStyle(
                   color: msg.isUser ? Colors.white : const Color(0xFF1A1A2E),
-                  fontSize: 15,
+                  fontSize: 15.sp,
                   height: 1.55,
                 ),
               ),
             ),
           ),
-          if (msg.isUser) const SizedBox(width: 8),
+          if (msg.isUser) SizedBox(width: 8.w),
         ],
       ),
     );
   }
 
- 
+
   Widget _buildTypingIndicator() {
     return Padding(
-      padding: const EdgeInsets.only(left: 20, bottom: 4),
+      padding: EdgeInsets.only(left: 20.w, bottom: 4.h),
       child: Row(
         children: [
           Container(
-            width: 28, height: 28,
+            width: 28.w, height: 28.w,
             decoration: BoxDecoration(
               color: const Color(0xFF1A2030),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(8.r),
             ),
-            child: const RobotIcon(size: 28),
+            child: RobotIcon(size: 28.w),
           ),
-          const SizedBox(width: 8),
+          SizedBox(width: 8.w),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
             decoration: BoxDecoration(
-                color: Colors.white, borderRadius: BorderRadius.circular(18)),
+                color: Colors.white, borderRadius: BorderRadius.circular(18.r)),
             child: _TypingDots(),
           ),
         ],
@@ -513,12 +497,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     return FadeTransition(
       opacity: _pageFade,
       child: Container(
-        margin: const EdgeInsets.all(18),
-        height: 56,
-        padding: const EdgeInsets.symmetric(horizontal: 18),
+        margin: EdgeInsets.all(18.w),
+        height: 56.h,
+        padding: EdgeInsets.symmetric(horizontal: 18.w),
         decoration: BoxDecoration(
           color: const Color(0xFF1A2030),
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(30.r),
         ),
         child: Row(
           children: [
@@ -527,25 +511,22 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 controller: _inputController,
                 cursorColor: Colors.white,
                 cursorWidth: 2,
-                textDirection: TextDirection.rtl,
-                textAlign: TextAlign.right,
                 keyboardType: TextInputType.multiline,
                 maxLines: 1,
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.white,
-                  fontSize: 15,
+                  fontSize: 15.sp,
                   height: 1.4,
                 ),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   border: InputBorder.none,
                   isCollapsed: true,
-                  contentPadding: EdgeInsets.symmetric(vertical: 8),
-                  hintText: 'اكتب رسالتك...',
+                  contentPadding: EdgeInsets.symmetric(vertical: 8.h),
+                  hintText: 'Type your message...',
                   hintStyle: TextStyle(
                     color: Colors.white38,
-                    fontSize: 15,
+                    fontSize: 15.sp,
                   ),
-                  hintTextDirection: TextDirection.rtl,
                 ),
                 onSubmitted: (_) => _sendMessage(),
               ),
@@ -554,8 +535,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               onTap: _toggleListening,
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                width: 36,
-                height: 36,
+                width: 36.w,
+                height: 36.w,
                 decoration: BoxDecoration(
                   color: _isListening
                       ? Colors.red.withValues(alpha: 0.2)
@@ -565,11 +546,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 child: Icon(
                   _isListening ? Icons.mic_rounded : Icons.mic_none_rounded,
                   color: _isListening ? Colors.red : Colors.white,
-                  size: 24,
+                  size: 24.sp,
                 ),
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12.w),
             GestureDetector(
               onTap: _sendMessage,
               child: TweenAnimationBuilder<double>(
@@ -578,13 +559,13 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 builder: (_, value, child) =>
                     Transform.scale(scale: value, child: child),
                 child: Container(
-                  width: 36, height: 36,
+                  width: 36.w, height: 36.w,
                   decoration: const BoxDecoration(
                     color: Color(0xFF3D73FF),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.send_rounded,
-                      color: Colors.white, size: 20),
+                  child: Icon(Icons.send_rounded,
+                      color: Colors.white, size: 20.sp),
                 ),
               ),
             ),
@@ -719,9 +700,9 @@ class _TypingDotsState extends State<_TypingDots> with TickerProviderStateMixin 
       children: List.generate(3, (i) {
         return AnimatedBuilder(
           animation: _ctrls[i],
-          builder: (_, __) => Container(
-            margin: const EdgeInsets.symmetric(horizontal: 3),
-            width: 7, height: 7,
+          builder: (context, child) => Container(
+            margin: EdgeInsets.symmetric(horizontal: 3.w),
+            width: 7.w, height: 7.w,
             decoration: BoxDecoration(
               color: Color.lerp(
                   const Color(0xFFAAAAAA), const Color(0xFF1A1A2E), _ctrls[i].value),

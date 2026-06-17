@@ -1,8 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:popsign/core/helpers/spacing.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/theme/styles.dart';
 import '../../../../core/widgets/linear_button.dart';
@@ -30,18 +30,18 @@ class StartPageScreen extends StatelessWidget {
               verticalSpace(40),
               Text(
                 textAlign: TextAlign.center,
-                "Learn a Language easily with Cards",
+                S.get('learn_lang_title'),
                 style: AppTextStyles.font36BoldWhite,
               ),
               verticalSpace(16),
               Text(
                 textAlign: TextAlign.center,
-                "Learn words using cards, choosing \nlevels that are convenient for you",
+                S.get('learn_lang_subtitle'),
                 style: AppTextStyles.font17RegularGray,
               ),
               verticalSpace(40),
               LinearButton(
-                text: "Get Started",
+                text: S.get('get_started'),
                 height: 50.h,
                 width: 342.w,
                 icon: Icons.bolt,

@@ -167,7 +167,7 @@ class _WordListScreenState extends State<WordListScreen> {
 
         title: ValueListenableBuilder<LanguageInfo>(
           valueListenable: languageNotifier,
-          builder: (_, lang, __) => Text(
+          builder: (context, lang, child) => Text(
             "${lang.flag}  ${lang.name}",
             style: TextStyle(
               color: textColor,

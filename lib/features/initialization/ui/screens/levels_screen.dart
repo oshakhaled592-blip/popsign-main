@@ -1,54 +1,152 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:popsign/core/helpers/level_helper.dart';
-
+import 'package:popsign/core/l10n/app_strings.dart';
+import 'package:popsign/core/theme/app_colors.dart';
+import 'pre_start_screen.dart';
 
 class LevelsScreen extends StatelessWidget {
-  final String uid;
+  const LevelsScreen({super.key});
 
-  const LevelsScreen({super.key, required this.uid});
+  static const _levelColors = {
+    'A1': AppColors.a1Color,
+    'A2': AppColors.a2Color,
+    'B1': AppColors.b1Color,
+    'B2': AppColors.b2Color,
+    'C1': AppColors.c1Color,
+    'C2': AppColors.c2Color,
+  };
+
+  static const _levelDesc = {
+    'A1': '1 – 100 words',
+    'A2': '101 – 1k words',
+    'B1': '1k – 2k words',
+    'B2': '2k – 3k words',
+    'C1': '3k – 4k words',
+    'C2': '4k – 5k words',
+  };
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bg = isDark ? const Color(0xFF0B0F18) : const Color(0xFFF2F4FA);
+    final cardBg = isDark ? const Color(0xFF141A29) : Colors.white;
+    final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
+    final subColor = isDark ? Colors.white54 : Colors.grey.shade500;
+
     return Scaffold(
-      body: FutureBuilder<DocumentSnapshot>(
-        future: FirebaseFirestore.instance
-            .collection('users')
-            .doc(uid)
-            .get(),
+      backgroundColor: bg,
+      appBar: AppBar(
+        backgroundColor: bg,
+        elevation: 0,
+        centerTitle: true,
+        title: Text(
+          S.get('levels_title'),
+          style: TextStyle(
+            color: textColor,
+            fontSize: 18.sp,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        leading: GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: Icon(Icons.arrow_back_ios_new_rounded, color: textColor, size: 20.sp),
+        ),
+      ),
+      body: FutureBuilder<SharedPreferences>(
+        future: SharedPreferences.getInstance(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (!snapshot.hasData || !snapshot.data!.exists) {
-            return const Center(child: Text("No user data found"));
+          if (!snapshot.hasData) {
+            return Center(
+              child: Text(S.get('no_user_data'), style: TextStyle(color: textColor)),
+            );
           }
 
-          final data = snapshot.data!.data() as Map<String, dynamic>;
-          String userLevel = data["level"];
+          final userLevel = snapshot.data!.getString('userLevel') ?? 'A1';
 
-          List<String> levels = ["A1", "A2", "B1", "B2", "C1"];
-
-          return ListView.builder(
-            itemCount: levels.length,
+          return ListView.separated(
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+            itemCount: allLevels.length,
+            separatorBuilder: (context, i) => SizedBox(height: 12.h),
             itemBuilder: (context, index) {
-              String level = levels[index];
+              final level = allLevels[index];
+              final unlocked = isUnlocked(level, userLevel);
+              final color = _levelColors[level] ?? AppColors.a1Color;
 
-              bool unlocked = isUnlocked(level, userLevel);
-
-              return ListTile(
-                title: Text(level),
-                trailing: Icon(
-                  unlocked ? Icons.lock_open : Icons.lock,
-                  color: unlocked ? Colors.green : Colors.red,
-                ),
+              return GestureDetector(
                 onTap: unlocked
-                    ? () {
-                        print("Open $level");
-                        // هنا تفتحي محتوى المستوى
-                      }
+                    ? () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => PreStartScreen(
+                              selectedCategory: {'level': level},
+                            ),
+                          ),
+                        )
                     : null,
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                  decoration: BoxDecoration(
+                    color: cardBg,
+                    borderRadius: BorderRadius.circular(16.r),
+                    border: Border.all(
+                      color: unlocked
+                          ? color.withValues(alpha: 0.4)
+                          : Colors.grey.withValues(alpha: 0.15),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 44.w,
+                        height: 36.h,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: unlocked ? color : Colors.grey.shade600,
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
+                        child: Text(
+                          level,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 14.w),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              level,
+                              style: TextStyle(
+                                color: unlocked ? textColor : subColor,
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Text(
+                              _levelDesc[level] ?? '',
+                              style: TextStyle(color: subColor, fontSize: 12.sp),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Icon(
+                        unlocked ? Icons.lock_open_rounded : Icons.lock_rounded,
+                        color: unlocked ? color : Colors.grey.shade500,
+                        size: 22.sp,
+                      ),
+                    ],
+                  ),
+                ),
               );
             },
           );

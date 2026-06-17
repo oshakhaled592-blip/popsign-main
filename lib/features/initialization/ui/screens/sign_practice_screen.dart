@@ -7,6 +7,8 @@ import 'package:video_player/video_player.dart';
 
 import '../../../../core/services/translation_service.dart';
 import '../../../../core/models/prediction_model.dart';
+import '../../../../core/l10n/app_strings.dart';
+import '../../../../core/theme/language_notifier.dart';
 
 class SignPracticeScreen extends StatefulWidget {
   final String targetWord;
@@ -36,6 +38,7 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
   @override
   void initState() {
     super.initState();
+    languageNotifier.addListener(_rebuild);
     _celebController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
@@ -43,8 +46,11 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
     _celebAnim = CurvedAnimation(parent: _celebController, curve: Curves.elasticOut);
   }
 
+  void _rebuild() => setState(() {});
+
   @override
   void dispose() {
+    languageNotifier.removeListener(_rebuild);
     _videoController?.dispose();
     _celebController.dispose();
     super.dispose();
@@ -100,67 +106,6 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
     return s.isGranted;
   }
 
-  void _showSourcePicker() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: isDark ? const Color(0xFF141A29) : Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-      ),
-      builder: (_) => SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 24.w),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 40.w, height: 4.h,
-                decoration: BoxDecoration(
-                  color: isDark ? Colors.white24 : Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(4.r),
-                ),
-              ),
-              SizedBox(height: 20.h),
-              _srcBtn(Icons.video_library_rounded, 'Choose from Gallery',
-                  () { Navigator.pop(context); _pickAndPredict(ImageSource.gallery); }, isDark),
-              SizedBox(height: 12.h),
-              _srcBtn(Icons.videocam_rounded, 'Record a Video',
-                  () { Navigator.pop(context); _pickAndPredict(ImageSource.camera); }, isDark),
-              SizedBox(height: 8.h),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _srcBtn(IconData icon, String label, VoidCallback onTap, bool isDark) {
-    const purple = Color(0xFF6C63FF);
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
-        decoration: BoxDecoration(
-          color: purple.withValues(alpha: isDark ? 0.1 : 0.07),
-          borderRadius: BorderRadius.circular(14.r),
-          border: Border.all(color: purple.withValues(alpha: 0.2)),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: purple, size: 22.sp),
-            SizedBox(width: 14.w),
-            Text(label,
-                style: TextStyle(
-                  color: isDark ? Colors.white : const Color(0xFF1A1A2E),
-                  fontSize: 15.sp, fontWeight: FontWeight.w500)),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -193,7 +138,7 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
                     ),
                   ),
                   Expanded(
-                    child: Text('Practice Sign', textAlign: TextAlign.center,
+                    child: Text(S.get('practice_sign_title'), textAlign: TextAlign.center,
                         style: TextStyle(color: textColor, fontSize: 18.sp, fontWeight: FontWeight.bold)),
                   ),
                   SizedBox(width: 44.w),
@@ -227,7 +172,7 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
                               color: const Color(0xFF22C55E).withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(20.r),
                             ),
-                            child: Text('Sign this word',
+                            child: Text(S.get('sign_this_word'),
                                 style: TextStyle(color: const Color(0xFF22C55E),
                                     fontSize: 12.sp, fontWeight: FontWeight.w600)),
                           ),
@@ -236,7 +181,7 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
                               style: TextStyle(color: textColor, fontSize: 40.sp,
                                   fontWeight: FontWeight.bold)),
                           SizedBox(height: 8.h),
-                          Text('Sign the word above, then upload your video',
+                          Text(S.get('sign_word_instructions'),
                               textAlign: TextAlign.center,
                               style: TextStyle(color: subColor, fontSize: 13.sp, height: 1.5)),
                         ],
@@ -273,7 +218,7 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
                                 child: const CircularProgressIndicator(
                                     strokeWidth: 2.5, color: Color(0xFF6C63FF))),
                             SizedBox(width: 12.w),
-                            Text('Analyzing…',
+                            Text(S.get('analyzing'),
                                 style: TextStyle(color: textColor, fontSize: 16.sp,
                                     fontWeight: FontWeight.w600)),
                           ],
@@ -295,10 +240,10 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
                             children: [
                               Icon(Icons.check_circle_rounded, color: Colors.green, size: 52.sp),
                               SizedBox(height: 10.h),
-                              Text('Correct!', style: TextStyle(color: Colors.green,
+                              Text(S.get('correct_title'), style: TextStyle(color: Colors.green,
                                   fontSize: 24.sp, fontWeight: FontWeight.bold)),
                               SizedBox(height: 4.h),
-                              Text('You signed "${widget.targetWord}" correctly!',
+                              Text(S.get('signed_correctly').replaceAll('{word}', widget.targetWord),
                                   style: TextStyle(color: subColor, fontSize: 13.sp)),
                             ],
                           ),
@@ -318,15 +263,15 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
                           children: [
                             Icon(Icons.cancel_rounded, color: Colors.red, size: 48.sp),
                             SizedBox(height: 10.h),
-                            Text('Not quite!', style: TextStyle(color: Colors.red,
+                            Text(S.get('not_quite_title'), style: TextStyle(color: Colors.red,
                                 fontSize: 20.sp, fontWeight: FontWeight.bold)),
                             SizedBox(height: 8.h),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                _badge('Expected', widget.targetWord, Colors.green, isDark),
+                                _badge(S.get('expected_label'), widget.targetWord, Colors.green, isDark),
                                 SizedBox(width: 12.w),
-                                _badge('Got', _result!.top.label, Colors.red, isDark),
+                                _badge(S.get('got_label'), _result!.top.label, Colors.red, isDark),
                               ],
                             ),
                           ],
@@ -355,9 +300,9 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
               child: Column(
                 children: [
                   if (_status == _PracticeStatus.correct)
-                    _btn('Done ✓', Colors.green, () => Navigator.pop(context, true)),
+                    _btn(S.get('done_check'), Colors.green, () => Navigator.pop(context, true)),
                   if (_status == _PracticeStatus.wrong) ...[
-                    _btn('Try Again', const Color(0xFF6C63FF), () {
+                    _btn(S.get('try_again'), const Color(0xFF6C63FF), () {
                       setState(() {
                         _status = _PracticeStatus.idle;
                         _result = null;
@@ -365,17 +310,18 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
                         _videoController = null;
                         _videoReady = false;
                       });
-                      _showSourcePicker();
+                      _pickAndPredict(ImageSource.camera);
                     }),
                     SizedBox(height: 10.h),
                     GestureDetector(
                       onTap: () => Navigator.pop(context, false),
-                      child: Text('Skip for now',
+                      child: Text(S.get('skip_for_now'),
                           style: TextStyle(color: subColor, fontSize: 14.sp)),
                     ),
                   ],
                   if (_status == _PracticeStatus.idle)
-                    _btn('Upload Video', const Color(0xFF6C63FF), _showSourcePicker),
+                    _btn(S.get('record_video'), const Color(0xFF6C63FF),
+                        () => _pickAndPredict(ImageSource.camera)),
                   SizedBox(height: 12.h),
                   Container(
                     width: 120.w, height: 4.h,

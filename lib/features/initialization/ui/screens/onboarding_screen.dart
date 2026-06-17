@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/routing/routes.dart';
+import '../../../../core/theme/language_notifier.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -22,6 +24,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   @override
   void initState() {
     super.initState();
+    languageNotifier.addListener(_rebuild);
     _floatController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2000),
@@ -31,8 +34,11 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     );
   }
 
+  void _rebuild() => setState(() {});
+
   @override
   void dispose() {
+    languageNotifier.removeListener(_rebuild);
     _pageController.dispose();
     _floatController.dispose();
     super.dispose();
@@ -42,7 +48,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('hasSeenOnboarding', true);
     if (!mounted) return;
-    Navigator.pushReplacementNamed(context, Routes.login);
+    Navigator.pushReplacementNamed(context, Routes.selectLanguage);
   }
 
   void _next() {
@@ -105,7 +111,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                         borderRadius: BorderRadius.circular(20.r),
                       ),
                       child: Text(
-                        'Skip',
+                        S.get('skip'),
                         style: TextStyle(
                           color: subColor,
                           fontSize: 13.sp,
@@ -161,7 +167,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     child: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 200),
                       child: Text(
-                        isLast ? 'Get Started' : 'Next',
+                        isLast ? S.get('get_started') : S.get('next'),
                         key: ValueKey(isLast),
                         style: TextStyle(
                           color: Colors.white,
@@ -290,7 +296,7 @@ class _Page1 extends StatelessWidget {
                                   ),
                                   child: Center(
                                     child: Text(
-                                      'I Know',
+                                      S.get('i_know'),
                                       style: TextStyle(
                                         color: accent,
                                         fontSize: 12.sp,
@@ -312,7 +318,7 @@ class _Page1 extends StatelessWidget {
                                   ),
                                   child: Center(
                                     child: Text(
-                                      'Learn',
+                                      S.get('learn'),
                                       style: TextStyle(
                                         color: textColor,
                                         fontSize: 12.sp,
@@ -384,7 +390,7 @@ class _Page1 extends StatelessWidget {
           SizedBox(height: 44.h),
 
           Text(
-            'Learn with Flashcards',
+            S.get('flashcards_title'),
             textAlign: TextAlign.center,
             style: TextStyle(
               color: textColor,
@@ -397,7 +403,7 @@ class _Page1 extends StatelessWidget {
           SizedBox(height: 14.h),
 
           Text(
-            'Build your sign language vocabulary one card at a time. Mark what you know and focus on what you\'re still learning.',
+            S.get('flashcards_desc'),
             textAlign: TextAlign.center,
             style: TextStyle(
               color: subColor,
@@ -466,7 +472,7 @@ class _Page2 extends StatelessWidget {
           SizedBox(height: 44.h),
 
           Text(
-            'Translate Any Sign',
+            S.get('translate_sign_title'),
             textAlign: TextAlign.center,
             style: TextStyle(
               color: textColor,
@@ -479,7 +485,7 @@ class _Page2 extends StatelessWidget {
           SizedBox(height: 14.h),
 
           Text(
-            'Upload a sign language video and get an instant text translation. Breaking the barrier between sign and spoken language.',
+            S.get('translate_sign_desc'),
             textAlign: TextAlign.center,
             style: TextStyle(
               color: subColor,

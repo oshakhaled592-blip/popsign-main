@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:popsign/core/l10n/app_strings.dart';
 import 'package:popsign/core/routing/routes.dart';
+import 'package:popsign/core/theme/language_notifier.dart';
+import 'package:popsign/core/theme/theme_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -31,6 +34,20 @@ class _SplashScreenState extends State<SplashScreen>
     Future.delayed(const Duration(seconds: 2), () async {
       if (!mounted) return;
       final prefs = await SharedPreferences.getInstance();
+
+      final langCode = prefs.getString('langCode');
+      final langName = prefs.getString('langName');
+      final langFlag = prefs.getString('langFlag');
+      if (langCode != null && langName != null && langFlag != null) {
+        languageNotifier.value =
+            LanguageInfo(name: langName, flag: langFlag, code: langCode);
+      }
+
+      final isDark = prefs.getBool('isDark');
+      if (isDark != null) {
+        themeNotifier.value = isDark ? ThemeMode.dark : ThemeMode.light;
+      }
+
       final hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? false;
       final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
       if (!mounted) return;
@@ -40,10 +57,16 @@ class _SplashScreenState extends State<SplashScreen>
         Navigator.pushReplacementNamed(context, Routes.login);
       } else {
         final hasChosenLanguage = prefs.getString('langCode') != null;
-        Navigator.pushReplacementNamed(
-          context,
-          hasChosenLanguage ? Routes.selectCategories : Routes.startPage,
-        );
+        final hasSelectedLevel = prefs.getBool('hasSelectedLevel') ?? false;
+        String destination;
+        if (!hasChosenLanguage) {
+          destination = Routes.startPage;
+        } else if (!hasSelectedLevel) {
+          destination = Routes.selectCategories;
+        } else {
+          destination = Routes.dashboard;
+        }
+        Navigator.pushReplacementNamed(context, destination);
       }
     });
   }
@@ -68,7 +91,7 @@ class _SplashScreenState extends State<SplashScreen>
                 'assets/images/Logo.png',
                 width: 100.w,
                 height: 100.w,
-                errorBuilder: (_, __, ___) => Icon(
+                errorBuilder: (ctx, err, stack) => Icon(
                   Icons.hearing,
                   color: Colors.white,
                   size: 80.sp,
@@ -86,7 +109,7 @@ class _SplashScreenState extends State<SplashScreen>
               ),
               SizedBox(height: 8.h),
               Text(
-                "Learn a Language with Cards",
+                S.get('splash_tagline'),
                 style: TextStyle(
                   color: Colors.white38,
                   fontSize: 14.sp,
