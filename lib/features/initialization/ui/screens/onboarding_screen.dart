@@ -65,7 +65,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? const Color(0xFF0B0F18) : const Color(0xFFF5F7FB);
+    final bg = isDark ? const Color(0xFF0D0F1A) : const Color(0xFFF5F7FB);
     final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
     final subColor = isDark ? Colors.white54 : const Color(0xFF9CA3AF);
     const accent = Color(0xFF22C55E);
@@ -237,7 +237,7 @@ class _Page1 extends StatelessWidget {
                           horizontal: 20.w, vertical: 22.h),
                       decoration: BoxDecoration(
                         color: isDark
-                            ? const Color(0xFF18202E)
+                            ? const Color(0xFF171D2E)
                             : Colors.white,
                         borderRadius: BorderRadius.circular(24.r),
                         boxShadow: [
@@ -365,7 +365,7 @@ class _Page1 extends StatelessWidget {
                       padding: EdgeInsets.all(8.w),
                       decoration: BoxDecoration(
                         color: isDark
-                            ? const Color(0xFF1E2538)
+                            ? const Color(0xFF1E1F35)
                             : Colors.white,
                         shape: BoxShape.circle,
                         boxShadow: [
@@ -432,7 +432,7 @@ class _Page2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const purple = Color(0xFF6C63FF);
+    const purple = Color(0xFF7C3AED);
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 28.w),

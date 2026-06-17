@@ -42,13 +42,13 @@ class LinearButton extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             icon != null
-                ? Icon(icon, color: AppColors.darkBackground)
+                ? Icon(icon, color: Colors.white)
                 : SizedBox.shrink(),
             icon != null ? horizontalSpace(5) : SizedBox.shrink(),
             Flexible(
               child: Text(
                 text,
-                style: AppTextStyles.font14Boldblack,
+                style: AppTextStyles.font14Boldblack.copyWith(color: Colors.white),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,

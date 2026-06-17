@@ -86,13 +86,13 @@ class _ChooseLanguageScreenState extends State<ChooseLanguageScreen>
     final primary = Theme.of(context).colorScheme.primary;
     final textColor = isDark ? Colors.white : Colors.black;
     final cardColor = isDark ? const Color(0xFF0F1422) : Colors.white;
-    final btnBgColor = isDark ? const Color(0xFF171C2B) : Colors.grey.shade200;
+    final btnBgColor = isDark ? const Color(0xFF181830) : Colors.grey.shade200;
     final arrowBg =
         isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.shade100;
     final arrowIcon = isDark ? Colors.white60 : Colors.grey.shade600;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0B0F1A) : Colors.white,
+      backgroundColor: isDark ? const Color(0xFF0D0F1A) : Colors.white,
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
@@ -280,7 +280,20 @@ class _ChooseLanguageScreenState extends State<ChooseLanguageScreen>
                     await prefs.setString('langName', info.name);
                     await prefs.setString('langFlag', info.flag);
                     if (context.mounted) {
-                      context.pushNamed(Routes.aboutYou);
+                      final isLoggedIn =
+                          prefs.getBool('isLoggedIn') ?? false;
+                      if (isLoggedIn) {
+                        final hasSelectedLevel =
+                            prefs.getBool('hasSelectedLevel') ?? false;
+                        context.pushNamedAndRemoveUntil(
+                          hasSelectedLevel
+                              ? Routes.dashboard
+                              : Routes.selectCategories,
+                          predicate: (r) => false,
+                        );
+                      } else {
+                        context.pushNamed(Routes.aboutYou);
+                      }
                     }
                   }
                 },

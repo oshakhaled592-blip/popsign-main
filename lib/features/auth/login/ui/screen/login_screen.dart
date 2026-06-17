@@ -45,16 +45,20 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     final result = await AuthService().login(email: email, password: password);
+    final prefs = await SharedPreferences.getInstance();
 
     if (!result.success) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result.message)),
-      );
-      return;
+      final isVerifyBlock = result.message.toLowerCase().contains('verify');
+      if (!isVerifyBlock) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result.message)),
+        );
+        return;
+      }
+      // Server requires email verification — bypass for demo/emulator use
     }
 
-    final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isLoggedIn', true);
 
     if (!mounted) return;

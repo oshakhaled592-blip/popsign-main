@@ -47,7 +47,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF171C2B) : Colors.white,
+        backgroundColor: isDark ? const Color(0xFF181830) : Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
         title: Text(
           S.get('full_name'),
@@ -128,7 +128,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final bgColor    = isDark ? const Color(0xFF0B1020) : const Color(0xFFF5F7FB);
-    final cardColor  = isDark ? const Color(0xFF171C2B) : Colors.white;
+    final cardColor  = isDark ? const Color(0xFF181830) : Colors.white;
     final textColor  = isDark ? Colors.white : const Color(0xFF1A1A2E);
     final subText    = isDark ? Colors.white54 : const Color(0xFF9CA3AF);
 
@@ -369,6 +369,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   await prefs.remove('userPriorKnowledge');
                   await prefs.remove('userPurpose');
                   await prefs.remove('userMinutesPerDay');
+                  await prefs.remove('localEmail');
                   nav.pushNamedAndRemoveUntil(Routes.login, (route) => false);
                 },
                 child: Container(

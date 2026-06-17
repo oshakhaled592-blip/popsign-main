@@ -24,7 +24,12 @@
       "Bash(curl -sS -m 20 -k http://91.108.113.135/api/docs/swagger-ui-init.js -o /tmp/swagger-init.js)",
       "Bash(curl -sS -m 20 -k -X POST -H \"Content-Type: application/json\" -d '{\"user_id\":\"probe\"}' -w \"\\\\nSTATUS:%{http_code}\\\\n\" http://91.108.113.135/api/chat/new-session)",
       "Bash(cd \"/c/Users/Osha/Downloads/popsign-main \\(1\\)/popsign-main\" && echo \"=== TEXT WITHOUT FLEXIBLE IN ROW/COLUMN ===\" && grep -B 3 \"children: \\\\[\" lib/features/auth/login/ui/widgets/dont_have_account.dart | tail -10)",
-      "Read(//c/c/Users/Osha/Downloads/popsign-main \\(1\\)/popsign-main/lib/features/auth/login/ui/widgets/**)"
+      "Read(//c/c/Users/Osha/Downloads/popsign-main \\(1\\)/popsign-main/lib/features/auth/login/ui/widgets/**)",
+      "Bash(curl -s --max-time 10 -X POST http://91.108.113.135/api/auth/login -H 'Content-Type: application/json' -d '{\"email\":\"rofyyousry2004@gmail.com\",\"password\":\"osha123\"}')",
+      "Bash(curl -s --max-time 8 \"http://91.108.113.135/api/level\" -w \"\\\\nSTATUS:%{http_code}\")",
+      "Bash(curl -s --max-time 8 \"http://91.108.113.135/api/levels\" -w \"\\\\nSTATUS:%{http_code}\")",
+      "Bash(curl -s --max-time 8 \"http://91.108.113.135/api/submission\" -w \"\\\\nSTATUS:%{http_code}\")",
+      "Bash(curl -s --max-time 8 \"http://91.108.113.135/api/predict\" -X POST -w \"\\\\nSTATUS:%{http_code}\")"
     ]
   }
 }

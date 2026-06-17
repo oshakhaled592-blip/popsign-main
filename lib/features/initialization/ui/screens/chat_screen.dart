@@ -149,7 +149,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(msg),
-      backgroundColor: const Color(0xFF1A2030),
+      backgroundColor: const Color(0xFF1A1D2E),
       behavior: SnackBarBehavior.floating,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       duration: const Duration(seconds: 2),
@@ -227,14 +227,14 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFF0D1018), Color(0xFF070C17), Color(0xFF050914)],
+            colors: [Color(0xFF0D0F1A), Color(0xFF0A0C15), Color(0xFF080910)],
           ),
         ),
         child: SafeArea(
           child: Column(
             children: [
               _buildHeader(),
-              Container(height: 1, color: Colors.white54),
+              Container(height: 1, color: Colors.white.withValues(alpha: 0.08)),
               Expanded(
                 child: _messages.isEmpty
                     ? _buildCommonQuestions()
@@ -276,7 +276,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     'Sign Assistant',
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: const Color(0xFF3D73FF),
+                      color: const Color(0xFF7C3AED),
                       fontSize: 22.sp,
                       fontWeight: FontWeight.bold,
                     ),
@@ -430,7 +430,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             Container(
               width: 28.w, height: 28.w,
               decoration: BoxDecoration(
-                color: const Color(0xFF1A2030),
+                color: const Color(0xFF1A1D2E),
                 borderRadius: BorderRadius.circular(8.r),
               ),
               child: RobotIcon(size: 28.w),
@@ -441,7 +441,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
               decoration: BoxDecoration(
-                color: msg.isUser ? const Color(0xFF3D73FF) : Colors.white,
+                color: msg.isUser ? const Color(0xFF7C3AED) : Colors.white,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(18.r),
                   topRight: Radius.circular(18.r),
@@ -475,7 +475,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           Container(
             width: 28.w, height: 28.w,
             decoration: BoxDecoration(
-              color: const Color(0xFF1A2030),
+              color: const Color(0xFF1A1D2E),
               borderRadius: BorderRadius.circular(8.r),
             ),
             child: RobotIcon(size: 28.w),
@@ -501,7 +501,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         height: 56.h,
         padding: EdgeInsets.symmetric(horizontal: 18.w),
         decoration: BoxDecoration(
-          color: const Color(0xFF1A2030),
+          color: const Color(0xFF1A1D2E),
           borderRadius: BorderRadius.circular(30.r),
         ),
         child: Row(
@@ -561,7 +561,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 child: Container(
                   width: 36.w, height: 36.w,
                   decoration: const BoxDecoration(
-                    color: Color(0xFF3D73FF),
+                    color: Color(0xFF7C3AED),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(Icons.send_rounded,
@@ -587,7 +587,7 @@ class RobotIcon extends StatelessWidget {
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: const Color(0xFF1A2030),
+        color: const Color(0xFF1A1D2E),
         borderRadius: BorderRadius.circular(size * 0.28),
       ),
       child: Stack(
@@ -598,7 +598,7 @@ class RobotIcon extends StatelessWidget {
             width: size * 0.72,
             height: size * 0.62,
             decoration: BoxDecoration(
-              color: const Color(0xFF3D73FF),
+              color: const Color(0xFF7C3AED),
               borderRadius: BorderRadius.circular(size * 0.18),
             ),
           ),

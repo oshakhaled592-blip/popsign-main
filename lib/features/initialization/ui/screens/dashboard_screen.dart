@@ -100,8 +100,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? const Color(0xFF0B0F18) : const Color(0xFFF2F4FA);
-    final cardBg = isDark ? const Color(0xFF141A29) : Colors.white;
+    final bg = isDark ? const Color(0xFF0D0F1A) : const Color(0xFFF2F4FA);
+    final cardBg = isDark ? const Color(0xFF141829) : Colors.white;
     final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
     final subColor = isDark ? Colors.white54 : Colors.grey.shade500;
     final levelColor = _levelColors[_currentLevel] ?? AppColors.a1Color;

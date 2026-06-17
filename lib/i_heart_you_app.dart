@@ -10,7 +10,7 @@ class IHeartYouApp extends StatelessWidget {
 
   static final ThemeData _lightTheme = ThemeData(
     brightness: Brightness.light,
-    scaffoldBackgroundColor: const Color(0xFFF2F4FA),
+    scaffoldBackgroundColor: const Color(0xFFF5F7FF),
     colorScheme: ColorScheme.fromSeed(
       seedColor: AppColors.linear1,
       brightness: Brightness.light,

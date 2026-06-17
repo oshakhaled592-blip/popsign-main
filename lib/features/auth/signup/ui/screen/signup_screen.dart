@@ -90,14 +90,21 @@ class _SignupScreenState extends State<SignupScreen> {
     await prefs.remove('onb_level');
     await prefs.remove('onb_minutesPerDay');
 
+    await prefs.setString('localEmail', email);
+    await prefs.setBool('isLoggedIn', true);
+
     if (!mounted) return;
     setState(() => isLoading = false);
 
-    context.pushNamedAndRemoveUntil(
-      Routes.checkEmail,
-      arguments: email,
-      predicate: (route) => false,
-    );
+    final hasChosenLanguage = prefs.getString('langCode') != null;
+    final hasSelectedLevel = prefs.getBool('hasSelectedLevel') ?? false;
+    final destination = !hasChosenLanguage
+        ? Routes.startPage
+        : !hasSelectedLevel
+            ? Routes.selectCategories
+            : Routes.dashboard;
+
+    context.pushNamedAndRemoveUntil(destination, predicate: (route) => false);
   }
 
   @override

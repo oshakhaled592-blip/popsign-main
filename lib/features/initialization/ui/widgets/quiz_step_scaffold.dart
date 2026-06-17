@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/helpers/spacing.dart';
 
-const Color quizAccent = Color(0xFF4C6FFF);
+const Color quizAccent = Color(0xFF7C3AED);
 
 class QuizScaffold extends StatelessWidget {
   final int step;
@@ -26,9 +26,9 @@ class QuizScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? const Color(0xFF0B0F1A) : const Color(0xFFF5F7FB);
+    final bg = isDark ? const Color(0xFF0D0F1A) : const Color(0xFFF5F7FB);
     final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
-    final btnBgColor = isDark ? const Color(0xFF171C2B) : Colors.white;
+    final btnBgColor = isDark ? const Color(0xFF181830) : Colors.white;
     final trackColor =
         isDark ? Colors.white24 : Colors.black.withValues(alpha: 0.1);
     final disabled = onContinue == null;
@@ -154,7 +154,7 @@ class QuestionHeader extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
     final subColor = isDark ? Colors.white60 : const Color(0xFF6B7280);
-    final cardColor = isDark ? const Color(0xFF131A2C) : Colors.white;
+    final cardColor = isDark ? const Color(0xFF13182A) : Colors.white;
 
     return Column(
       children: [
@@ -237,7 +237,7 @@ class QuizOptionCard extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
     final subColor = isDark ? Colors.white60 : const Color(0xFF9CA3AF);
-    final cardColor = isDark ? const Color(0xFF131A2C) : Colors.white;
+    final cardColor = isDark ? const Color(0xFF13182A) : Colors.white;
 
     return GestureDetector(
       onTap: onTap,

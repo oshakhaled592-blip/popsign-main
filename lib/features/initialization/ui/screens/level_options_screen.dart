@@ -33,7 +33,7 @@ class _LevelOptionsScreenState extends State<LevelOptionsScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
     final subColor = isDark ? Colors.white60 : const Color(0xFF9CA3AF);
-    final cardColor = isDark ? const Color(0xFF131A2C) : Colors.white;
+    final cardColor = isDark ? const Color(0xFF13182A) : Colors.white;
 
     return QuizScaffold(
       step: 4,

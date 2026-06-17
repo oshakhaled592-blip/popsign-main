@@ -6,7 +6,6 @@ import 'package:popsign/core/helpers/spacing.dart';
 import 'package:popsign/core/l10n/app_strings.dart';
 import 'package:popsign/core/routing/routes.dart';
 import 'package:popsign/core/theme/language_notifier.dart';
-import 'package:popsign/core/theme/styles.dart';
 import 'package:popsign/core/widgets/linear_button.dart';
 import '../../../../core/theme/app_colors.dart';
 
@@ -72,7 +71,17 @@ class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
+    final subColor = isDark ? const Color(0xFF83899F) : Colors.grey.shade600;
+    final cardColor = isDark ? const Color(0xFF22252E) : Colors.white;
+    final cardBorder = isDark
+        ? Colors.transparent
+        : Colors.grey.shade200;
+    final bgColor = isDark ? const Color(0xFF14161B) : const Color(0xFFF5F7FB);
+
     return Scaffold(
+      backgroundColor: bgColor,
       body: SafeArea(
         child: Container(
           width: double.infinity,
@@ -81,7 +90,11 @@ class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
             children: [
               Text(
                 S.get('select_level'),
-                style: AppTextStyles.font24BoldWhite,
+                style: TextStyle(
+                  fontSize: 24.sp,
+                  fontWeight: FontWeight.bold,
+                  color: textColor,
+                ),
                 textAlign: TextAlign.center,
               ),
 
@@ -93,8 +106,7 @@ class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
                   separatorBuilder: (context, index) => verticalSpace(12),
                   itemBuilder: (context, index) {
                     final item = categories[index];
-                    final isSelected =
-                        selectedLevel == item['category'];
+                    final isSelected = selectedLevel == item['category'];
 
                     return GestureDetector(
                       onTap: () {
@@ -102,12 +114,28 @@ class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
                           selectedLevel = item['category'];
                         });
                       },
-                      child: Container(
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? Colors.green.withValues(alpha: 0.3)
-                              : AppColors.darkGray,
+                              ? Colors.green.withValues(alpha: isDark ? 0.25 : 0.12)
+                              : cardColor,
                           borderRadius: BorderRadius.circular(16.r),
+                          border: Border.all(
+                            color: isSelected
+                                ? Colors.green.withValues(alpha: 0.6)
+                                : cardBorder,
+                            width: isSelected ? 1.5 : 1,
+                          ),
+                          boxShadow: isDark
+                              ? []
+                              : [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.06),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
                         ),
                         height: 60.h,
                         padding: EdgeInsets.symmetric(horizontal: 17.w),
@@ -123,7 +151,11 @@ class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
                               ),
                               child: Text(
                                 item['category'],
-                                style: AppTextStyles.font16boldWhite,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13.sp,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
 
@@ -131,18 +163,30 @@ class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
 
                             Text(
                               item['quantity'],
-                              style: AppTextStyles.font18RegularWhite,
+                              style: TextStyle(
+                                color: textColor,
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
 
                             const Spacer(),
 
-                            Checkbox(
-                              value: isSelected,
-                              onChanged: (_) {
-                                setState(() {
-                                  selectedLevel = item['category'];
-                                });
-                              },
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              width: 24.w,
+                              height: 24.w,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: isSelected ? Colors.green : Colors.transparent,
+                                border: Border.all(
+                                  color: isSelected ? Colors.green : Colors.grey,
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: isSelected
+                                  ? Icon(Icons.check, color: Colors.white, size: 14.sp)
+                                  : null,
                             ),
                           ],
                         ),
@@ -156,17 +200,18 @@ class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
 
               Text(
                 S.get('words_coverage_note'),
-                style: AppTextStyles.font13RegularWhiteInter,
+                style: TextStyle(
+                  color: subColor,
+                  fontSize: 13.sp,
+                ),
+                textAlign: TextAlign.center,
               ),
 
               verticalSpace(20),
 
               LinearButton(
                 text: isLoading ? S.get('loading') : S.get('continue'),
-                onPressed:
-                    (selectedLevel == null || isLoading)
-                        ? null
-                        : saveLevel,
+                onPressed: (selectedLevel == null || isLoading) ? null : saveLevel,
                 width: double.infinity.w,
                 radius: 12.r,
               ),

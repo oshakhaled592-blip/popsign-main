@@ -98,22 +98,29 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
   }
 
   Future<bool> _requestPermission() async {
-    if (await Permission.videos.isGranted) return true;
-    if (await Permission.storage.isGranted) return true;
-    final v = await Permission.videos.request();
-    if (v.isGranted) return true;
-    final s = await Permission.storage.request();
-    return s.isGranted;
+    final camera = await Permission.camera.request();
+    if (!camera.isGranted) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(S.get('storage_permission_required')),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+      return false;
+    }
+    return true;
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? const Color(0xFF0B0F18) : const Color(0xFFF2F4FA);
-    final cardBg = isDark ? const Color(0xFF141A29) : Colors.white;
+    final bg = isDark ? const Color(0xFF0D0F1A) : const Color(0xFFF2F4FA);
+    final cardBg = isDark ? const Color(0xFF141829) : Colors.white;
     final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
     final subColor = isDark ? Colors.white38 : Colors.grey.shade500;
-    final btnBg = isDark ? const Color(0xFF1E2538) : Colors.white;
+    final btnBg = isDark ? const Color(0xFF1E1F35) : Colors.white;
 
     return Scaffold(
       backgroundColor: bg,
@@ -216,7 +223,7 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
                           children: [
                             SizedBox(width: 20.w, height: 20.w,
                                 child: const CircularProgressIndicator(
-                                    strokeWidth: 2.5, color: Color(0xFF6C63FF))),
+                                    strokeWidth: 2.5, color: Color(0xFF7C3AED))),
                             SizedBox(width: 12.w),
                             Text(S.get('analyzing'),
                                 style: TextStyle(color: textColor, fontSize: 16.sp,
@@ -302,7 +309,7 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
                   if (_status == _PracticeStatus.correct)
                     _btn(S.get('done_check'), Colors.green, () => Navigator.pop(context, true)),
                   if (_status == _PracticeStatus.wrong) ...[
-                    _btn(S.get('try_again'), const Color(0xFF6C63FF), () {
+                    _btn(S.get('try_again'), const Color(0xFF7C3AED), () {
                       setState(() {
                         _status = _PracticeStatus.idle;
                         _result = null;
@@ -320,7 +327,7 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
                     ),
                   ],
                   if (_status == _PracticeStatus.idle)
-                    _btn(S.get('record_video'), const Color(0xFF6C63FF),
+                    _btn(S.get('record_video'), const Color(0xFF7C3AED),
                         () => _pickAndPredict(ImageSource.camera)),
                   SizedBox(height: 12.h),
                   Container(

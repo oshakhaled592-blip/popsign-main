@@ -61,11 +61,11 @@ class _PreStartScreenState extends State<PreStartScreen>
   @override
   Widget build(BuildContext context) {
     final isDark    = Theme.of(context).brightness == Brightness.dark;
-    final bg        = isDark ? const Color(0xFF0B0F18) : const Color(0xFFF2F4FA);
-    final cardBg    = isDark ? const Color(0xFF141A29) : Colors.white;
+    final bg        = isDark ? const Color(0xFF0D0F1A) : const Color(0xFFF2F4FA);
+    final cardBg    = isDark ? const Color(0xFF141829) : Colors.white;
     final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
     final subColor  = isDark ? Colors.white38 : Colors.grey.shade500;
-    final btnBg     = isDark ? const Color(0xFF1E2538) : Colors.white;
+    final btnBg     = isDark ? const Color(0xFF1E1F35) : Colors.white;
     final btnIcon   = isDark ? Colors.white70 : const Color(0xFF1A1A2E);
     final divColor  = isDark
         ? Colors.white.withValues(alpha: 0.06)
