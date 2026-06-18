@@ -60,6 +60,25 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     await prefs.setBool('isLoggedIn', true);
+    await prefs.setString('localEmail', email);
+    await prefs.setString('userEmail', email);
+
+    // Derive display name from email if not already set
+    final existingName = prefs.getString('userName') ?? '';
+    if (existingName.isEmpty) {
+      final namePart = email
+          .split('@')
+          .first
+          .replaceAll('.', ' ')
+          .replaceAll('_', ' ')
+          .replaceAll('-', ' ');
+      final derived = namePart
+          .split(' ')
+          .where((w) => w.isNotEmpty)
+          .map((w) => w[0].toUpperCase() + w.substring(1))
+          .join(' ');
+      if (derived.isNotEmpty) await prefs.setString('userName', derived);
+    }
 
     if (!mounted) return;
 

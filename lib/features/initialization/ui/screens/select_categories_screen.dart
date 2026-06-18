@@ -26,6 +26,13 @@ class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
   void initState() {
     super.initState();
     languageNotifier.addListener(_rebuild);
+    _loadCurrentLevel();
+  }
+
+  Future<void> _loadCurrentLevel() async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getString('userLevel');
+    if (saved != null && mounted) setState(() => selectedLevel = saved);
   }
 
   void _rebuild() => setState(() {});
@@ -57,7 +64,12 @@ class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
 
       if (!mounted) return;
 
-      Navigator.pushReplacementNamed(context, Routes.dashboard);
+      // Always go to levels screen so the user immediately sees their new level
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        Routes.levels,
+        (route) => route.settings.name == Routes.dashboard,
+      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('${S.get('error_prefix')}: $e')),
@@ -88,6 +100,26 @@ class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
           padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
           child: Column(
             children: [
+              if (Navigator.canPop(context))
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      width: 44.w,
+                      height: 44.h,
+                      margin: EdgeInsets.only(bottom: 16.h),
+                      decoration: BoxDecoration(
+                        color: cardColor,
+                        borderRadius: BorderRadius.circular(14.r),
+                        border: Border.all(color: cardBorder),
+                      ),
+                      child: Icon(Icons.arrow_back_ios_new_rounded,
+                          color: textColor, size: 18.sp),
+                    ),
+                  ),
+                ),
+
               Text(
                 S.get('select_level'),
                 style: TextStyle(

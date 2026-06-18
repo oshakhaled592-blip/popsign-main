@@ -75,9 +75,18 @@ class AppRouter {
       case Routes.lostPage:
         return MaterialPageRoute(builder: (_) => const LostPage());
       case Routes.signPractice:
-        final word = settings.arguments as String? ?? '';
+        final args = settings.arguments;
+        final String word;
+        final String videoUrl;
+        if (args is Map) {
+          word = (args['word'] ?? '').toString();
+          videoUrl = (args['videoUrl'] ?? '').toString();
+        } else {
+          word = args?.toString() ?? '';
+          videoUrl = '';
+        }
         return MaterialPageRoute(
-          builder: (_) => SignPracticeScreen(targetWord: word),
+          builder: (_) => SignPracticeScreen(targetWord: word, videoUrl: videoUrl),
         );
       case Routes.reset:
         return MaterialPageRoute(builder: (_) => const ResetScreen());

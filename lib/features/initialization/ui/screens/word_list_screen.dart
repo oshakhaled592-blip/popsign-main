@@ -3,39 +3,28 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:popsign/core/data/word_data.dart';
 import 'package:popsign/core/l10n/app_strings.dart';
 import 'package:popsign/core/routing/routes.dart';
+import 'package:popsign/core/services/levels_service.dart';
 import 'package:popsign/core/services/progress_service.dart';
 import 'package:popsign/core/theme/language_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class WordModel {
   String word;
+  String videoUrl;
   int progress;
-  String image;
 
-  WordModel(this.word, this.progress, this.image);
+  WordModel(this.word, this.videoUrl, this.progress);
 
   bool get isDone => progress == 3;
 }
 
-final _images = [
-  'assets/images/mother.png', 'assets/images/day.png',
-  'assets/images/you.png',    'assets/images/get.png',
-  'assets/images/put.png',    'assets/images/race.png',
-  'assets/images/start.png',  'assets/images/finish.png',
-  'assets/images/design.png', 'assets/images/mother.png',
-];
-
-List<WordModel> _wordsForLang(String code, String level) {
+List<WordModel> _localWordsForLang(String code, String level) {
   final list = getWords(code, level);
-  return List.generate(
-    list.length,
-    (i) => WordModel(list[i], 0, _images[i % _images.length]),
-  );
+  return list.map((w) => WordModel(w, '', 0)).toList();
 }
 
 class WordListScreen extends StatefulWidget {
   final String level;
-
   const WordListScreen({super.key, this.level = 'A1'});
 
   @override
@@ -46,6 +35,7 @@ class _WordListScreenState extends State<WordListScreen> {
   final _scrollController = ScrollController();
   late List<WordModel> words;
   late String _currentLangCode;
+  bool _loadingApi = true;
 
   String get _progressKey => 'progress_${_currentLangCode}_${widget.level}';
 
@@ -53,9 +43,38 @@ class _WordListScreenState extends State<WordListScreen> {
   void initState() {
     super.initState();
     _currentLangCode = languageNotifier.value.code;
-    words = _wordsForLang(_currentLangCode, widget.level);
+    words = _localWordsForLang(_currentLangCode, widget.level);
     languageNotifier.addListener(_onLangChanged);
     _loadProgress(_currentLangCode);
+    _fetchFromApi();
+  }
+
+  Future<void> _fetchFromApi() async {
+    setState(() => _loadingApi = true);
+    final apiData = await LevelsService().getLevels();
+    final levelWords = apiData[widget.level];
+    if (levelWords != null && levelWords.isNotEmpty && mounted) {
+      final saved = await _getSavedProgress();
+      setState(() {
+        words = levelWords.asMap().entries.map((e) {
+          return WordModel(
+            e.value.word,
+            e.value.videoUrl,
+            saved != null && e.key < saved.length ? saved[e.key] : 0,
+          );
+        }).toList();
+        _loadingApi = false;
+      });
+    } else if (mounted) {
+      setState(() => _loadingApi = false);
+    }
+  }
+
+  Future<List<int>?> _getSavedProgress() async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getString(_progressKey);
+    if (saved == null) return null;
+    return saved.split(',').map((s) => int.tryParse(s) ?? 0).toList();
   }
 
   Future<void> _saveProgress() async {
@@ -83,9 +102,10 @@ class _WordListScreenState extends State<WordListScreen> {
       _saveProgress();
       setState(() {
         _currentLangCode = newCode;
-        words = _wordsForLang(newCode, widget.level);
+        words = _localWordsForLang(newCode, widget.level);
       });
       _loadProgress(newCode);
+      _fetchFromApi();
     }
   }
 
@@ -99,6 +119,7 @@ class _WordListScreenState extends State<WordListScreen> {
   int get remaining => words.where((w) => w.progress < 3).length;
 
   int get percent {
+    if (words.isEmpty) return 0;
     final total = words.length * 3;
     final done = words.fold(0, (sum, w) => sum + w.progress);
     return ((done / total) * 100).toInt();
@@ -108,10 +129,22 @@ class _WordListScreenState extends State<WordListScreen> {
     final result = await Navigator.pushNamed(
       context,
       Routes.signPractice,
-      arguments: words[index].word,
+      arguments: {
+        'word': words[index].word,
+        'videoUrl': words[index].videoUrl,
+      },
     );
 
-    if (result == true && mounted) {
+    if (!mounted) return;
+
+    if (result == 'done') {
+      // "I know this sign" — mark word as fully complete
+      final wasNotDone = words[index].progress < 3;
+      setState(() => words[index].progress = 3);
+      await _saveProgress();
+      if (wasNotDone) ProgressService.onWordLearned();
+    } else if (result == true) {
+      // Correct camera prediction — add one dot (need 3 to finish)
       final wasNotDone = words[index].progress < 3;
       setState(() {
         if (wasNotDone) words[index].progress++;
@@ -143,12 +176,10 @@ class _WordListScreenState extends State<WordListScreen> {
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-
       appBar: AppBar(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         centerTitle: true,
-
         leading: Padding(
           padding: EdgeInsets.only(left: 12.w),
           child: GestureDetector(
@@ -164,7 +195,6 @@ class _WordListScreenState extends State<WordListScreen> {
             ),
           ),
         ),
-
         title: ValueListenableBuilder<LanguageInfo>(
           valueListenable: languageNotifier,
           builder: (context, lang, child) => Text(
@@ -176,7 +206,6 @@ class _WordListScreenState extends State<WordListScreen> {
             ),
           ),
         ),
-
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 14.w),
@@ -195,7 +224,6 @@ class _WordListScreenState extends State<WordListScreen> {
           ),
         ],
       ),
-
       body: Column(
         children: [
           SizedBox(height: 14.h),
@@ -232,10 +260,30 @@ class _WordListScreenState extends State<WordListScreen> {
 
           SizedBox(height: 18.h),
 
-          Text(
-            "$remaining ${S.get('words_left')}  •  $percent% ${S.get('complete')}",
-            style: TextStyle(color: subTextColor, fontSize: 16.sp),
-          ),
+          if (_loadingApi)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 14.w,
+                  height: 14.w,
+                  child: const CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Color(0xFF7C3AED),
+                  ),
+                ),
+                SizedBox(width: 8.w),
+                Text(
+                  'Loading words...',
+                  style: TextStyle(color: subTextColor, fontSize: 13.sp),
+                ),
+              ],
+            )
+          else
+            Text(
+              "$remaining ${S.get('words_left')}  •  $percent% ${S.get('complete')}",
+              style: TextStyle(color: subTextColor, fontSize: 16.sp),
+            ),
 
           SizedBox(height: 18.h),
 
@@ -252,7 +300,7 @@ class _WordListScreenState extends State<WordListScreen> {
                   final item = words[index];
                   return WordCard(
                     word: item.word,
-                    image: item.image,
+                    videoUrl: item.videoUrl,
                     progress: item.progress,
                     isDone: item.isDone,
                     onTap: () => onLearn(index),
@@ -269,7 +317,7 @@ class _WordListScreenState extends State<WordListScreen> {
 
 class WordCard extends StatelessWidget {
   final String word;
-  final String image;
+  final String videoUrl;
   final int progress;
   final bool isDone;
   final VoidCallback onTap;
@@ -277,7 +325,7 @@ class WordCard extends StatelessWidget {
   const WordCard({
     super.key,
     required this.word,
-    required this.image,
+    required this.videoUrl,
     required this.progress,
     required this.isDone,
     required this.onTap,
@@ -289,6 +337,7 @@ class WordCard extends StatelessWidget {
     final textColor = isDark ? Colors.white : const Color(0xFF1C1C1C);
     final dimColor = isDark ? const Color(0xFF31384A) : Colors.grey.shade300;
     final inactiveColor = isDark ? const Color(0xFF232938) : Colors.grey.shade200;
+    const accent = Color(0xFF7C3AED);
 
     return Container(
       height: 72.h,
@@ -301,6 +350,13 @@ class WordCard extends StatelessWidget {
       ),
       child: Row(
         children: [
+          if (videoUrl.isNotEmpty)
+            Padding(
+              padding: EdgeInsets.only(right: 10.w),
+              child: Icon(Icons.play_circle_outline_rounded,
+                  color: accent, size: 22.sp),
+            ),
+
           Expanded(
             child: Text(
               word,
@@ -350,7 +406,7 @@ class WordCard extends StatelessWidget {
               width: 74.w,
               height: 40.h,
               decoration: BoxDecoration(
-                color: isDone ? inactiveColor : textColor,
+                color: isDone ? inactiveColor : accent,
                 borderRadius: BorderRadius.circular(12.r),
               ),
               child: Center(
@@ -359,7 +415,7 @@ class WordCard extends StatelessWidget {
                   style: TextStyle(
                     color: isDone
                         ? textColor.withValues(alpha: 0.38)
-                        : Theme.of(context).scaffoldBackgroundColor,
+                        : Colors.white,
                     fontSize: 16.sp,
                     fontWeight: FontWeight.w500,
                   ),

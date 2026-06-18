@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
 
 import '../../../../core/services/translation_service.dart';
@@ -12,8 +13,13 @@ import '../../../../core/theme/language_notifier.dart';
 
 class SignPracticeScreen extends StatefulWidget {
   final String targetWord;
+  final String videoUrl;
 
-  const SignPracticeScreen({super.key, required this.targetWord});
+  const SignPracticeScreen({
+    super.key,
+    required this.targetWord,
+    this.videoUrl = '',
+  });
 
   @override
   State<SignPracticeScreen> createState() => _SignPracticeScreenState();
@@ -28,6 +34,7 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
   _PracticeStatus _status = _PracticeStatus.idle;
   PredictionResult? _result;
   String _error = '';
+  bool _videoWatched = false;
 
   VideoPlayerController? _videoController;
   bool _videoReady = false;
@@ -133,7 +140,7 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
               child: Row(
                 children: [
                   GestureDetector(
-                    onTap: () => Navigator.pop(context, false),
+                    onTap: () => Navigator.pop(context, _videoWatched ? 'done' : false),
                     child: Container(
                       width: 44.w, height: 44.h,
                       decoration: BoxDecoration(
@@ -195,9 +202,76 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
                       ),
                     ),
 
+                    // tutorial video card
+                    SizedBox(height: 16.h),
+                    GestureDetector(
+                      onTap: () async {
+                        final url = widget.videoUrl.isNotEmpty
+                            ? widget.videoUrl
+                            : 'https://www.youtube.com/results?search_query=sign+language+${Uri.encodeComponent(widget.targetWord)}';
+                        final uri = Uri.parse(url);
+                        if (await canLaunchUrl(uri)) {
+                          await launchUrl(uri, mode: LaunchMode.externalApplication);
+                        }
+                        if (mounted) setState(() => _videoWatched = true);
+                      },
+                      child: Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF7C3AED).withValues(alpha: isDark ? 0.18 : 0.08),
+                          borderRadius: BorderRadius.circular(20.r),
+                          border: Border.all(
+                            color: const Color(0xFF7C3AED).withValues(alpha: 0.35),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 48.w,
+                              height: 48.w,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF7C3AED),
+                                borderRadius: BorderRadius.circular(14.r),
+                              ),
+                              child: Icon(Icons.play_arrow_rounded,
+                                  color: Colors.white, size: 28.sp),
+                            ),
+                            SizedBox(width: 14.w),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    widget.videoUrl.isNotEmpty
+                                        ? 'Watch Tutorial'
+                                        : 'Search Tutorial on YouTube',
+                                    style: TextStyle(
+                                      color: const Color(0xFF7C3AED),
+                                      fontSize: 15.sp,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  SizedBox(height: 3.h),
+                                  Text(
+                                    'See how to sign "${widget.targetWord}"',
+                                    style: TextStyle(color: subColor, fontSize: 12.sp),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Icon(Icons.open_in_new_rounded,
+                                color: const Color(0xFF7C3AED), size: 18.sp),
+                          ],
+                        ),
+                      ),
+                    ),
+
                     SizedBox(height: 20.h),
 
-                    // video preview
+                    // recorded video preview
                     if (_videoReady && _videoController != null)
                       Center(
                         child: SizedBox(
@@ -326,9 +400,31 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
                           style: TextStyle(color: subColor, fontSize: 14.sp)),
                     ),
                   ],
-                  if (_status == _PracticeStatus.idle)
+                  if (_status == _PracticeStatus.idle) ...[
                     _btn(S.get('record_video'), const Color(0xFF7C3AED),
                         () => _pickAndPredict(ImageSource.camera)),
+                    if (_videoWatched) ...[
+                      SizedBox(height: 10.h),
+                      Container(
+                        width: double.infinity,
+                        height: 48.h,
+                        decoration: BoxDecoration(
+                          color: Colors.green.withValues(alpha: isDark ? 0.15 : 0.08),
+                          borderRadius: BorderRadius.circular(16.r),
+                          border: Border.all(color: Colors.green.withValues(alpha: 0.4)),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.check_circle_rounded, color: Colors.green, size: 20.sp),
+                            SizedBox(width: 8.w),
+                            Text('I know this sign',
+                                style: TextStyle(color: Colors.green, fontSize: 15.sp, fontWeight: FontWeight.w600)),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ],
                   SizedBox(height: 12.h),
                   Container(
                     width: 120.w, height: 4.h,
