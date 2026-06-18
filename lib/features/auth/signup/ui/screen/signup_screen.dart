@@ -97,19 +97,20 @@ class _SignupScreenState extends State<SignupScreen> {
     setState(() => isLoading = false);
 
     final hasChosenLanguage = prefs.getString('langCode') != null;
-    final hasSelectedLevel = prefs.getBool('hasSelectedLevel') ?? false;
-    final destination = !hasChosenLanguage
-        ? Routes.startPage
-        : !hasSelectedLevel
-            ? Routes.selectCategories
-            : Routes.dashboard;
+    final destination = !hasChosenLanguage ? Routes.startPage : Routes.dashboard;
 
     context.pushNamedAndRemoveUntil(destination, predicate: (route) => false);
   }
 
   @override
   Widget build(BuildContext context) {
+    final isDark    = Theme.of(context).brightness == Brightness.dark;
+    final bg        = isDark ? const Color(0xFF0D0F1A) : const Color(0xFFF5F7FB);
+    final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
+    final subColor  = isDark ? Colors.white60 : const Color(0xFF6B7280);
+
     return Scaffold(
+      backgroundColor: bg,
       body: SingleChildScrollView(
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 35.w),
@@ -120,10 +121,11 @@ class _SignupScreenState extends State<SignupScreen> {
               const LogoAndName(),
               verticalSpace(36),
 
-              Text(S.get('signup'), style: AppTextStyles.font24BoldWhite),
+              Text(S.get('signup'),
+                  style: AppTextStyles.font24BoldWhite.copyWith(color: textColor)),
               Text(
                 S.get('signup_subtitle'),
-                style: AppTextStyles.font13RegularWhite,
+                style: AppTextStyles.font13RegularWhite.copyWith(color: subColor),
               ),
 
               verticalSpace(28),

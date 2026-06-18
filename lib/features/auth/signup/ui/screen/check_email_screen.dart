@@ -14,7 +14,14 @@ class CheckEmailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark    = Theme.of(context).brightness == Brightness.dark;
+    final bg        = isDark ? const Color(0xFF0D0F1A) : const Color(0xFFF5F7FB);
+    final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
+    final subColor  = isDark ? Colors.white60 : const Color(0xFF6B7280);
+    const accent    = Color(0xFF22C55E);
+
     return Scaffold(
+      backgroundColor: bg,
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 35.w),
@@ -26,12 +33,12 @@ class CheckEmailScreen extends StatelessWidget {
                   width: 90.w,
                   height: 90.h,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF22C55E).withValues(alpha: 0.12),
+                    color: accent.withValues(alpha: 0.12),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
                     Icons.mark_email_unread_rounded,
-                    color: const Color(0xFF22C55E),
+                    color: accent,
                     size: 44.sp,
                   ),
                 ),
@@ -42,7 +49,7 @@ class CheckEmailScreen extends StatelessWidget {
               Text(
                 'Verify your email',
                 textAlign: TextAlign.center,
-                style: AppTextStyles.font24BoldWhite,
+                style: AppTextStyles.font24BoldWhite.copyWith(color: textColor),
               ),
 
               verticalSpace(12),
@@ -50,7 +57,7 @@ class CheckEmailScreen extends StatelessWidget {
               Text(
                 "We've sent a verification link to\n$email\n\nPlease check your inbox and verify your account before logging in.",
                 textAlign: TextAlign.center,
-                style: AppTextStyles.font13RegularWhite,
+                style: AppTextStyles.font13RegularWhite.copyWith(color: subColor),
               ),
 
               verticalSpace(36),

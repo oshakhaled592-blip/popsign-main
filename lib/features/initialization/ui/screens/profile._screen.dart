@@ -114,17 +114,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await prefs.setBool('isDark', value);
   }
 
-  void _showComingSoon(String title) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('$title — ${S.get('coming_soon')}'),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: const Color(0xFF22C55E),
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final bgColor    = isDark ? const Color(0xFF0B1020) : const Color(0xFFF5F7FB);
@@ -327,7 +316,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       textColor: textColor,
                       subText: subText,
                       isDivider: true,
-                      onTap: () => _showComingSoon(S.get('password')),
+                      onTap: () => Navigator.pushNamed(context, Routes.changePassword),
                     ),
 
                     profileTile(
@@ -345,8 +334,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       textColor: textColor,
                       subText: subText,
                       isDivider: false,
-                      onTap: () =>
-                          Navigator.pushNamed(context, Routes.selectCategories),
+                      onTap: () => Navigator.pushNamed(context, Routes.levels),
                     ),
                   ],
                 ),
@@ -364,12 +352,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   await prefs.remove('langCode');
                   await prefs.remove('langName');
                   await prefs.remove('langFlag');
-                  await prefs.remove('hasSelectedLevel');
-                  await prefs.remove('userLevel');
                   await prefs.remove('userPriorKnowledge');
                   await prefs.remove('userPurpose');
                   await prefs.remove('userMinutesPerDay');
                   await prefs.remove('localEmail');
+                  // hasSelectedLevel and userLevel are kept so the next login
+                  // goes straight to dashboard without re-asking for a level.
                   nav.pushNamedAndRemoveUntil(Routes.login, (route) => false);
                 },
                 child: Container(

@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:popsign/core/l10n/app_strings.dart';
 import 'package:popsign/core/routing/routes.dart';
 import 'package:popsign/core/theme/language_notifier.dart';
-import 'package:popsign/core/theme/theme_notifier.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -43,11 +42,6 @@ class _SplashScreenState extends State<SplashScreen>
             LanguageInfo(name: langName, flag: langFlag, code: langCode);
       }
 
-      final isDark = prefs.getBool('isDark');
-      if (isDark != null) {
-        themeNotifier.value = isDark ? ThemeMode.dark : ThemeMode.light;
-      }
-
       final hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? false;
       final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
       if (!mounted) return;
@@ -57,15 +51,7 @@ class _SplashScreenState extends State<SplashScreen>
         Navigator.pushReplacementNamed(context, Routes.login);
       } else {
         final hasChosenLanguage = prefs.getString('langCode') != null;
-        final hasSelectedLevel = prefs.getBool('hasSelectedLevel') ?? false;
-        String destination;
-        if (!hasChosenLanguage) {
-          destination = Routes.startPage;
-        } else if (!hasSelectedLevel) {
-          destination = Routes.selectCategories;
-        } else {
-          destination = Routes.dashboard;
-        }
+        final destination = !hasChosenLanguage ? Routes.startPage : Routes.dashboard;
         Navigator.pushReplacementNamed(context, destination);
       }
     });
@@ -79,8 +65,13 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isDark   = Theme.of(context).brightness == Brightness.dark;
+    final bg       = isDark ? const Color(0xFF0A0E18) : const Color(0xFFF5F7FB);
+    final textCol  = isDark ? Colors.white : const Color(0xFF1A1A2E);
+    final subCol   = isDark ? Colors.white38 : const Color(0xFF9CA3AF);
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0A0E18),
+      backgroundColor: bg,
       body: FadeTransition(
         opacity: _fade,
         child: Center(
@@ -93,7 +84,7 @@ class _SplashScreenState extends State<SplashScreen>
                 height: 100.w,
                 errorBuilder: (ctx, err, stack) => Icon(
                   Icons.hearing,
-                  color: Colors.white,
+                  color: textCol,
                   size: 80.sp,
                 ),
               ),
@@ -101,7 +92,7 @@ class _SplashScreenState extends State<SplashScreen>
               Text(
                 "I Hear You",
                 style: TextStyle(
-                  color: Colors.white,
+                  color: textCol,
                   fontSize: 28.sp,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.5,
@@ -111,7 +102,7 @@ class _SplashScreenState extends State<SplashScreen>
               Text(
                 S.get('splash_tagline'),
                 style: TextStyle(
-                  color: Colors.white38,
+                  color: subCol,
                   fontSize: 14.sp,
                 ),
               ),

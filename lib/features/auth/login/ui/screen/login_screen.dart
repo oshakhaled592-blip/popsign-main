@@ -80,22 +80,31 @@ class _LoginScreenState extends State<LoginScreen> {
       if (derived.isNotEmpty) await prefs.setString('userName', derived);
     }
 
+    // If the user picked a level during onboarding before logging in, apply it
+    final onbLevel = prefs.getString('onb_level');
+    if (onbLevel != null) {
+      await prefs.setString('userLevel', onbLevel);
+      await prefs.setBool('hasSelectedLevel', true);
+      await prefs.remove('onb_level');
+    }
+
     if (!mounted) return;
 
     final hasChosenLanguage = prefs.getString('langCode') != null;
-    final hasSelectedLevel = prefs.getBool('hasSelectedLevel') ?? false;
-    final destination = !hasChosenLanguage
-        ? Routes.startPage
-        : !hasSelectedLevel
-            ? Routes.selectCategories
-            : Routes.dashboard;
+    final destination = !hasChosenLanguage ? Routes.startPage : Routes.dashboard;
 
     context.pushNamedAndRemoveUntil(destination, predicate: (route) => false);
   }
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bg        = isDark ? const Color(0xFF0D0F1A) : const Color(0xFFF5F7FB);
+    final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
+    final subColor  = isDark ? Colors.white60 : const Color(0xFF6B7280);
+
     return Scaffold(
+      backgroundColor: bg,
       body: Container(
         padding: EdgeInsets.symmetric(horizontal: 35.w),
         width: double.infinity,
@@ -105,10 +114,11 @@ class _LoginScreenState extends State<LoginScreen> {
             const LogoAndName(),
             verticalSpace(36),
 
-            Text(S.get('login'), style: AppTextStyles.font24BoldWhite),
+            Text(S.get('login'),
+                style: AppTextStyles.font24BoldWhite.copyWith(color: textColor)),
             Text(
               S.get('login_subtitle'),
-              style: AppTextStyles.font13RegularWhite,
+              style: AppTextStyles.font13RegularWhite.copyWith(color: subColor),
             ),
 
             verticalSpace(28),

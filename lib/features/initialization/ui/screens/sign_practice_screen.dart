@@ -28,13 +28,14 @@ class SignPracticeScreen extends StatefulWidget {
 enum _PracticeStatus { idle, loading, correct, wrong }
 
 class _SignPracticeScreenState extends State<SignPracticeScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   final _service = TranslationService();
 
   _PracticeStatus _status = _PracticeStatus.idle;
   PredictionResult? _result;
   String _error = '';
   bool _videoWatched = false;
+  bool _waitingForVideoReturn = false;
 
   VideoPlayerController? _videoController;
   bool _videoReady = false;
@@ -45,6 +46,7 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     languageNotifier.addListener(_rebuild);
     _celebController = AnimationController(
       vsync: this,
@@ -56,7 +58,16 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
   void _rebuild() => setState(() {});
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && _waitingForVideoReturn) {
+      _waitingForVideoReturn = false;
+      if (mounted) setState(() => _videoWatched = true);
+    }
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     languageNotifier.removeListener(_rebuild);
     _videoController?.dispose();
     _celebController.dispose();
@@ -206,14 +217,25 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
                     SizedBox(height: 16.h),
                     GestureDetector(
                       onTap: () async {
-                        final url = widget.videoUrl.isNotEmpty
+                        String urlStr = widget.videoUrl.isNotEmpty
                             ? widget.videoUrl
                             : 'https://www.youtube.com/results?search_query=sign+language+${Uri.encodeComponent(widget.targetWord)}';
-                        final uri = Uri.parse(url);
-                        if (await canLaunchUrl(uri)) {
-                          await launchUrl(uri, mode: LaunchMode.externalApplication);
+
+                        // Convert watch/short URLs to embed URLs so Chrome Custom Tab
+                        // handles them instead of handing off to the YouTube app.
+                        // YouTube app won't intercept embed paths, so back returns here.
+                        final videoId = RegExp(
+                          r'(?:youtube\.com/watch\?v=|youtu\.be/)([a-zA-Z0-9_-]+)',
+                        ).firstMatch(urlStr)?.group(1);
+                        if (videoId != null) {
+                          urlStr = 'https://www.youtube.com/embed/$videoId';
                         }
-                        if (mounted) setState(() => _videoWatched = true);
+
+                        final uri = Uri.parse(urlStr);
+                        if (await canLaunchUrl(uri)) {
+                          _waitingForVideoReturn = true;
+                          await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
+                        }
                       },
                       child: Container(
                         width: double.infinity,
@@ -401,8 +423,19 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
                     ),
                   ],
                   if (_status == _PracticeStatus.idle) ...[
-                    _btn(S.get('record_video'), const Color(0xFF7C3AED),
-                        () => _pickAndPredict(ImageSource.camera)),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _btn(S.get('record_video'), const Color(0xFF7C3AED),
+                              () => _pickAndPredict(ImageSource.camera)),
+                        ),
+                        SizedBox(width: 12.w),
+                        Expanded(
+                          child: _btn(S.get('upload_video'), const Color(0xFF0EA5E9),
+                              () => _pickAndPredict(ImageSource.gallery)),
+                        ),
+                      ],
+                    ),
                     if (_videoWatched) ...[
                       SizedBox(height: 10.h),
                       Container(

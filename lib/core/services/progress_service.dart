@@ -90,6 +90,47 @@ class ProgressService {
     return null;
   }
 
+  // Called when every word in a CEFR level reaches progress 3.
+  // Unlocks the next level and fires a notification (once per completion).
+  static Future<void> onCefrLevelCompleted({required String cefrLevel}) async {
+    await init();
+
+    final prefs = await SharedPreferences.getInstance();
+
+    // Only fire once per level (reset when the user resets that level's progress)
+    final completionKey = 'cefr_completed_$cefrLevel';
+    if (prefs.getBool(completionKey) == true) return;
+    await prefs.setBool(completionKey, true);
+
+    final idx = _allCefr.indexOf(cefrLevel);
+    if (idx < 0) return;
+
+    if (idx >= _allCefr.length - 1) {
+      // All levels done — C2 finished
+      await _showNotification(
+        id: 20,
+        title: '🏆 You mastered all levels!',
+        body: 'Incredible! You have completed every sign language level!',
+      );
+      return;
+    }
+
+    final nextLevel = _allCefr[idx + 1];
+
+    // Advance userLevel only if it hasn't already been set higher
+    final currentUserLevel = prefs.getString('userLevel') ?? 'A1';
+    final currentUserIdx = _allCefr.indexOf(currentUserLevel);
+    if (idx + 1 > currentUserIdx) {
+      await prefs.setString('userLevel', nextLevel);
+    }
+
+    await _showNotification(
+      id: 10 + idx,
+      title: '🎉 Level $cefrLevel Complete!',
+      body: 'Amazing work! Level $nextLevel is now unlocked! 🔓',
+    );
+  }
+
   // Called after each word is learned (progress reaches 3)
   static Future<void> onWordLearned() async {
     await init();

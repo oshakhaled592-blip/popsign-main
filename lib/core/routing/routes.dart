@@ -20,7 +20,8 @@ class Routes {
   static const String lostPage = 'lost-page';
   static const String signPractice = 'sign-practice';
   static const String reset = 'reset';
-  static const String forgotPassword = 'forgot-password';
+  static const String forgotPassword    = 'forgot-password';
+  static const String changePassword    = 'change-password';
   static const String checkEmail = 'check-email';
 
   // pre-signup questionnaire

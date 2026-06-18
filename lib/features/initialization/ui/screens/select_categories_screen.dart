@@ -64,12 +64,15 @@ class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
 
       if (!mounted) return;
 
-      // Always go to levels screen so the user immediately sees their new level
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        Routes.levels,
-        (route) => route.settings.name == Routes.dashboard,
-      );
+      final nav = Navigator.of(context);
+      if (nav.canPop()) {
+        // Came from within the app (e.g. profile → levels → selectCategories)
+        nav.pop();
+      } else {
+        // Onboarding: build a proper stack [dashboard, levels] so back works
+        nav.pushNamedAndRemoveUntil(Routes.dashboard, (r) => false);
+        nav.pushNamed(Routes.levels);
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('${S.get('error_prefix')}: $e')),

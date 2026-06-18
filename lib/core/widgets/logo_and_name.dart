@@ -8,6 +8,7 @@ class LogoAndName extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Column(
       children: [
         SvgPicture.asset(
@@ -15,7 +16,12 @@ class LogoAndName extends StatelessWidget {
           height: 81.39.h,
           width: 67.45.w,
         ),
-        Text("I Hear You", style: AppTextStyles.font36SemiboldWhite),
+        Text(
+          "I Hear You",
+          style: AppTextStyles.font36SemiboldWhite.copyWith(
+            color: isDark ? Colors.white : const Color(0xFF1A1A2E),
+          ),
+        ),
       ],
     );
   }

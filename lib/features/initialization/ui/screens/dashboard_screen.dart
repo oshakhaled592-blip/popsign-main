@@ -106,9 +106,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final subColor = isDark ? Colors.white54 : Colors.grey.shade500;
     final levelColor = _levelColors[_currentLevel] ?? AppColors.a1Color;
 
-    return Scaffold(
-      backgroundColor: bg,
-      body: SafeArea(
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        backgroundColor: bg,
+        body: SafeArea(
         child: _loading
             ? const Center(child: CircularProgressIndicator())
             : RefreshIndicator(
@@ -255,6 +257,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
               ),
+        ),
       ),
     );
   }

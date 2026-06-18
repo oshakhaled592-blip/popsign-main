@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../../core/l10n/app_strings.dart';
+import '../../../../../core/services/auth_service.dart';
 import '../../../../../core/theme/language_notifier.dart';
-import '../../../../../core/theme/styles.dart';
 import '../../../../../core/widgets/linear_button.dart';
 import '../../../../../core/widgets/text_form_widget.dart';
 
@@ -15,8 +15,9 @@ class ForgotPasswordScreen extends StatefulWidget {
 }
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
+  final _formKey   = GlobalKey<FormState>();
+  final _emailCtrl = TextEditingController();
+  bool _isLoading  = false;
 
   @override
   void initState() {
@@ -29,31 +30,42 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   void dispose() {
     languageNotifier.removeListener(_rebuild);
-    _emailController.dispose();
+    _emailCtrl.dispose();
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
-    // The new backend doesn't expose a password-reset endpoint yet.
+    setState(() => _isLoading = true);
+    final result = await AuthService().forgotPassword(
+      email: _emailCtrl.text.trim(),
+    );
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          "Password reset isn't available yet. Please contact support.",
-        ),
+      SnackBar(
+        content: Text(result.message),
+        backgroundColor: result.success ? Colors.green : Colors.red,
+        behavior: SnackBarBehavior.floating,
       ),
     );
+    if (result.success) Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark ? Colors.white : const Color(0xFF1C1C1C);
-    final btnBg = isDark ? const Color(0xFF171C2B) : Colors.grey.shade200;
+    final isDark    = Theme.of(context).brightness == Brightness.dark;
+    final bg        = isDark ? const Color(0xFF0D0F1A) : const Color(0xFFF5F7FB);
+    final cardColor = isDark ? const Color(0xFF141829) : Colors.white;
+    final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
+    final subColor  = isDark ? Colors.white54 : const Color(0xFF6B7280);
+    final btnBg     = isDark ? const Color(0xFF1E1F35) : Colors.grey.shade200;
+    const accent    = Color(0xFF22C55E);
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: bg,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: 24.w),
@@ -63,91 +75,112 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: 24.h),
+                SizedBox(height: 20.h),
 
-                Container(
-                  width: 42.w,
-                  height: 42.h,
-                  decoration: BoxDecoration(
-                    color: btnBg,
-                    borderRadius: BorderRadius.circular(14.r),
-                  ),
-                  child: IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: Icon(
-                      Icons.arrow_back_ios_new_rounded,
-                      size: 18.sp,
-                      color: textColor,
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    width: 44.w,
+                    height: 44.h,
+                    decoration: BoxDecoration(
+                      color: btnBg,
+                      borderRadius: BorderRadius.circular(14.r),
                     ),
+                    child: Icon(Icons.arrow_back_ios_new_rounded,
+                        color: textColor, size: 18.sp),
                   ),
                 ),
 
-                SizedBox(height: 32.h),
+                SizedBox(height: 28.h),
 
                 Center(
                   child: Container(
                     width: 80.w,
                     height: 80.h,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF22C55E).withValues(alpha: 0.12),
+                      color: accent.withValues(alpha: 0.12),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(
-                      Icons.lock_reset_rounded,
-                      color: const Color(0xFF22C55E),
-                      size: 40.sp,
-                    ),
+                    child: Icon(Icons.lock_reset_rounded, color: accent, size: 40.sp),
                   ),
                 ),
 
-                SizedBox(height: 24.h),
+                SizedBox(height: 20.h),
 
                 Center(
                   child: Text(
                     S.get('reset_password'),
-                    style: AppTextStyles.font24BoldWhite.copyWith(
-                      fontSize: 26.sp,
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: 24.sp,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
 
-                SizedBox(height: 8.h),
+                SizedBox(height: 6.h),
 
                 Center(
                   child: Text(
-                    "Enter your email and we'll send you a reset link",
+                    S.get('reset_password_subtitle'),
                     textAlign: TextAlign.center,
-                    style: AppTextStyles.font13RegularGray.copyWith(
-                      fontSize: 14.sp,
-                    ),
+                    style: TextStyle(color: subColor, fontSize: 13.sp),
                   ),
                 ),
 
-                SizedBox(height: 40.h),
+                SizedBox(height: 32.h),
 
+                _label(S.get('email'), textColor),
+                SizedBox(height: 8.h),
                 TextFormWidget(
-                  controller: _emailController,
+                  controller: _emailCtrl,
                   hintText: S.get('email'),
                   icon: Icons.email_outlined,
                   keyboardType: TextInputType.emailAddress,
-                  validator: (value) {
-                    final v = value?.trim() ?? '';
-                    if (v.isEmpty) return "Please enter your email";
-                    if (!v.contains('@') || !v.contains('.')) {
-                      return "Please enter a valid email";
+                  validator: (v) {
+                    final val = (v ?? '').trim();
+                    if (val.isEmpty) return S.get('email_required');
+                    if (!val.contains('@') || !val.contains('.')) {
+                      return S.get('email_invalid');
                     }
                     return null;
                   },
                 ),
 
-                SizedBox(height: 36.h),
+                SizedBox(height: 28.h),
 
-                LinearButton(
-                  text: S.get('reset_password'),
-                  onPressed: _submit,
+                Container(
+                  padding: EdgeInsets.all(14.w),
+                  decoration: BoxDecoration(
+                    color: cardColor,
+                    borderRadius: BorderRadius.circular(14.r),
+                    border: Border.all(
+                        color: accent.withValues(alpha: isDark ? 0.2 : 0.15)),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.info_outline_rounded, color: accent, size: 18.sp),
+                      SizedBox(width: 10.w),
+                      Expanded(
+                        child: Text(
+                          S.get('reset_email_hint'),
+                          style: TextStyle(color: subColor, fontSize: 12.sp),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
 
-                SizedBox(height: 30.h),
+                SizedBox(height: 32.h),
+
+                LinearButton(
+                  text: _isLoading ? S.get('loading') : S.get('reset_password'),
+                  onPressed: _isLoading ? null : _submit,
+                  width: double.infinity.w,
+                  radius: 14.r,
+                ),
+
+                SizedBox(height: 40.h),
               ],
             ),
           ),
@@ -155,4 +188,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       ),
     );
   }
+
+  Widget _label(String text, Color color) => Text(
+        text,
+        style: TextStyle(
+          color: color,
+          fontSize: 14.sp,
+          fontWeight: FontWeight.w600,
+        ),
+      );
 }

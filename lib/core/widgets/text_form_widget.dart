@@ -34,21 +34,23 @@ class _TextFormWidgetState extends State<TextFormWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark     = Theme.of(context).brightness == Brightness.dark;
+    final fillColor  = isDark ? AppColors.darkGray : const Color(0xFFEFF1F8);
+    final iconColor  = isDark ? AppColors.grayText : Colors.grey.shade500;
+    final inputColor = isDark ? AppColors.grayText : const Color(0xFF374151);
+
     return TextFormField(
       controller: widget.controller,
       validator: widget.validator,
-      style: AppTextStyles.font13RegularGray,
+      style: AppTextStyles.font13RegularGray.copyWith(color: inputColor),
       keyboardType: widget.keyboardType,
       autofocus: widget.autofocus ?? false,
       obscureText: widget.obscureText == true ? _isObscured : false,
       decoration: InputDecoration(
         filled: true,
-        fillColor: AppColors.darkGray,
+        fillColor: fillColor,
         prefixIcon: widget.icon != null
-            ? Icon(
-                widget.icon,
-                color: AppColors.grayText,
-              )
+            ? Icon(widget.icon, color: iconColor)
             : null,
         suffixIcon: widget.obscureText == true
             ? IconButton(
@@ -58,15 +60,13 @@ class _TextFormWidgetState extends State<TextFormWidget> {
                   });
                 },
                 icon: Icon(
-                  _isObscured
-                      ? Icons.visibility
-                      : Icons.visibility_off,
-                  color: AppColors.grayText,
+                  _isObscured ? Icons.visibility : Icons.visibility_off,
+                  color: iconColor,
                 ),
               )
             : null,
         hintText: widget.hintText,
-        hintStyle: AppTextStyles.font13RegularGray,
+        hintStyle: AppTextStyles.font13RegularGray.copyWith(color: iconColor),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30.r),
           borderSide: BorderSide.none,

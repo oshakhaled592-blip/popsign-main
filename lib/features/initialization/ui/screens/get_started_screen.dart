@@ -32,8 +32,11 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bg     = isDark ? const Color(0xFF0D0F1A) : const Color(0xFFF5F7FB);
+
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: bg,
       body: SafeArea(
         child: SizedBox(
           width: double.infinity,
@@ -61,6 +64,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                   S.get('learn_lang_title'),
                   textAlign: TextAlign.center,
                   style: AppTextStyles.font24BoldWhite.copyWith(
+                    color: isDark ? Colors.white : const Color(0xFF1A1A2E),
                     fontSize: 32.sp,
                     fontWeight: FontWeight.bold,
                   ),
@@ -72,6 +76,7 @@ class _GetStartedScreenState extends State<GetStartedScreen> {
                   S.get('learn_lang_subtitle'),
                   textAlign: TextAlign.center,
                   style: AppTextStyles.font13RegularGray.copyWith(
+                    color: isDark ? const Color(0xFF9CA3AF) : Colors.grey.shade600,
                     height: 1.5,
                     fontSize: 15.sp,
                   ),

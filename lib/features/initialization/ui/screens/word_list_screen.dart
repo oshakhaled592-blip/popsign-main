@@ -142,7 +142,10 @@ class _WordListScreenState extends State<WordListScreen> {
       final wasNotDone = words[index].progress < 3;
       setState(() => words[index].progress = 3);
       await _saveProgress();
-      if (wasNotDone) ProgressService.onWordLearned();
+      if (wasNotDone) {
+        ProgressService.onWordLearned();
+        _checkLevelComplete();
+      }
     } else if (result == true) {
       // Correct camera prediction — add one dot (need 3 to finish)
       final wasNotDone = words[index].progress < 3;
@@ -152,7 +155,14 @@ class _WordListScreenState extends State<WordListScreen> {
       await _saveProgress();
       if (wasNotDone && words[index].progress == 3) {
         ProgressService.onWordLearned();
+        _checkLevelComplete();
       }
+    }
+  }
+
+  void _checkLevelComplete() {
+    if (words.isNotEmpty && words.every((w) => w.progress >= 3)) {
+      ProgressService.onCefrLevelCompleted(cefrLevel: widget.level);
     }
   }
 
@@ -165,6 +175,9 @@ class _WordListScreenState extends State<WordListScreen> {
         }
       });
       _saveProgress();
+      // Allow the level-complete notification to fire again after a reset
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('cefr_completed_${widget.level}');
     }
   }
 

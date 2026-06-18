@@ -12,12 +12,17 @@ class StartPageScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark     = Theme.of(context).brightness == Brightness.dark;
+    final bg         = isDark ? const Color(0xFF0D0F1A) : const Color(0xFFF5F7FB);
+    final textColor  = isDark ? Colors.white : const Color(0xFF1A1A2E);
+    final subColor   = isDark ? const Color(0xFF9CA3AF) : Colors.grey.shade600;
+
     return Scaffold(
+      backgroundColor: bg,
       body: SafeArea(
         child: SizedBox(
           width: double.infinity,
           child: Column(
-            // mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               verticalSpace(20),
@@ -31,13 +36,13 @@ class StartPageScreen extends StatelessWidget {
               Text(
                 textAlign: TextAlign.center,
                 S.get('learn_lang_title'),
-                style: AppTextStyles.font36BoldWhite,
+                style: AppTextStyles.font36BoldWhite.copyWith(color: textColor),
               ),
               verticalSpace(16),
               Text(
                 textAlign: TextAlign.center,
                 S.get('learn_lang_subtitle'),
-                style: AppTextStyles.font17RegularGray,
+                style: AppTextStyles.font17RegularGray.copyWith(color: subColor),
               ),
               verticalSpace(40),
               LinearButton(

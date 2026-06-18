@@ -20,6 +20,7 @@ import 'package:popsign/features/initialization/ui/screens/reset_screen.dart';
 import 'routes.dart';
 import '../../features/auth/login/ui/screen/login_screen.dart';
 import '../../features/auth/login/ui/screen/forgot_password_screen.dart';
+import '../../features/auth/login/ui/screen/change_password_screen.dart';
 import '../../features/auth/signup/ui/screen/signup_screen.dart';
 import '../../features/auth/signup/ui/screen/check_email_screen.dart';
 
@@ -37,6 +38,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const SignupScreen());
       case Routes.forgotPassword:
         return MaterialPageRoute(builder: (_) => const ForgotPasswordScreen());
+      case Routes.changePassword:
+        return MaterialPageRoute(builder: (_) => const ChangePasswordScreen());
       case Routes.checkEmail:
         final email = settings.arguments as String? ?? '';
         return MaterialPageRoute(builder: (_) => CheckEmailScreen(email: email));

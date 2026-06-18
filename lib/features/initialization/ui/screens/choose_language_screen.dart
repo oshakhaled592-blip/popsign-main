@@ -283,12 +283,8 @@ class _ChooseLanguageScreenState extends State<ChooseLanguageScreen>
                       final isLoggedIn =
                           prefs.getBool('isLoggedIn') ?? false;
                       if (isLoggedIn) {
-                        final hasSelectedLevel =
-                            prefs.getBool('hasSelectedLevel') ?? false;
                         context.pushNamedAndRemoveUntil(
-                          hasSelectedLevel
-                              ? Routes.dashboard
-                              : Routes.selectCategories,
+                          Routes.dashboard,
                           predicate: (r) => false,
                         );
                       } else {
