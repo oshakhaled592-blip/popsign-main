@@ -118,7 +118,7 @@ class _ResetScreenState extends State<ResetScreen>
 
                   SizedBox(height: 28.h),
 
-                  Divider(height: 1, color: divColor),
+                  Divider(height: 1.h, color: divColor),
 
                   Row(
                     children: [
@@ -147,7 +147,7 @@ class _ResetScreenState extends State<ResetScreen>
                         ),
                       ),
 
-                      Container(width: 1, height: 52.h, color: divColor),
+                      Container(width: 1.w, height: 52.h, color: divColor),
 
                       Expanded(
                         child: InkWell(

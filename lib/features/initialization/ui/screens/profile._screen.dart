@@ -316,7 +316,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       textColor: textColor,
                       subText: subText,
                       isDivider: true,
-                      onTap: () => Navigator.pushNamed(context, Routes.changePassword),
+                      onTap: () => ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(S.get('coming_soon')),
+                          backgroundColor: const Color(0xFF22C55E),
+                          behavior: SnackBarBehavior.floating,
+                          duration: const Duration(seconds: 2),
+                        ),
+                      ),
                     ),
 
                     profileTile(
@@ -446,7 +453,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           if (isDivider)
             Divider(
-              height: 1,
+              height: 1.h,
               indent: 68.w,
               endIndent: 0,
               color: isDark

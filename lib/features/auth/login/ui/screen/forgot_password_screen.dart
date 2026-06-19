@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../../core/l10n/app_strings.dart';
+import '../../../../../core/routing/routes.dart';
 import '../../../../../core/services/auth_service.dart';
 import '../../../../../core/theme/language_notifier.dart';
 import '../../../../../core/widgets/linear_button.dart';
@@ -36,22 +37,95 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-
     setState(() => _isLoading = true);
-    final result = await AuthService().forgotPassword(
-      email: _emailCtrl.text.trim(),
-    );
-    if (!mounted) return;
-    setState(() => _isLoading = false);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(result.message),
-        backgroundColor: result.success ? Colors.green : Colors.red,
+    try {
+      await AuthService().sendPasswordReset(_emailCtrl.text.trim());
+      if (!mounted) return;
+      _showSuccessDialog();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(e.toString()),
+        backgroundColor: Colors.red,
         behavior: SnackBarBehavior.floating,
+      ));
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _showSuccessDialog() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF141829) : Colors.white,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.r)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 64.w,
+              height: 64.w,
+              decoration: BoxDecoration(
+                color: const Color(0xFF22C55E).withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.mark_email_read_rounded,
+                  color: const Color(0xFF22C55E), size: 32.sp),
+            ),
+            SizedBox(height: 16.h),
+            Text(
+              S.get('check_your_email'),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: isDark ? Colors.white : const Color(0xFF1A1A2E),
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 10.h),
+            Text(
+              S.get('email_sent_instructions'),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: isDark ? Colors.white60 : const Color(0xFF6B7280),
+                fontSize: 13.sp,
+                height: 1.5,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          SizedBox(
+            width: double.infinity,
+            child: TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.pushNamedAndRemoveUntil(
+                    context, Routes.login, (_) => false);
+              },
+              style: TextButton.styleFrom(
+                backgroundColor: const Color(0xFF22C55E),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.r)),
+                padding: EdgeInsets.symmetric(vertical: 12.h),
+              ),
+              child: Text(
+                S.get('go_to_login'),
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600),
+              ),
+            ),
+          ),
+        ],
       ),
     );
-    if (result.success) Navigator.pop(context);
   }
 
   @override
@@ -91,7 +165,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                 ),
 
-                SizedBox(height: 28.h),
+                SizedBox(height: 40.h),
 
                 Center(
                   child: Container(
@@ -101,36 +175,42 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       color: accent.withValues(alpha: 0.12),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.lock_reset_rounded, color: accent, size: 40.sp),
+                    child: Icon(Icons.lock_reset_rounded,
+                        color: accent, size: 40.sp),
                   ),
                 ),
 
-                SizedBox(height: 20.h),
+                SizedBox(height: 24.h),
 
                 Center(
                   child: Text(
                     S.get('reset_password'),
                     style: TextStyle(
-                      color: textColor,
-                      fontSize: 24.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
+                        color: textColor,
+                        fontSize: 24.sp,
+                        fontWeight: FontWeight.bold),
                   ),
                 ),
 
-                SizedBox(height: 6.h),
+                SizedBox(height: 8.h),
 
                 Center(
                   child: Text(
-                    S.get('reset_password_subtitle'),
+                    S.get('reset_email_hint'),
                     textAlign: TextAlign.center,
                     style: TextStyle(color: subColor, fontSize: 13.sp),
                   ),
                 ),
 
-                SizedBox(height: 32.h),
+                SizedBox(height: 40.h),
 
-                _label(S.get('email'), textColor),
+                Text(
+                  S.get('email'),
+                  style: TextStyle(
+                      color: textColor,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600),
+                ),
                 SizedBox(height: 8.h),
                 TextFormWidget(
                   controller: _emailCtrl,
@@ -147,7 +227,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   },
                 ),
 
-                SizedBox(height: 28.h),
+                SizedBox(height: 24.h),
 
                 Container(
                   padding: EdgeInsets.all(14.w),
@@ -159,12 +239,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.info_outline_rounded, color: accent, size: 18.sp),
+                      Icon(Icons.info_outline_rounded,
+                          color: accent, size: 18.sp),
                       SizedBox(width: 10.w),
                       Expanded(
                         child: Text(
-                          S.get('reset_email_hint'),
-                          style: TextStyle(color: subColor, fontSize: 12.sp),
+                          S.get('reset_step1_hint'),
+                          style:
+                              TextStyle(color: subColor, fontSize: 12.sp),
                         ),
                       ),
                     ],
@@ -174,7 +256,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 SizedBox(height: 32.h),
 
                 LinearButton(
-                  text: _isLoading ? S.get('loading') : S.get('reset_password'),
+                  text: _isLoading
+                      ? S.get('loading')
+                      : S.get('send_reset_link'),
                   onPressed: _isLoading ? null : _submit,
                   width: double.infinity.w,
                   radius: 14.r,
@@ -188,13 +272,4 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       ),
     );
   }
-
-  Widget _label(String text, Color color) => Text(
-        text,
-        style: TextStyle(
-          color: color,
-          fontSize: 14.sp,
-          fontWeight: FontWeight.w600,
-        ),
-      );
 }

@@ -151,7 +151,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       content: Text(msg),
       backgroundColor: const Color(0xFF1A1D2E),
       behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
       duration: const Duration(seconds: 2),
     ));
   }
@@ -234,7 +234,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           child: Column(
             children: [
               _buildHeader(),
-              Container(height: 1, color: Colors.white.withValues(alpha: 0.08)),
+              Container(height: 1.h, color: Colors.white.withValues(alpha: 0.08)),
               Expanded(
                 child: _messages.isEmpty
                     ? _buildCommonQuestions()

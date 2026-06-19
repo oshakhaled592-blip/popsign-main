@@ -306,7 +306,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
         ),
         if (hasDivider)
           Divider(
-            height: 1,
+            height: 1.h,
             indent: 68.w,
             endIndent: 0,
             color: isDark

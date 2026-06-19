@@ -9,6 +9,17 @@ enum ServerStatus { unknown, online, offline }
 
 class TranslationNotifier extends ChangeNotifier {
   final _service = TranslationService();
+  bool _disposed = false;
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
+
+  void _notify() {
+    if (!_disposed) notifyListeners();
+  }
 
   TranslationStatus _status = TranslationStatus.idle;
   PredictionResult? _result;
@@ -38,20 +49,20 @@ class TranslationNotifier extends ChangeNotifier {
 
   Future<void> checkHealth() async {
     _serverStatus = ServerStatus.unknown;
-    notifyListeners();
+    _notify();
     final ok = await _service.checkHealth();
     _serverStatus = ok ? ServerStatus.online : ServerStatus.offline;
-    notifyListeners();
+    _notify();
   }
 
   Future<void> loadClasses() async {
     _classesLoading = true;
-    notifyListeners();
+    _notify();
     try {
       _classes = await _service.getClasses();
     } catch (_) {}
     _classesLoading = false;
-    notifyListeners();
+    _notify();
   }
 
   Future<void> predict(File video) async {
@@ -59,7 +70,7 @@ class TranslationNotifier extends ChangeNotifier {
     _status = TranslationStatus.loading;
     _result = null;
     _error = '';
-    notifyListeners();
+    _notify();
 
     try {
       _result = await _service.predict(video);
@@ -70,13 +81,13 @@ class TranslationNotifier extends ChangeNotifier {
       _status = TranslationStatus.error;
     }
 
-    notifyListeners();
+    _notify();
   }
 
   void removeFromSentence(int index) {
     if (index >= 0 && index < _sentence.length) {
       _sentence.removeAt(index);
-      notifyListeners();
+      _notify();
     }
   }
 
@@ -86,7 +97,7 @@ class TranslationNotifier extends ChangeNotifier {
     _result = null;
     _error = '';
     _videoFile = null;
-    notifyListeners();
+    _notify();
   }
 
   void reset() {
@@ -94,6 +105,6 @@ class TranslationNotifier extends ChangeNotifier {
     _result = null;
     _error = '';
     _videoFile = null;
-    notifyListeners();
+    _notify();
   }
 }
