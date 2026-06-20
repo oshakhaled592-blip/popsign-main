@@ -179,8 +179,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       children: [
                         CircleAvatar(
                           radius: 34.r,
-                          backgroundImage:
-                              const AssetImage("assets/images/profile.png"),
+                          backgroundColor: accent.withValues(alpha: 0.15),
+                          child: _userName.isNotEmpty
+                              ? Text(
+                                  _userName[0].toUpperCase(),
+                                  style: TextStyle(
+                                    color: accent,
+                                    fontSize: 22.sp,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )
+                              : Icon(Icons.person_rounded, color: accent, size: 30.sp),
                         ),
                         Positioned(
                           bottom: 0,

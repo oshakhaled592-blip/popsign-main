@@ -156,7 +156,17 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                   children: [
                     CircleAvatar(
                       radius: 52.r,
-                      backgroundImage: const AssetImage("assets/images/profile.png"),
+                      backgroundColor: accent.withValues(alpha: isDark ? 0.18 : 0.12),
+                      child: _name.isNotEmpty
+                          ? Text(
+                              _name[0].toUpperCase(),
+                              style: TextStyle(
+                                color: accent,
+                                fontSize: 38.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            )
+                          : Icon(Icons.person_rounded, color: accent, size: 52.sp),
                     ),
                     Positioned(
                       bottom: 2,

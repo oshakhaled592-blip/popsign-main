@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../../core/services/translation_service.dart';
 import '../../../../core/models/prediction_model.dart';
@@ -28,17 +28,17 @@ class SignPracticeScreen extends StatefulWidget {
 enum _PracticeStatus { idle, loading, correct, wrong }
 
 class _SignPracticeScreenState extends State<SignPracticeScreen>
-    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+    with SingleTickerProviderStateMixin {
   final _service = TranslationService();
 
   _PracticeStatus _status = _PracticeStatus.idle;
   PredictionResult? _result;
   String _error = '';
-  bool _videoWatched = false;
-  bool _waitingForVideoReturn = false;
+  final bool _videoWatched = false;
 
   VideoPlayerController? _videoController;
   bool _videoReady = false;
+  WebViewController? _ytWebController;
 
   late AnimationController _celebController;
   late Animation<double> _celebAnim;
@@ -46,30 +46,80 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
     languageNotifier.addListener(_rebuild);
     _celebController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 600),
     );
     _celebAnim = CurvedAnimation(parent: _celebController, curve: Curves.elasticOut);
+
+    final videoId = _extractVideoId(widget.videoUrl);
+    if (videoId != null) {
+      final embedHtml = '''
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:#000; width:100vw; height:100vh; overflow:hidden; }
+    iframe { position:absolute; top:0; left:0; width:100%; height:100%; border:0; }
+  </style>
+</head>
+<body>
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/$videoId?autoplay=1&playsinline=1&controls=1&rel=0&modestbranding=1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen>
+  </iframe>
+</body>
+</html>''';
+
+      _ytWebController = WebViewController()
+        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..setUserAgent(
+          'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 '
+          '(KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36',
+        )
+        ..setNavigationDelegate(NavigationDelegate(
+          onNavigationRequest: (req) {
+            if (req.url.startsWith('intent://') ||
+                req.url.startsWith('market://')) {
+              return NavigationDecision.prevent;
+            }
+            return NavigationDecision.navigate;
+          },
+        ))
+        ..loadHtmlString(
+          embedHtml,
+          baseUrl: 'https://www.youtube-nocookie.com',
+        );
+    }
+  }
+
+  String? _extractVideoId(String url) {
+    if (url.isEmpty) return null;
+    final patterns = [
+      RegExp(r'youtu\.be/([a-zA-Z0-9_-]+)'),
+      RegExp(r'youtube\.com/watch\?v=([a-zA-Z0-9_-]+)'),
+      RegExp(r'youtube\.com/shorts/([a-zA-Z0-9_-]+)'),
+      RegExp(r'youtube\.com/embed/([a-zA-Z0-9_-]+)'),
+    ];
+    for (final p in patterns) {
+      final m = p.firstMatch(url);
+      if (m != null) return m.group(1);
+    }
+    return null;
   }
 
   void _rebuild() => setState(() {});
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed && _waitingForVideoReturn) {
-      _waitingForVideoReturn = false;
-      if (mounted) setState(() => _videoWatched = true);
-    }
-  }
-
-  @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
     languageNotifier.removeListener(_rebuild);
     _videoController?.dispose();
+    _ytWebController = null;
     _celebController.dispose();
     super.dispose();
   }
@@ -213,83 +263,34 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
                       ),
                     ),
 
-                    // tutorial video card
+                    // tutorial video — embedded inline
                     SizedBox(height: 16.h),
-                    GestureDetector(
-                      onTap: () async {
-                        String urlStr = widget.videoUrl.isNotEmpty
-                            ? widget.videoUrl
-                            : 'https://www.youtube.com/results?search_query=sign+language+${Uri.encodeComponent(widget.targetWord)}';
-
-                        // Convert watch/short URLs to embed URLs so Chrome Custom Tab
-                        // handles them instead of handing off to the YouTube app.
-                        // YouTube app won't intercept embed paths, so back returns here.
-                        final videoId = RegExp(
-                          r'(?:youtube\.com/watch\?v=|youtu\.be/)([a-zA-Z0-9_-]+)',
-                        ).firstMatch(urlStr)?.group(1);
-                        if (videoId != null) {
-                          urlStr = 'https://www.youtube.com/embed/$videoId';
-                        }
-
-                        final uri = Uri.parse(urlStr);
-                        if (await canLaunchUrl(uri)) {
-                          _waitingForVideoReturn = true;
-                          await launchUrl(uri, mode: LaunchMode.inAppBrowserView);
-                        }
-                      },
-                      child: Container(
+                    if (_ytWebController != null)
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(20.r),
+                        child: SizedBox(
+                          height: 210.h,
+                          child: WebViewWidget(controller: _ytWebController!),
+                        ),
+                      )
+                    else
+                      Container(
                         width: double.infinity,
-                        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+                        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 18.h),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF7C3AED).withValues(alpha: isDark ? 0.18 : 0.08),
+                          color: isDark ? const Color(0xFF1E1F35) : Colors.grey.shade100,
                           borderRadius: BorderRadius.circular(20.r),
-                          border: Border.all(
-                            color: const Color(0xFF7C3AED).withValues(alpha: 0.35),
-                          ),
                         ),
                         child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Container(
-                              width: 48.w,
-                              height: 48.w,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF7C3AED),
-                                borderRadius: BorderRadius.circular(14.r),
-                              ),
-                              child: Icon(Icons.play_arrow_rounded,
-                                  color: Colors.white, size: 28.sp),
-                            ),
-                            SizedBox(width: 14.w),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    widget.videoUrl.isNotEmpty
-                                        ? 'Watch Tutorial'
-                                        : 'Search Tutorial on YouTube',
-                                    style: TextStyle(
-                                      color: const Color(0xFF7C3AED),
-                                      fontSize: 15.sp,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                  SizedBox(height: 3.h),
-                                  Text(
-                                    'See how to sign "${widget.targetWord}"',
-                                    style: TextStyle(color: subColor, fontSize: 12.sp),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Icon(Icons.open_in_new_rounded,
-                                color: const Color(0xFF7C3AED), size: 18.sp),
+                            Icon(Icons.video_library_outlined, color: subColor, size: 20.sp),
+                            SizedBox(width: 10.w),
+                            Text('No tutorial available',
+                                style: TextStyle(color: subColor, fontSize: 14.sp)),
                           ],
                         ),
                       ),
-                    ),
 
                     SizedBox(height: 20.h),
 

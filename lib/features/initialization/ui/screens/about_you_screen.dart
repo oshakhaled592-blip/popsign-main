@@ -5,7 +5,6 @@ import '../../../../core/helpers/extension.dart';
 import '../../../../core/helpers/spacing.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/routing/routes.dart';
-import '../../../../core/theme/language_notifier.dart';
 import '../widgets/quiz_step_scaffold.dart';
 
 class AboutYouScreen extends StatefulWidget {
@@ -20,8 +19,6 @@ class _AboutYouScreenState extends State<AboutYouScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final language = languageNotifier.value.name;
-
     return QuizScaffold(
       step: 1,
       totalSteps: 5,
@@ -42,13 +39,13 @@ class _AboutYouScreenState extends State<AboutYouScreen> {
             ),
             verticalSpace(28),
             QuizOptionCard(
-              title: S.get('quiz_dont_know').replaceAll('{lang}', language),
+              title: S.get('quiz_dont_know').replaceAll('{lang}', 'ASL'),
               icon: Icons.sentiment_neutral_rounded,
               selected: selected == 'none',
               onTap: () => setState(() => selected = 'none'),
             ),
             QuizOptionCard(
-              title: S.get('quiz_already_studied').replaceAll('{lang}', language),
+              title: S.get('quiz_already_studied').replaceAll('{lang}', 'ASL'),
               icon: Icons.school_outlined,
               selected: selected == 'studied',
               onTap: () => setState(() => selected = 'studied'),

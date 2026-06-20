@@ -5,7 +5,6 @@ import '../../../../core/helpers/extension.dart';
 import '../../../../core/helpers/spacing.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/routing/routes.dart';
-import '../../../../core/theme/language_notifier.dart';
 import '../widgets/quiz_step_scaffold.dart';
 
 class PurposeScreen extends StatefulWidget {
@@ -27,8 +26,6 @@ class _PurposeScreenState extends State<PurposeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final language = languageNotifier.value.name;
-
     return QuizScaffold(
       step: 2,
       totalSteps: 5,
@@ -45,7 +42,7 @@ class _PurposeScreenState extends State<PurposeScreen> {
           children: [
             QuestionHeader(
               emoji: '🎯',
-              title: S.get('quiz_why_study').replaceAll('{lang}', language),
+              title: S.get('quiz_why_study').replaceAll('{lang}', 'ASL'),
             ),
             verticalSpace(28),
             ...options.map((o) => QuizOptionCard(

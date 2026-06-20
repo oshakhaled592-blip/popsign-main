@@ -5,92 +5,88 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Chapter 7 — Flutter (I Hear You Application)</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Fira+Code:wght@400;500&display=swap');
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-    font-size: 11pt;
-    line-height: 1.75;
-    color: #1a1a2e;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 12pt;
+    line-height: 1.8;
+    color: #000;
     background: #fff;
-    max-width: 800px;
+    max-width: 780px;
     margin: 0 auto;
-    padding: 40px 50px;
+    padding: 50px 60px;
   }
 
-  /* ── Chapter Title ── */
-  .chapter-title {
-    font-size: 26pt;
-    font-weight: 700;
-    color: #0f172a;
-    border-bottom: 4px solid #22c55e;
-    padding-bottom: 14px;
-    margin-bottom: 36px;
+  /* ── Chapter cover page ── */
+  .chapter-cover {
+    height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    page-break-after: always;
+    border: 2px dashed #aaa;
+    margin: -50px -60px 60px -60px;
   }
 
-  /* ── Headings ── */
+  .chapter-cover h1 {
+    font-size: 28pt;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  /* ── Section headings ── */
   h2 {
-    font-size: 16pt;
-    font-weight: 700;
-    color: #0f172a;
-    margin-top: 42px;
-    margin-bottom: 14px;
-    padding-left: 12px;
-    border-left: 5px solid #22c55e;
+    font-size: 14pt;
+    font-weight: bold;
+    text-decoration: underline;
+    margin-top: 36px;
+    margin-bottom: 12px;
+    color: #000;
   }
 
   h3 {
     font-size: 13pt;
-    font-weight: 700;
-    color: #0f172a;
-    margin-top: 28px;
+    font-weight: bold;
+    margin-top: 24px;
     margin-bottom: 10px;
   }
 
   h4 {
-    font-size: 11pt;
-    font-weight: 700;
-    color: #22c55e;
-    margin-top: 20px;
+    font-size: 12pt;
+    font-weight: bold;
+    margin-top: 18px;
     margin-bottom: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
   }
 
   /* ── Paragraphs ── */
-  p { margin-bottom: 10px; color: #374151; }
+  p { margin-bottom: 12px; text-align: justify; }
 
   /* ── Lists ── */
-  ul, ol {
-    margin: 10px 0 10px 24px;
-    color: #374151;
-  }
-  li { margin-bottom: 5px; }
+  ul, ol { margin: 10px 0 12px 30px; }
+  li { margin-bottom: 6px; }
 
   /* ── Code blocks ── */
   pre {
-    background: #0f172a;
-    color: #e2e8f0;
-    padding: 18px 20px;
-    border-radius: 8px;
+    background: #1e1e2e;
+    color: #cdd6f4;
+    padding: 16px 20px;
+    border-radius: 6px;
     margin: 14px 0;
     overflow-x: auto;
-    font-family: 'Fira Code', 'Courier New', monospace;
-    font-size: 9pt;
-    line-height: 1.6;
-    border-left: 4px solid #22c55e;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 9.5pt;
+    line-height: 1.55;
     page-break-inside: avoid;
   }
 
   code {
-    background: #f1f5f9;
-    color: #0f172a;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-family: 'Fira Code', 'Courier New', monospace;
-    font-size: 9.5pt;
+    background: #f0f0f0;
+    color: #000;
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    font-size: 10pt;
   }
 
   pre code {
@@ -105,127 +101,133 @@
     width: 100%;
     border-collapse: collapse;
     margin: 16px 0;
-    font-size: 10pt;
+    font-size: 11pt;
     page-break-inside: avoid;
   }
 
   th {
-    background: #0f172a;
+    background: #2d2d44;
     color: #fff;
-    padding: 10px 14px;
+    padding: 9px 12px;
     text-align: left;
-    font-weight: 600;
+    font-weight: bold;
   }
 
   td {
-    padding: 9px 14px;
-    border-bottom: 1px solid #e5e7eb;
-    color: #374151;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    vertical-align: top;
   }
 
-  tr:nth-child(even) td { background: #f9fafb; }
+  tr:nth-child(even) td { background: #f7f7f7; }
 
   /* ── Horizontal rule ── */
-  hr {
-    border: none;
-    border-top: 2px solid #e5e7eb;
-    margin: 36px 0;
-  }
-
-  /* ── Flow diagram ── */
-  .flow {
-    background: #f0fdf4;
-    border: 1px solid #bbf7d0;
-    border-radius: 8px;
-    padding: 16px 20px;
-    margin: 14px 0;
-    font-family: 'Fira Code', monospace;
-    font-size: 9pt;
-    white-space: pre;
-    color: #14532d;
-    page-break-inside: avoid;
-  }
-
-  /* ── Info box ── */
-  .info-box {
-    background: #f0fdf4;
-    border-left: 4px solid #22c55e;
-    padding: 12px 16px;
-    margin: 14px 0;
-    border-radius: 0 6px 6px 0;
-    color: #14532d;
-    font-size: 10pt;
-  }
+  hr { border: none; border-top: 1px solid #ccc; margin: 30px 0; }
 
   /* ── Page break ── */
-  .page-break { page-break-before: always; }
+  .page-break { page-break-before: always; margin-top: 40px; }
 
-  /* ── Section number style ── */
-  .section-num {
-    color: #22c55e;
-    font-weight: 700;
-    margin-right: 6px;
-  }
+  /* ── Numbered section label ── */
+  .section-label { font-weight: bold; }
 
-  /* ── Print tweaks ── */
+  /* ── Print ── */
   @media print {
     body { padding: 0; }
-    a { color: inherit; text-decoration: none; }
+    .chapter-cover { height: 100vh; border: none; margin: 0; }
     pre { white-space: pre-wrap; word-break: break-word; }
-    h2 { page-break-after: avoid; }
-    h3 { page-break-after: avoid; }
+    h2, h3, h4 { page-break-after: avoid; }
   }
 </style>
 </head>
 <body>
 
-<div class="chapter-title">Chapter 7 &mdash; Flutter<br><small style="font-size:14pt;font-weight:400;color:#6b7280;">I Hear You Application</small></div>
+<!-- ══════════════════════════════════════════════════════
+     CHAPTER COVER PAGE
+══════════════════════════════════════════════════════ -->
+<div class="chapter-cover">
+  <h1>Chapter 7 (Flutter)</h1>
+</div>
 
-<hr>
+<!-- ══════════════════════════════════════════════════════
+     7.1
+══════════════════════════════════════════════════════ -->
+<h2>7.1 Introduction to Flutter and Dart</h2>
 
-<!-- ═══════════════════════════════════════════════════════ 7.1 -->
-<h2><span class="section-num">7.1</span> Introduction to Flutter and Dart</h2>
+<h3>1. What is Flutter?</h3>
+<p>Flutter is an open-source UI software development toolkit created by <strong>Google</strong>. It is used for building <strong>natively compiled applications</strong> for <strong>mobile (Android and iOS)</strong>, <strong>web</strong>, <strong>desktop</strong>, and even embedded devices, all from a <strong>single codebase</strong>. Launched officially in 2017, Flutter quickly gained popularity due to its performance, flexibility, and developer-friendly architecture.</p>
 
-<h3>What is Flutter?</h3>
-<p>Flutter is an open-source UI software development toolkit created by <strong>Google</strong>. It is used for building natively compiled applications for <strong>mobile (Android and iOS)</strong>, <strong>web</strong>, <strong>desktop</strong>, and embedded devices, all from a <strong>single codebase</strong>. Launched officially in 2017, Flutter quickly gained popularity due to its performance, flexibility, and developer-friendly architecture.</p>
-
-<h4>Key Features of Flutter</h4>
+<h4>Key Features of Flutter:</h4>
 <ul>
-  <li><strong>Cross-Platform Development:</strong> Write your code once and run it anywhere.</li>
-  <li><strong>Native Performance:</strong> Flutter compiles to native ARM code using Dart.</li>
-  <li><strong>Beautiful UI:</strong> A rich set of widgets that mimic native component behaviour.</li>
-  <li><strong>Hot Reload:</strong> Instantly see UI changes without restarting the app.</li>
-  <li><strong>Custom Rendering Engine:</strong> Uses Skia/Impeller for consistent UI across all platforms.</li>
+  <li><strong>Cross-Platform Development:</strong> Write your code once and run it anywhere. No need to maintain separate codebases for Android, iOS, Web, or Desktop.</li>
+  <li><strong>Native Performance:</strong> Flutter compiles down to native ARM code using Dart, which ensures smooth performance, unlike other hybrid frameworks that rely on JavaScript bridges.</li>
+  <li><strong>Beautiful UI:</strong> Flutter provides a rich set of widgets that mimic the behavior of native components. Developers can easily build beautiful and custom user interfaces.</li>
+  <li><strong>Hot Reload:</strong> This allows developers to instantly see the changes in the UI without restarting the app, significantly speeding up the development process.</li>
+  <li><strong>Custom Rendering Engine:</strong> Flutter uses its own rendering engine (Skia/Impeller) which means the UI looks and behaves consistently across all platforms.</li>
 </ul>
 
-<h3>Understanding Dart</h3>
-<p>Dart is the programming language used to build Flutter applications. It is developed by <strong>Google</strong> and designed for fast, modern, reactive apps.</p>
+<h3>2. Understanding Dart: The Language Behind Flutter</h3>
+<p>Dart is the programming language used to build Flutter applications. It is also developed by <strong>Google</strong> and was designed specifically to create fast, modern, reactive apps.</p>
+
+<h4>Why Dart?</h4>
 <ul>
-  <li><strong>Optimised for UI:</strong> Handles layout expressions and smooth animations.</li>
-  <li><strong>Object-Oriented and Class-Based:</strong> Full support for classes, inheritance, interfaces, and mixins.</li>
-  <li><strong>AOT &amp; JIT Compilation:</strong> AOT for production performance; JIT for hot reload during development.</li>
-  <li><strong>Strongly Typed with Null Safety:</strong> Prevents null reference errors at compile time.</li>
+  <li><strong>Optimized for UI:</strong> Dart is built to handle UI development. It allows for layout expressions, smooth animations, and declarative programming.</li>
+  <li><strong>Object-Oriented and Class-Based:</strong> Dart follows modern programming principles with strong support for classes, inheritance, and interfaces.</li>
+  <li><strong>Ahead-of-Time (AOT) &amp; Just-in-Time (JIT) Compilation:</strong> AOT compiles the code ahead of time for fast startup and better performance in production. JIT allows for hot reload during development, improving developer efficiency.</li>
+  <li><strong>Strongly Typed with Null Safety:</strong> Prevents null reference errors at compile time, improving application stability.</li>
+  <li><strong>Garbage Collected and Memory Safe:</strong> It helps manage resources efficiently and prevents many common memory issues.</li>
 </ul>
 
-<h3>Why Flutter was Chosen for I Hear You</h3>
+<h3>3. The Relationship Between Flutter and Dart</h3>
+<p>Flutter and Dart are designed to work hand-in-hand. Dart powers the logic and behavior, while Flutter provides the UI framework built entirely with Dart.</p>
+<ul>
+  <li><strong>Single Language Stack:</strong> Unlike other frameworks (like React Native, which uses JavaScript with some native code), Flutter allows the entire application to be written in Dart. This simplifies development and debugging.</li>
+  <li><strong>No Need for OEM Widgets:</strong> Flutter draws the UI components itself using Dart and Skia, rather than relying on the platform's native components. This ensures uniform appearance and behavior.</li>
+  <li><strong>Customizability:</strong> Because everything in Flutter is a widget, including layout elements, animations, and even themes, developers have full control over the appearance and functionality.</li>
+</ul>
+
+<h3>4. Flutter Architecture Overview</h3>
+<p>Flutter follows a layered architecture consisting of:</p>
+<ul>
+  <li><strong>Framework Layer:</strong> The top layer, written in Dart, includes the core libraries, rendering system, widgets, and foundation classes.</li>
+  <li><strong>Engine Layer:</strong> Written in C++, the engine uses Skia/Impeller to render everything and handles input, text layout, and more.</li>
+  <li><strong>Embedder Layer:</strong> Platform-specific code that allows Flutter to run on various platforms like Android, iOS, web, etc.</li>
+</ul>
+
+<h3>5. Advantages of Choosing Flutter for I Hear You</h3>
 <p>The I Hear You application targets <strong>sign language learners</strong> on both Android and iOS. Flutter was selected because:</p>
 <ul>
-  <li>A single codebase covers both platforms simultaneously.</li>
-  <li>The rich widget ecosystem supports complex UI like flashcard animations and video playback.</li>
+  <li>A single codebase covers both platforms simultaneously, reducing development time and cost.</li>
+  <li>The rich widget ecosystem supports complex UI interactions like flashcard animations and video playback.</li>
   <li>The <code>flutter_screenutil</code> package ensures fully responsive layouts across all screen sizes.</li>
   <li>Firebase integration is first-class with official Flutter packages.</li>
+  <li>Hot Reload enabled fast iteration during development.</li>
 </ul>
+
+<h3>6. Challenges and Considerations</h3>
+<ul>
+  <li><strong>App Size:</strong> Flutter apps can be slightly larger in size due to the built-in rendering engine.</li>
+  <li><strong>Limited Native SDK Access:</strong> Although Flutter supports platform channels, working with native APIs still requires writing native platform-specific code in Kotlin/Swift.</li>
+  <li><strong>Learning Curve:</strong> Dart is not as widely known as JavaScript or Kotlin, requiring an initial learning investment.</li>
+</ul>
+
+<h3>7. Summary</h3>
+<p>Flutter and Dart together provide a robust ecosystem for building modern, responsive, and high-performance applications across multiple platforms. Their integration creates a development experience that is both productive and powerful, with the ability to produce beautiful UIs and maintain a single codebase. This is precisely why Flutter was chosen for the I Hear You sign-language learning application.</p>
 
 <hr>
 
-<!-- ═══════════════════════════════════════════════════════ 7.2 -->
+<!-- ══════════════════════════════════════════════════════
+     7.2
+══════════════════════════════════════════════════════ -->
 <div class="page-break"></div>
-<h2><span class="section-num">7.2</span> Project Structure in Flutter</h2>
+<h2>7.2 Project Structure and State Management (ValueNotifier and ChangeNotifier)</h2>
 
-<h3>Overview</h3>
-<p>The I Hear You project follows a <strong>feature-based layered architecture</strong> that separates concerns clearly and enables scalability. The root directory contains a <code>lib/</code> folder housing all Dart source code, divided into <code>core/</code> (shared utilities) and <code>features/</code> (screen-specific modules).</p>
+<h3>1. Introduction to Project Structure in Flutter</h3>
+<p>Building a scalable and maintainable Flutter application starts with a well-organized project structure. Without proper organization, even small apps can become difficult to manage over time. Flutter doesn't impose a specific architecture by default, so developers choose patterns that best fit their project's complexity.</p>
+<p>For the I Hear You application, a <strong>feature-based layered architecture</strong> was adopted, separating concerns clearly into core utilities and feature modules. This enables scalability without the overhead of complex global state management libraries.</p>
 
-<h3>Folder Structure</h3>
+<h3>2. Project Folder Structure</h3>
+<p>The <code>lib/</code> folder houses all Dart source code, divided into <code>core/</code> (shared utilities) and <code>features/</code> (screen-specific modules):</p>
+
 <pre>lib/
 ├── core/
 │   ├── helpers/
@@ -273,7 +275,6 @@
 │       │   ├── level_intro_screen.dart
 │       │   ├── level_options_screen.dart
 │       │   ├── study_time_screen.dart
-│       │   ├── select_categories_screen.dart
 │       │   ├── dashboard_screen.dart
 │       │   ├── levels_screen.dart
 │       │   ├── pre_start_screen.dart
@@ -288,31 +289,209 @@
 │           └── quiz_step_scaffold.dart
 └── main.dart</pre>
 
-<h3>Layer Descriptions</h3>
+<h4>Layer Descriptions:</h4>
+<ul>
+  <li><strong>core/helpers/:</strong> Utility functions such as <code>verticalSpace()</code> and <code>horizontalSpace()</code> for consistent widget spacing.</li>
+  <li><strong>core/l10n/:</strong> All user-facing strings across 14 languages via <code>app_strings.dart</code>.</li>
+  <li><strong>core/models/:</strong> Data models for API responses (e.g., <code>PredictionResult</code>, <code>PredictionItem</code>).</li>
+  <li><strong>core/routing/:</strong> Named route definitions and <code>AppRouter</code> for centralised navigation.</li>
+  <li><strong>core/services/:</strong> Service classes abstracting all external communication.</li>
+  <li><strong>core/state/:</strong> <code>TranslationNotifier</code> — a <code>ChangeNotifier</code> managing translation feature state.</li>
+  <li><strong>core/theme/:</strong> Theme configuration, text styles, colour definitions, and notifiers for dark/light mode and language.</li>
+  <li><strong>core/widgets/:</strong> Reusable components: <code>LinearButton</code>, <code>TextFormWidget</code>, and <code>LogoAndName</code>.</li>
+</ul>
+
+<h3>3. What is State Management in Flutter?</h3>
+<p>In Flutter, <strong>everything is a widget</strong>. These widgets can be stateless (don't change) or stateful (change over time). Managing the changes in these widgets — especially when the UI depends on data from API responses or user actions — is referred to as <strong>State Management</strong>.</p>
+<p>Flutter offers several approaches:</p>
+<ul>
+  <li>setState — for local widget state</li>
+  <li>ValueNotifier — for lightweight global reactive state</li>
+  <li>ChangeNotifier — for feature-specific complex state</li>
+  <li>SharedPreferences — for persistent state across sessions</li>
+  <li>Provider, Bloc/Cubit, Riverpod, GetX — for larger apps</li>
+</ul>
+<p>For the I Hear You application, a <strong>lightweight, pragmatic approach</strong> was chosen — using ValueNotifier, ChangeNotifier, SharedPreferences, and setState — without heavy global state libraries, keeping the codebase lean and maintainable.</p>
+
+<h3>4. Understanding ValueNotifier and State</h3>
+<p>A <code>ValueNotifier&lt;T&gt;</code> is a class that holds a single value and <em>notifies</em> all registered listeners whenever that value changes. It is Flutter's simplest built-in reactive primitive.</p>
+
+<h4>4.1 Theme Notifier — Dark / Light Mode</h4>
+<p>A global <code>ValueNotifier&lt;ThemeMode&gt;</code> manages dark/light mode for the entire app:</p>
+
+<pre>// theme_notifier.dart
+final themeNotifier = ValueNotifier&lt;ThemeMode&gt;(ThemeMode.dark);</pre>
+
+<p>Used in <code>main.dart</code> to rebuild the entire <code>MaterialApp</code> when the user toggles the theme:</p>
+
+<pre>ValueListenableBuilder&lt;ThemeMode&gt;(
+  valueListenable: themeNotifier,
+  builder: (context, mode, _) =&gt; MaterialApp(
+    themeMode: mode,
+    theme: ThemeData.light(),
+    darkTheme: ThemeData.dark(),
+    onGenerateRoute: AppRouter.generateRoute,
+  ),
+)</pre>
+
+<p>The theme choice is <strong>persisted to SharedPreferences</strong> (key: <code>isDark</code>) and loaded before <code>runApp()</code> in <code>main.dart</code> so the splash screen always shows the correct theme immediately — eliminating the flash-of-wrong-theme problem:</p>
+
+<pre>void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  final prefs = await SharedPreferences.getInstance();
+  final savedDark = prefs.getBool('isDark');
+  if (savedDark != null) {
+    themeNotifier.value = savedDark ? ThemeMode.dark : ThemeMode.light;
+  }
+  runApp(const IHeartYouApp());
+}</pre>
+
+<h4>4.2 Language Notifier</h4>
+<p>A <code>ValueNotifier&lt;LanguageInfo&gt;</code> holds the currently selected UI language (code, name, and flag):</p>
+
+<pre>// language_notifier.dart
+final languageNotifier = ValueNotifier&lt;LanguageInfo&gt;(
+  LanguageInfo(code: 'en', name: 'English', flag: '🇺🇸'),
+);</pre>
+
+<p>Screens subscribe and unsubscribe in <code>initState</code> / <code>dispose</code>:</p>
+
+<pre>@override
+void initState() {
+  super.initState();
+  languageNotifier.addListener(_rebuild);
+}
+
+void _rebuild() =&gt; setState(() {});
+
+@override
+void dispose() {
+  languageNotifier.removeListener(_rebuild);
+  super.dispose();
+}</pre>
+
+<h3>5. ChangeNotifier — Translation Feature State</h3>
+<p>For the sign-language translation feature, a <code>TranslationNotifier</code> extending <code>ChangeNotifier</code> manages the full lifecycle of a video prediction request:</p>
+
+<pre>enum TranslationStatus { idle, loading, success, error }
+enum ServerStatus { unknown, online, offline }
+
+class TranslationNotifier extends ChangeNotifier {
+  final _service = TranslationService();
+  bool _disposed = false;
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
+
+  void _notify() {
+    if (!_disposed) notifyListeners();
+  }
+
+  TranslationStatus _status = TranslationStatus.idle;
+  PredictionResult? _result;
+  String _error = '';
+  final List&lt;PredictionItem&gt; _sentence = [];
+
+  bool get isLoading =&gt; _status == TranslationStatus.loading;
+  bool get isSuccess =&gt; _status == TranslationStatus.success;
+  bool get isError   =&gt; _status == TranslationStatus.error;
+
+  Future&lt;void&gt; predict(File video) async {
+    _status = TranslationStatus.loading;
+    _result = null;
+    _error = '';
+    _notify();
+
+    try {
+      _result = await _service.predict(video);
+      _status = TranslationStatus.success;
+      _sentence.add(_result!.top);
+    } catch (e) {
+      _error = e.toString().replaceFirst('Exception: ', '');
+      _status = TranslationStatus.error;
+    }
+    _notify();
+  }
+}</pre>
+
+<p>The <code>_disposed</code> flag is a critical safety pattern: it prevents <code>notifyListeners()</code> from being called after the widget is removed from the tree — protecting against the common <code>ChangeNotifier.debugAssertNotDisposed</code> crash when async operations outlive their widget.</p>
+
+<h3>6. SharedPreferences — Persistent State</h3>
+<p>All data that must survive app restarts is stored in <code>SharedPreferences</code>:</p>
+
 <table>
-  <tr><th>Layer</th><th>Description</th></tr>
-  <tr><td><code>core/helpers/</code></td><td>Utility functions such as <code>verticalSpace()</code> and <code>horizontalSpace()</code> for consistent widget spacing.</td></tr>
-  <tr><td><code>core/l10n/</code></td><td>All user-facing strings across 14 languages via <code>app_strings.dart</code>.</td></tr>
-  <tr><td><code>core/models/</code></td><td>Data models for API responses (e.g., <code>PredictionResult</code>, <code>PredictionItem</code>).</td></tr>
-  <tr><td><code>core/routing/</code></td><td>Named route definitions and <code>AppRouter</code> for centralised navigation.</td></tr>
-  <tr><td><code>core/services/</code></td><td>Service classes abstracting all external communication — backend REST, Firebase Auth, and the AI translation server.</td></tr>
-  <tr><td><code>core/state/</code></td><td><code>TranslationNotifier</code> — a <code>ChangeNotifier</code> managing translation feature state.</td></tr>
-  <tr><td><code>core/theme/</code></td><td>Theme configuration, text styles (<code>AppTextStyles</code>), colour definitions, and notifiers for dark/light mode and language.</td></tr>
-  <tr><td><code>core/widgets/</code></td><td>Reusable components: <code>LinearButton</code>, <code>TextFormWidget</code>, and <code>LogoAndName</code>.</td></tr>
-  <tr><td><code>features/auth/</code></td><td>All authentication screens (login, signup, email verification).</td></tr>
-  <tr><td><code>features/initialization/</code></td><td>All post-auth screens: onboarding quiz, learning dashboards, and profile management.</td></tr>
+  <tr><th>Key</th><th>Type</th><th>Purpose</th></tr>
+  <tr><td><code>isDark</code></td><td>bool</td><td>Theme preference</td></tr>
+  <tr><td><code>isLoggedIn</code></td><td>bool</td><td>Authentication gate at startup</td></tr>
+  <tr><td><code>hasSelectedLevel</code></td><td>bool</td><td>Skip onboarding on next launch</td></tr>
+  <tr><td><code>userLevel</code></td><td>String</td><td>Selected CEFR level (A1–C2)</td></tr>
+  <tr><td><code>authToken</code></td><td>String</td><td>Backend JWT token</td></tr>
+  <tr><td><code>userEmail</code></td><td>String</td><td>Logged-in user email</td></tr>
+  <tr><td><code>localEmail</code></td><td>String</td><td>Email entered during signup</td></tr>
+  <tr><td><code>userName</code></td><td>String</td><td>Display name (editable)</td></tr>
+  <tr><td><code>langCode</code></td><td>String</td><td>Selected learning language code</td></tr>
+  <tr><td><code>langName</code></td><td>String</td><td>Selected learning language name</td></tr>
+  <tr><td><code>langFlag</code></td><td>String</td><td>Flag emoji for selected language</td></tr>
+  <tr><td><code>userPurpose</code></td><td>String</td><td>Reason for learning (family, work…)</td></tr>
+  <tr><td><code>userMinutesPerDay</code></td><td>int</td><td>Daily study time goal</td></tr>
 </table>
+
+<h3>7. setState — Local Screen State</h3>
+<p>Individual screens use <code>setState</code> for transient UI state such as form input, loading indicators, and selection state. Every async method follows the <code>mounted</code> guard pattern:</p>
+
+<pre>bool _isLoading = false;
+
+Future&lt;void&gt; _login() async {
+  if (!_formKey.currentState!.validate()) return;
+  setState(() =&gt; _isLoading = true);
+
+  final result = await AuthService().login(
+    email: _emailCtrl.text.trim(),
+    password: _passCtrl.text.trim(),
+  );
+
+  if (!mounted) return;  // guard against disposed widget
+  setState(() =&gt; _isLoading = false);
+  // handle result...
+}</pre>
+
+<h3>8. Benefits of This State Management Approach</h3>
+<ul>
+  <li><strong>Simple and Clean Syntax:</strong> No boilerplate event classes or code generation required.</li>
+  <li><strong>Testable:</strong> Service classes and notifiers are easy to unit test in isolation.</li>
+  <li><strong>Scalable:</strong> The approach scales well for small-to-medium apps without overwhelming complexity.</li>
+  <li><strong>Separation of Concerns:</strong> Keeps UI code (screens) separate from business logic (services) and persistence (SharedPreferences).</li>
+</ul>
+
+<h3>9. Summary</h3>
+<p>The I Hear You app uses a four-layer state management model: <code>ValueNotifier</code> for global reactive app state (theme and language), <code>ChangeNotifier</code> for feature-specific complex state (translation), <code>SharedPreferences</code> for persistent cross-session data, and <code>setState</code> for transient screen-level state. This combination provides reactivity where needed without adding unnecessary overhead.</p>
 
 <hr>
 
-<!-- ═══════════════════════════════════════════════════════ 7.3 -->
+<!-- ══════════════════════════════════════════════════════
+     7.3
+══════════════════════════════════════════════════════ -->
 <div class="page-break"></div>
-<h2><span class="section-num">7.3</span> UI Components and Navigation</h2>
+<h2>7.3 UI Components and Navigation in Flutter</h2>
 
-<h3>Design System</h3>
-<p>The app uses a consistent design system built around two themes — <strong>Dark</strong> and <strong>Light</strong> — toggled in real time via the <code>themeNotifier</code> (<code>ValueNotifier&lt;ThemeMode&gt;</code>).</p>
+<h3>1. Introduction</h3>
+<p>Flutter is a UI toolkit designed to enable fast and expressive development of cross-platform applications. One of Flutter's core strengths lies in its rich set of <strong>UI components (Widgets)</strong> and its powerful, customizable navigation system. In the I Hear You application, both are used extensively to create a polished, multilingual, and theme-aware experience.</p>
 
-<h4>Colour Palette</h4>
+<h3>2. Understanding UI in Flutter: Everything is a Widget</h3>
+<p>Flutter takes a widget-centric approach. Everything in Flutter — from layout elements to text and icons — is a widget. There are two main types:</p>
+<ul>
+  <li><strong>Stateless Widgets:</strong> These are immutable. Once created, they do not change. Used when the UI depends only on input values.</li>
+  <li><strong>Stateful Widgets:</strong> These are mutable and can rebuild themselves when their state changes. Useful for dynamic interfaces.</li>
+</ul>
+
+<h3>3. Design System</h3>
+<p>The app uses a consistent design system built around two themes — <strong>Dark</strong> and <strong>Light</strong> — toggled in real time via the <code>themeNotifier</code>.</p>
+
+<h4>3.1 Colour Palette</h4>
 <table>
   <tr><th>Role</th><th>Dark Mode</th><th>Light Mode</th></tr>
   <tr><td>Background</td><td><code>#0B1020</code> / <code>#0D0F1A</code></td><td><code>#F5F7FB</code></td></tr>
@@ -322,21 +501,40 @@
   <tr><td>Text Secondary</td><td><code>rgba(255,255,255,0.54)</code></td><td><code>#6B7280</code></td></tr>
 </table>
 
-<h4>Typography (AppTextStyles)</h4>
-<p>All font sizes use <code>.sp</code> from <code>flutter_screenutil</code> for proper scaling:</p>
-<pre>static TextStyle font36BoldWhite = GoogleFonts.openSans(
+<h4>3.2 Typography (AppTextStyles)</h4>
+<p>All font sizes use <code>.sp</code> from <code>flutter_screenutil</code> for proper scaling across devices:</p>
+
+<pre>// styles.dart
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+static TextStyle font36BoldWhite = GoogleFonts.openSans(
   fontWeight: FontWeightHelper.bold,
   fontSize: 36.sp,
   color: Colors.white,
+);
+
+static TextStyle font16MediumWhite = GoogleFonts.openSans(
+  fontWeight: FontWeightHelper.medium,
+  fontSize: 16.sp,
+  color: Colors.white,
 );</pre>
 
-<h3>Responsive Design with flutter_screenutil</h3>
-<p>Every dimension in the app uses <code>flutter_screenutil</code> with a <strong>design size of 390×844 (iPhone 14 equivalent)</strong>:</p>
-<pre>ScreenUtilInit(
+<p>All text styles support theme overrides via <code>.copyWith(color: textColor)</code>.</p>
+
+<h3>4. Responsive Design with flutter_screenutil</h3>
+<p>Every dimension in the app uses <code>flutter_screenutil</code> with a <strong>design size of 390×844 (iPhone 14 equivalent)</strong>. This ensures the UI scales correctly across all Android and iOS screen sizes without hardcoded pixel values:</p>
+
+<pre>// main.dart
+ScreenUtilInit(
   designSize: const Size(390, 844),
   minTextAdapt: true,
-  builder: (context, child) { ... },
+  builder: (context, child) {
+    return MaterialApp(
+      // ...
+    );
+  },
 )</pre>
+
 <table>
   <tr><th>Suffix</th><th>Scales</th><th>Example</th></tr>
   <tr><td><code>.w</code></td><td>Width proportionally</td><td><code>24.w</code></td></tr>
@@ -345,57 +543,121 @@
   <tr><td><code>.r</code></td><td>Border radius / uniform size</td><td><code>12.r</code></td></tr>
 </table>
 
-<h3>Reusable Widgets</h3>
+<h3>5. Reusable Custom Widgets</h3>
+<p>To avoid repetition and improve code readability, common UI components are extracted into custom widgets in the <code>core/widgets/</code> directory.</p>
 
-<h4>LinearButton</h4>
-<p>The primary CTA button with a gradient background used across all action screens:</p>
+<h4>5.1 LinearButton — Primary CTA Button</h4>
+<p>A gradient action button used across all CTA screens:</p>
+
 <pre>LinearButton(
   text: S.get('get_started'),
-  onPressed: () => Navigator.pushNamed(context, Routes.login),
+  onPressed: () =&gt; Navigator.pushNamed(context, Routes.login),
   width: double.infinity.w,
   radius: 14.r,
 )</pre>
 
-<h4>TextFormWidget</h4>
+<h4>5.2 TextFormWidget — Styled Input Field</h4>
 <p>A styled input field with built-in show/hide for password fields and consistent validation UI:</p>
+
 <pre>TextFormWidget(
   controller: _emailCtrl,
   hintText: S.get('email'),
   icon: Icons.email_outlined,
   keyboardType: TextInputType.emailAddress,
-  validator: (v) => (v ?? '').isEmpty ? S.get('email_required') : null,
+  validator: (v) {
+    final val = (v ?? '').trim();
+    if (val.isEmpty) return S.get('email_required');
+    if (!val.contains('@') || !val.contains('.')) {
+      return S.get('email_invalid');
+    }
+    return null;
+  },
 )</pre>
 
-<h4>LogoAndName</h4>
-<p>The app logo and title widget, fully theme-aware:</p>
+<h4>5.3 LogoAndName — Theme-Aware App Logo</h4>
+
 <pre>class LogoAndName extends StatelessWidget {
+  @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Column(children: [
-      SvgPicture.asset('assets/svgs/app-logo.svg', height: 81.h, width: 67.w),
-      Text("I Hear You",
-        style: AppTextStyles.font36SemiboldWhite.copyWith(
-          color: isDark ? Colors.white : const Color(0xFF1A1A2E),
-        )),
-    ]);
+    return Column(
+      children: [
+        SvgPicture.asset(
+          'assets/svgs/app-logo.svg',
+          height: 81.h,
+          width: 67.w,
+        ),
+        Text(
+          "I Hear You",
+          style: AppTextStyles.font36SemiboldWhite.copyWith(
+            color: isDark ? Colors.white : const Color(0xFF1A1A2E),
+          ),
+        ),
+      ],
+    );
   }
 }</pre>
 
-<h3>Navigation</h3>
-<p>The app uses <strong>Named Routes</strong> with a central <code>AppRouter</code> class:</p>
-<pre>class AppRouter {
+<h4>5.4 QuizStepScaffold — Onboarding Layout</h4>
+<p>A shared layout widget used by all onboarding quiz steps, providing a consistent header, progress indicator, and content area. This avoids duplicating the scaffold structure across 6+ screens.</p>
+
+<h3>6. Navigation</h3>
+<p>The app uses <strong>Named Routes</strong> with a central <code>AppRouter</code> class that maps route strings to screen widgets:</p>
+
+<pre>// routes.dart
+class Routes {
+  static const String splash     = '/';
+  static const String login      = '/login';
+  static const String signup     = '/signup';
+  static const String dashboard  = '/dashboard';
+  static const String levels     = '/levels';
+  static const String lostPage   = '/lostPage';
+  static const String chat       = '/chat';
+  static const String profile    = '/profile';
+  static const String accountInfo = '/accountInfo';
+  // ...
+}
+
+// app_router.dart
+class AppRouter {
   static Route&lt;dynamic&gt; generateRoute(RouteSettings settings) {
     switch (settings.name) {
-      case Routes.splash:     return MaterialPageRoute(builder: (_) => const SplashScreen());
-      case Routes.login:      return MaterialPageRoute(builder: (_) => const LoginScreen());
-      case Routes.dashboard:  return MaterialPageRoute(builder: (_) => const DashboardScreen());
+      case Routes.splash:
+        return MaterialPageRoute(builder: (_) =&gt; const SplashScreen());
+      case Routes.login:
+        return MaterialPageRoute(builder: (_) =&gt; const LoginScreen());
+      case Routes.dashboard:
+        return MaterialPageRoute(builder: (_) =&gt; const DashboardScreen());
       // ...
+      default:
+        return MaterialPageRoute(builder: (_) =&gt; const SplashScreen());
     }
   }
 }</pre>
 
-<h4>Navigation Flow</h4>
-<div class="flow">SplashScreen
+<h4>6.1 Navigation Flow</h4>
+<p>The SplashScreen reads <code>SharedPreferences</code> flags (<code>isLoggedIn</code>, <code>hasSelectedLevel</code>) and routes the user to the correct starting point:</p>
+
+<pre>// splash_screen.dart
+Future&lt;void&gt; _navigate() async {
+  final prefs = await SharedPreferences.getInstance();
+  final isLoggedIn      = prefs.getBool('isLoggedIn') ?? false;
+  final hasSelectedLevel = prefs.getBool('hasSelectedLevel') ?? false;
+
+  if (!mounted) return;
+
+  if (isLoggedIn && hasSelectedLevel) {
+    Navigator.pushReplacementNamed(context, Routes.dashboard);
+  } else if (isLoggedIn) {
+    Navigator.pushReplacementNamed(context, Routes.chooseLanguage);
+  } else {
+    Navigator.pushReplacementNamed(context, Routes.startPage);
+  }
+}</pre>
+
+<h4>6.2 Full Navigation Diagram</h4>
+<pre style="background:#f0f8f0;color:#1a4a1a;border:1px solid #22c55e;">
+SplashScreen
     │
     ├─► StartPageScreen ──► GetStartedScreen ──► OnboardingScreen
     │                                                    │
@@ -412,148 +674,56 @@
             └─► DashboardScreen
                     │
                     ├─► LevelsScreen ──► PreStartScreen ──► WordListScreen ──► SignPracticeScreen
-                    ├─► LostPageScreen (Translation)
+                    ├─► LostPageScreen (Sign Language Translation)
                     ├─► ChatScreen (AI Sign Assistant)
-                    └─► ProfileScreen ──► AccountInfoScreen</div>
+                    └─► ProfileScreen ──► AccountInfoScreen
+</pre>
+
+<h3>7. Commonly Used UI Widgets in the App</h3>
+<table>
+  <tr><th>Widget</th><th>Description</th></tr>
+  <tr><td><code>Scaffold</code></td><td>Base layout for all screens with SafeArea wrapping</td></tr>
+  <tr><td><code>SingleChildScrollView</code></td><td>Prevents overflow on small screens with keyboards</td></tr>
+  <tr><td><code>ListView.builder</code></td><td>Used in LevelsScreen and WordListScreen for efficient scrolling lists</td></tr>
+  <tr><td><code>AnimatedContainer</code></td><td>Smooth transitions in flashcard and progress animations</td></tr>
+  <tr><td><code>CircularProgressIndicator</code></td><td>Loading states across all API calls</td></tr>
+  <tr><td><code>SnackBar</code></td><td>User feedback messages (error, success, "Coming Soon")</td></tr>
+  <tr><td><code>AlertDialog</code></td><td>Success confirmation dialogs (name edit, email sent)</td></tr>
+  <tr><td><code>Switch</code></td><td>Dark mode toggle in ProfileScreen</td></tr>
+  <tr><td><code>VideoPlayer</code></td><td>Sign practice video preview via <code>video_player</code> package</td></tr>
+</table>
+
+<h3>8. Summary</h3>
+<p>The I Hear You app demonstrates Flutter's UI capabilities through a consistent design system, a library of reusable custom widgets, and a centralized named-route navigation system. Every dimension uses <code>flutter_screenutil</code> for pixel-perfect responsiveness, and every text colour is derived from the active theme — ensuring a polished experience in both Dark and Light modes.</p>
 
 <hr>
 
-<!-- ═══════════════════════════════════════════════════════ 7.4 -->
+<!-- ══════════════════════════════════════════════════════
+     7.4
+══════════════════════════════════════════════════════ -->
 <div class="page-break"></div>
-<h2><span class="section-num">7.4</span> State Management</h2>
+<h2>7.4 API Integration using HTTP in Flutter</h2>
 
-<h3>Overview</h3>
-<p>The I Hear You app uses a <strong>lightweight, pragmatic state management approach</strong> without heavy global state libraries like BLoC or Provider. State is handled through four complementary mechanisms:</p>
-<ol>
-  <li><strong>ValueNotifier</strong> — global reactive app state (theme, language)</li>
-  <li><strong>ChangeNotifier</strong> — feature-specific complex state (translation)</li>
-  <li><strong>SharedPreferences</strong> — persisted user state across sessions</li>
-  <li><strong>setState</strong> — local screen-level transient state</li>
-</ol>
+<h3>1. Introduction</h3>
+<p>Modern mobile apps rarely operate in isolation; they communicate with remote servers through RESTful APIs to fetch or send data. In Flutter, this is typically done using the <strong>http</strong> package — the standard Dart HTTP client — or the more advanced <strong>dio</strong> package.</p>
+<p>The I Hear You application integrates <strong>three external servers</strong>:</p>
+<ul>
+  <li>A <strong>backend REST API</strong> at <code>http://91.108.113.135</code> — primary authentication source</li>
+  <li>A <strong>Firebase Auth</strong> server — for password management operations</li>
+  <li>A <strong>dedicated AI server</strong> — for sign-language prediction and conversational chat</li>
+</ul>
+<p>All external communication is abstracted into service classes (<code>AuthService</code>, <code>TranslationService</code>, <code>ChatService</code>), keeping UI code free of HTTP concerns.</p>
 
-<h3>1. ValueNotifier — Theme and Language</h3>
-<p><strong>Theme Notifier</strong> (<code>theme_notifier.dart</code>) uses a global <code>ValueNotifier&lt;ThemeMode&gt;</code> to rebuild the entire app when the user toggles dark/light mode:</p>
-<pre>final themeNotifier = ValueNotifier&lt;ThemeMode&gt;(ThemeMode.dark);
+<h3>2. Using the http Package</h3>
+<p>The <code>http</code> package is Flutter's standard HTTP client for making REST API calls.</p>
 
-// In main.dart:
-ValueListenableBuilder&lt;ThemeMode&gt;(
-  valueListenable: themeNotifier,
-  builder: (context, mode, _) => MaterialApp(
-    themeMode: mode,
-    theme: ThemeData.light(),
-    darkTheme: ThemeData.dark(),
-  ),
-)</pre>
+<h4>2.1 Installation</h4>
+<pre>dependencies:
+  http: ^1.2.1</pre>
 
-<p>The theme is <strong>persisted to SharedPreferences</strong> (<code>isDark</code>) and loaded <em>before</em> <code>runApp()</code> so the splash screen renders with the correct theme immediately — eliminating any flash of the wrong theme.</p>
+<h4>2.2 The AuthService Pattern</h4>
+<p>Every method in <code>AuthService</code> returns an <code>AuthResult</code> with a <code>success</code> flag and a user-facing <code>message</code>, keeping error handling uniform across the app:</p>
 
-<pre>void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(...);
-  final prefs = await SharedPreferences.getInstance();
-  final savedDark = prefs.getBool('isDark');
-  if (savedDark != null) {
-    themeNotifier.value = savedDark ? ThemeMode.dark : ThemeMode.light;
-  }
-  runApp(const IHeartYouApp());
-}</pre>
-
-<p><strong>Language Notifier</strong> holds a <code>LanguageInfo</code> (code, name, flag) and triggers rebuilds across any screen that subscribes:</p>
-<pre>final languageNotifier = ValueNotifier&lt;LanguageInfo&gt;(
-  LanguageInfo(code: 'en', name: 'English', flag: '🇺🇸'),
-);
-
-// In screen initState:
-languageNotifier.addListener(_rebuild);
-void _rebuild() =&gt; setState(() {});
-
-// In screen dispose:
-languageNotifier.removeListener(_rebuild);</pre>
-
-<h3>2. ChangeNotifier — Translation Feature</h3>
-<p><code>TranslationNotifier</code> manages the full lifecycle of a sign-language video translation request:</p>
-<pre>enum TranslationStatus { idle, loading, success, error }
-enum ServerStatus { unknown, online, offline }
-
-class TranslationNotifier extends ChangeNotifier {
-  TranslationStatus _status = TranslationStatus.idle;
-  PredictionResult? _result;
-  ServerStatus _serverStatus = ServerStatus.unknown;
-  bool _disposed = false;
-
-  @override
-  void dispose() {
-    _disposed = true;
-    super.dispose();
-  }
-
-  void _notify() {
-    if (!_disposed) notifyListeners();
-  }
-
-  Future&lt;void&gt; predict(File video) async {
-    _status = TranslationStatus.loading;
-    _notify();
-    try {
-      _result = await _service.predict(video);
-      _status = TranslationStatus.success;
-      _sentence.add(_result!.top);
-    } catch (e) {
-      _error = e.toString().replaceFirst('Exception: ', '');
-      _status = TranslationStatus.error;
-    }
-    _notify();
-  }
-}</pre>
-<div class="info-box">The <code>_disposed</code> flag prevents <code>notifyListeners()</code> from being called after the widget is removed from the tree — protecting against the common <code>ChangeNotifier.debugAssertNotDisposed</code> crash when async operations outlive their widget.</div>
-
-<h3>3. SharedPreferences — Persistent State</h3>
-<table>
-  <tr><th>Key</th><th>Type</th><th>Purpose</th></tr>
-  <tr><td><code>isDark</code></td><td>bool</td><td>Theme preference</td></tr>
-  <tr><td><code>isLoggedIn</code></td><td>bool</td><td>Authentication gate at startup</td></tr>
-  <tr><td><code>hasSelectedLevel</code></td><td>bool</td><td>Skip onboarding on next launch</td></tr>
-  <tr><td><code>userLevel</code></td><td>String</td><td>Selected CEFR level (A1–C2)</td></tr>
-  <tr><td><code>authToken</code></td><td>String</td><td>Backend JWT token</td></tr>
-  <tr><td><code>userEmail</code></td><td>String</td><td>Logged-in user email</td></tr>
-  <tr><td><code>localEmail</code></td><td>String</td><td>Email entered during signup</td></tr>
-  <tr><td><code>userName</code></td><td>String</td><td>Display name</td></tr>
-  <tr><td><code>langCode</code></td><td>String</td><td>Selected learning language code</td></tr>
-  <tr><td><code>langName</code></td><td>String</td><td>Selected learning language name</td></tr>
-  <tr><td><code>langFlag</code></td><td>String</td><td>Flag emoji for selected language</td></tr>
-  <tr><td><code>userPurpose</code></td><td>String</td><td>Reason for learning</td></tr>
-  <tr><td><code>userMinutesPerDay</code></td><td>int</td><td>Daily study time goal</td></tr>
-</table>
-
-<h3>4. setState — Local Screen State</h3>
-<p>Individual screens use <code>setState</code> for transient UI state such as form input, loading indicators, and selection state. Every async method follows the <code>mounted</code> guard pattern:</p>
-<pre>bool _isLoading = false;
-
-Future&lt;void&gt; _submit() async {
-  setState(() =&gt; _isLoading = true);
-  final result = await AuthService().login(email: ..., password: ...);
-  if (!mounted) return;  // guard against disposed widget
-  setState(() =&gt; _isLoading = false);
-}</pre>
-
-<hr>
-
-<!-- ═══════════════════════════════════════════════════════ 7.5 -->
-<div class="page-break"></div>
-<h2><span class="section-num">7.5</span> API Integration</h2>
-
-<h3>Backend REST API</h3>
-<p>The app communicates with a backend server at <code>http://91.108.113.135</code> using the standard Dart <code>http</code> package. All API logic is encapsulated in the <code>AuthService</code> class, keeping UI code free of HTTP concerns.</p>
-
-<h4>Active Backend Endpoints</h4>
-<table>
-  <tr><th>Method</th><th>Endpoint</th><th>Purpose</th></tr>
-  <tr><td>POST</td><td><code>/api/auth/signup</code></td><td>Register a new user</td></tr>
-  <tr><td>GET</td><td><code>/api/auth/verify/:token</code></td><td>Verify email with token from link</td></tr>
-  <tr><td>POST</td><td><code>/api/auth/login</code></td><td>Authenticate and receive JWT</td></tr>
-</table>
-
-<h4>AuthService Pattern</h4>
 <pre>class AuthResult {
   final bool success;
   final String message;
@@ -564,39 +734,116 @@ class AuthService {
   static const _base = 'http://91.108.113.135';
   static const _timeout = Duration(seconds: 20);
   final _fb = FirebaseAuth.instance;
-  // ...
 }</pre>
 
-<h4>Login Flow</h4>
-<pre>Future&lt;AuthResult&gt; login({required String email, required String password}) async {
-  final res = await http.post(
-    Uri.parse('$_base/api/auth/login'),
-    headers: {'Content-Type': 'application/json'},
-    body: jsonEncode({'email': email, 'password': password}),
-  ).timeout(_timeout);
+<h4>2.3 Making a POST Request — Login</h4>
 
-  final json = _decode(res);
+<pre>Future&lt;AuthResult&gt; login({
+  required String email,
+  required String password,
+}) async {
+  try {
+    final res = await http.post(
+      Uri.parse('$_base/api/auth/login'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email, 'password': password}),
+    ).timeout(_timeout);
 
-  // Save token early — present even in verify-required responses
-  final token = _extractToken(json);
-  if (token != null) {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('authToken', token);
-    await prefs.setString('userEmail', email);
+    final json = _decode(res);
+
+    // Save token early — present even in verify-required responses
+    final token = _extractToken(json);
+    if (token != null) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('authToken', token);
+      await prefs.setString('userEmail', email);
+    }
+
+    if (json['success'] != true) {
+      return AuthResult(
+        success: false,
+        message: json['message']?.toString() ?? 'Login failed',
+      );
+    }
+
+    // Mirror into Firebase for password-management operations
+    await _signIntoFirebase(email, password);
+
+    return AuthResult(success: true, message: json['message'] ?? 'Logged in');
+  } catch (_) {
+    return AuthResult(
+      success: false,
+      message: 'Network error. Check your internet connection',
+    );
   }
-
-  if (json['success'] != true) {
-    return AuthResult(success: false, message: json['message'] ?? 'Login failed');
-  }
-
-  await _signIntoFirebase(email, password);
-  return AuthResult(success: true, message: json['message'] ?? 'Logged in');
 }</pre>
 
-<h3>Firebase Auth Integration</h3>
-<p>Firebase Auth (<code>firebase_auth: ^6.5.2</code>) is integrated as a <strong>secondary auth layer</strong> for password-management operations that the backend does not support. During login the app also signs into Firebase so that password-change operations can be performed later.</p>
+<h4>2.4 Making a POST Request — Signup</h4>
 
-<h4>Firebase Sign-in Helper</h4>
+<pre>Future&lt;AuthResult&gt; signup({
+  required String email,
+  required String password,
+}) async {
+  try {
+    final res = await http.post(
+      Uri.parse('$_base/api/auth/signup'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email, 'password': password}),
+    ).timeout(_timeout);
+
+    final json = _decode(res);
+    final ok = json['success'] == true;
+
+    if (ok) {
+      try {
+        await _fb.createUserWithEmailAndPassword(email: email, password: password);
+      } catch (_) {}
+    }
+
+    return AuthResult(
+      success: ok,
+      message: json['message']?.toString() ?? 'Something went wrong',
+    );
+  } catch (_) {
+    return AuthResult(success: false, message: 'Network error.');
+  }
+}</pre>
+
+<h4>2.5 Response Parsing Helper</h4>
+
+<pre>Map&lt;String, dynamic&gt; _decode(http.Response res) {
+  try {
+    final decoded = jsonDecode(res.body);
+    if (decoded is Map&lt;String, dynamic&gt;) return decoded;
+  } catch (_) {}
+  return {};
+}
+
+String? _extractToken(Map&lt;String, dynamic&gt; json) {
+  for (final key in ['token', 'access_token', 'accessToken', 'jwt']) {
+    final v = json[key];
+    if (v is String && v.isNotEmpty) return v;
+  }
+  // Also check nested 'data' and 'user' objects
+  final data = json['data'];
+  if (data is Map&lt;String, dynamic&gt;) {
+    final nested = _extractToken(data);
+    if (nested != null) return nested;
+  }
+  return null;
+}</pre>
+
+<h3>3. Active Backend Endpoints</h3>
+<table>
+  <tr><th>Method</th><th>Endpoint</th><th>Purpose</th></tr>
+  <tr><td>POST</td><td><code>/api/auth/signup</code></td><td>Register a new user</td></tr>
+  <tr><td>GET</td><td><code>/api/auth/verify/:token</code></td><td>Verify email with token from link</td></tr>
+  <tr><td>POST</td><td><code>/api/auth/login</code></td><td>Authenticate and receive JWT</td></tr>
+</table>
+
+<h3>4. Firebase Auth Integration</h3>
+<p>Firebase Auth is integrated as a <strong>secondary auth layer</strong> for password-management operations. During login the app also signs into Firebase so that password-change operations can be performed later:</p>
+
 <pre>Future&lt;void&gt; _signIntoFirebase(String email, String password) async {
   try {
     await _fb.signInWithEmailAndPassword(email: email, password: password);
@@ -608,10 +855,10 @@ class AuthService {
     }
     // Other errors are non-fatal — backend is the primary auth source
   }
-}</pre>
+}
 
-<h4>Firebase Error Mapping</h4>
-<pre>String _fbError(FirebaseAuthException e) {
+// Firebase error mapping
+String _fbError(FirebaseAuthException e) {
   switch (e.code) {
     case 'wrong-password':
     case 'invalid-credential':    return 'Current password is incorrect.';
@@ -623,185 +870,478 @@ class AuthService {
   }
 }</pre>
 
-<h3>Translation Service</h3>
+<h3>5. Password Reset via Firebase</h3>
+
+<pre>Future&lt;void&gt; sendPasswordReset(String email) async {
+  try {
+    await _fb.sendPasswordResetEmail(email: email);
+  } on FirebaseAuthException catch (e) {
+    throw Exception(_fbError(e));
+  } catch (_) {
+    throw Exception('Network error. Check your internet connection');
+  }
+}</pre>
+
+<h3>6. Translation Service — Multipart File Upload</h3>
+<p>The sign-language translation feature sends a video file to the AI server using <code>http.MultipartRequest</code>:</p>
+
 <pre>class TranslationService {
+  final _base = 'http://91.108.113.135';
+
   Future&lt;bool&gt; checkHealth() async {
-    final res = await http.get(Uri.parse('$_base/health')).timeout(...);
+    final res = await http.get(Uri.parse('$_base/health'))
+        .timeout(const Duration(seconds: 10));
     return res.statusCode == 200;
   }
 
+  Future&lt;List&lt;String&gt;&gt; getClasses() async {
+    final res = await http.get(Uri.parse('$_base/classes'))
+        .timeout(const Duration(seconds: 15));
+    final json = jsonDecode(res.body);
+    return List&lt;String&gt;.from(json['classes'] ?? []);
+  }
+
   Future&lt;PredictionResult&gt; predict(File videoFile) async {
-    final request = http.MultipartRequest('POST', Uri.parse('$_base/predict'));
-    request.files.add(await http.MultipartFile.fromPath('video', videoFile.path));
-    final streamed = await request.send().timeout(...);
+    final request = http.MultipartRequest(
+      'POST',
+      Uri.parse('$_base/predict'),
+    );
+    request.files.add(
+      await http.MultipartFile.fromPath('video', videoFile.path),
+    );
+    final streamed = await request.send().timeout(const Duration(seconds: 60));
     final res = await http.Response.fromStream(streamed);
+    if (res.statusCode != 200) throw Exception('Prediction failed');
     return PredictionResult.fromJson(jsonDecode(res.body));
   }
 }</pre>
 
-<h3>Chat Service</h3>
+<h3>7. Chat Service — Session-Based Messaging</h3>
+
 <pre>class ChatService {
+  final _base = 'http://91.108.113.135';
+
   Future&lt;String&gt; newSession() async {
-    final res = await http.post(Uri.parse('$_base/session/new'), ...);
+    final res = await http.post(
+      Uri.parse('$_base/session/new'),
+      headers: {'Content-Type': 'application/json'},
+    ).timeout(const Duration(seconds: 15));
     return jsonDecode(res.body)['session_id'];
   }
 
-  Future&lt;String&gt; sendMessage({required String sessionId, required String message}) async {
-    final res = await http.post(Uri.parse('$_base/chat'),
-      body: jsonEncode({'session_id': sessionId, 'message': message}), ...);
+  Future&lt;String&gt; sendMessage({
+    required String sessionId,
+    required String message,
+  }) async {
+    final res = await http.post(
+      Uri.parse('$_base/chat'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'session_id': sessionId, 'message': message}),
+    ).timeout(const Duration(seconds: 30));
     return jsonDecode(res.body)['response'];
   }
 }</pre>
 
-<hr>
-
-<!-- ═══════════════════════════════════════════════════════ 7.6 -->
-<div class="page-break"></div>
-<h2><span class="section-num">7.6</span> Screens Overview and Implementation</h2>
-
-<h3>Authentication Screens</h3>
-
-<h4>Splash Screen</h4>
-<p>Entry point that determines routing based on saved session state:</p>
+<h3>8. Error Handling and Timeouts</h3>
+<p>All API calls use:</p>
 <ul>
-  <li>If <code>isLoggedIn = true</code> and <code>hasSelectedLevel = true</code> → navigate to Dashboard</li>
-  <li>If <code>isLoggedIn = true</code> but no level → navigate to onboarding (language selection)</li>
-  <li>Otherwise → navigate to StartPage</li>
+  <li><strong>.timeout(Duration)</strong> — to prevent indefinite waits on slow connections (20 seconds for auth, up to 60 seconds for video upload)</li>
+  <li><strong>try/catch blocks</strong> — to catch network errors, JSON decode failures, and timeouts</li>
+  <li><strong>Uniform AuthResult / Exception return</strong> — so UI code always knows how to handle any outcome</li>
 </ul>
-<p>The splash screen is <strong>fully theme-aware</strong>; the correct theme is loaded before <code>runApp()</code> so no flash-of-wrong-theme occurs.</p>
 
-<h4>Start Page Screen</h4>
-<p>Welcome screen with animated logo and tagline, offering <strong>"Get Started"</strong> and <strong>"Login"</strong> actions. All text colours are theme-aware (white on dark, <code>#1A1A2E</code> on light).</p>
-
-<h4>Get Started Screen</h4>
-<p>A brief marketing screen explaining the app's value proposition, with a CTA to begin the onboarding flow.</p>
-
-<h4>Login Screen</h4>
-<p><strong>Fields:</strong> Email, Password (with show/hide toggle)<br>
-<strong>Actions:</strong> Login, Forgot Password, Sign Up redirect</p>
-<pre>Future&lt;void&gt; _login() async {
-  if (!_formKey.currentState!.validate()) return;
-  setState(() =&gt; _isLoading = true);
+<pre>try {
   final result = await AuthService().login(
     email: _emailCtrl.text.trim(),
     password: _passCtrl.text.trim(),
   );
   if (!mounted) return;
-  setState(() =&gt; _isLoading = false);
-  if (result.success || result.message.toLowerCase().contains('verify')) {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', true);
-    // navigate based on level selection state...
+  if (result.success) {
+    Navigator.pushReplacementNamed(context, Routes.dashboard);
   } else {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(result.message)));
+      SnackBar(content: Text(result.message), backgroundColor: Colors.red),
+    );
+  }
+} catch (e) {
+  if (!mounted) return;
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+  );
+}</pre>
+
+<h3>9. Summary</h3>
+<p>The I Hear You application integrates three external services through a clean service-layer pattern using the standard <code>http</code> package. By encapsulating all HTTP logic in <code>AuthService</code>, <code>TranslationService</code>, and <code>ChatService</code>, the UI remains clean and free of network concerns. Consistent error handling, response parsing, and timeout management ensure a robust user experience even on unreliable connections.</p>
+
+<hr>
+
+<!-- ══════════════════════════════════════════════════════
+     7.5
+══════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h2>7.5 Deployment and Device Testing in Flutter</h2>
+
+<h3>1. Introduction</h3>
+<p>Developing a Flutter application is only part of the journey. Before users can benefit from the app, it must go through testing on real devices and eventually be deployed to official app stores such as <strong>Google Play</strong> and the <strong>Apple App Store</strong>. This phase is crucial for delivering a polished, functional, and reliable product.</p>
+
+<h3>2. Device Testing in Flutter</h3>
+
+<h4>2.1 Why Device Testing Matters</h4>
+<p>Testing on physical devices ensures:</p>
+<ul>
+  <li>Real-world performance (battery, network, CPU usage)</li>
+  <li>Accurate UI rendering on actual screen sizes and notches</li>
+  <li>Access to hardware features (camera, microphone, storage) used in the app</li>
+  <li>Correct behaviour of the <code>speech_to_text</code> microphone input in the Chat Screen</li>
+  <li>Accurate performance of <code>video_player</code> and <code>image_picker</code> on real devices</li>
+</ul>
+
+<h4>2.2 Running on Android</h4>
+<ol>
+  <li>Enable <strong>Developer Options</strong> and <strong>USB Debugging</strong> on the Android device</li>
+  <li>Connect the device via USB</li>
+  <li>Run: <code>flutter run</code></li>
+</ol>
+
+<h4>2.3 Running on iOS</h4>
+<ol>
+  <li>Open Xcode → Preferences → Accounts and sign in with an Apple ID</li>
+  <li>Connect your iPhone via USB</li>
+  <li>Run: <code>flutter run</code></li>
+</ol>
+<p>Note: A macOS system is required to build and test iOS apps.</p>
+
+<h4>2.4 Using Emulators / Simulators</h4>
+<ul>
+  <li><strong>Android Emulator:</strong> Open Android Studio → AVD Manager → Create Virtual Device → Choose Pixel device with appropriate API level → Run <code>flutter run</code></li>
+  <li><strong>iOS Simulator:</strong> Only available on macOS → Open via Xcode or run <code>open -a Simulator</code></li>
+</ul>
+<p>The app was tested on the Android emulator (Pixel 8, Android x64) as shown in the VS Code status bar during development.</p>
+
+<h3>3. Preparing the App for Release</h3>
+
+<h4>3.1 Set App Name, Icon, and Package ID</h4>
+<p>The app uses the <code>flutter_launcher_icons</code> and <code>flutter_native_splash</code> packages to generate platform-specific assets:</p>
+
+<pre># flutter_native_splash.yaml
+flutter_native_splash:
+  color: "#0B1020"
+  image: assets/images/splash_logo.png
+  android: true
+  ios: true</pre>
+
+<pre># pubspec.yaml (flutter_launcher_icons section)
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/app_icon.png"</pre>
+
+<p>Then run:</p>
+<pre>flutter pub run flutter_launcher_icons:main
+flutter pub run flutter_native_splash:create</pre>
+
+<h4>3.2 Required Permissions</h4>
+<p>The app requests the following runtime permissions via <code>permission_handler</code>:</p>
+<table>
+  <tr><th>Permission</th><th>Used By</th></tr>
+  <tr><td>Camera</td><td>Sign Practice Screen — video recording</td></tr>
+  <tr><td>Microphone</td><td>AI Chat Screen — speech-to-text input</td></tr>
+  <tr><td>Storage (read/write)</td><td>Image picker for gallery video selection</td></tr>
+</table>
+
+<h3>4. Building the Release Version</h3>
+
+<h4>4.1 Android Release</h4>
+<p><strong>Step 1:</strong> Create a keystore file:</p>
+<pre>keytool -genkey -v -keystore ~/my-release-key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias my-key-alias</pre>
+
+<p><strong>Step 2:</strong> Configure signing in <code>android/key.properties</code>:</p>
+<pre>storePassword=your-password
+keyPassword=your-password
+keyAlias=my-key-alias
+storeFile=../my-release-key.jks</pre>
+
+<p><strong>Step 3:</strong> Build App Bundle for Play Store:</p>
+<pre>flutter build appbundle --release</pre>
+
+<p>Or APK for direct installation:</p>
+<pre>flutter build apk --release</pre>
+
+<h4>4.2 iOS Release</h4>
+<ol>
+  <li>Open the project in Xcode: <code>open ios/Runner.xcworkspace</code></li>
+  <li>Update version and build number in Runner → General → Identity</li>
+  <li>Configure Signing &amp; Capabilities — select Apple Developer Team and unique Bundle Identifier</li>
+  <li>Select Any iOS Device → Product → Archive</li>
+  <li>Open Organizer to upload to the App Store</li>
+</ol>
+
+<h3>5. Store Deployment</h3>
+
+<h4>5.1 Google Play Store</h4>
+<ol>
+  <li>Sign in to Google Play Console</li>
+  <li>Create a new application</li>
+  <li>Upload the App Bundle (.aab) file</li>
+  <li>Fill in app name, description, screenshots, privacy policy, content rating</li>
+  <li>Submit for review</li>
+</ol>
+
+<h4>5.2 Apple App Store</h4>
+<ol>
+  <li>Sign in to App Store Connect</li>
+  <li>Create a new app record</li>
+  <li>Upload build via Xcode or Transporter</li>
+  <li>Fill out app information, screenshots, pricing, and privacy compliance</li>
+  <li>Submit for review</li>
+</ol>
+
+<h3>6. Testing Techniques</h3>
+
+<h4>6.1 Manual Testing</h4>
+<p>The following scenarios were tested manually on the Android emulator:</p>
+<ul>
+  <li>Complete authentication flow (signup → verify → login → logout)</li>
+  <li>Full onboarding quiz (language → about you → purpose → level → study time)</li>
+  <li>Flashcard learning flow (word list → I Know / Learn → sign practice)</li>
+  <li>Translation screen (upload video → server health check → result display)</li>
+  <li>AI chat (voice input → session management → response display)</li>
+  <li>Profile settings (dark mode toggle → name edit → theme persistence)</li>
+  <li>Theme switching in all screens (no flash of wrong theme)</li>
+  <li>Language switching (all 14 languages render correctly)</li>
+</ul>
+
+<h4>6.2 Flutter Testing Support</h4>
+<p>Flutter supports three levels of automated testing:</p>
+<ul>
+  <li><strong>Unit testing</strong> — testing individual service methods (e.g., <code>AuthService.login()</code>)</li>
+  <li><strong>Widget testing</strong> (<code>flutter_test</code>) — testing individual widget rendering and interaction</li>
+  <li><strong>Integration testing</strong> (<code>integration_test</code>) — end-to-end testing on a real device or emulator</li>
+</ul>
+
+<h3>7. Summary</h3>
+<p>Deploying the I Hear You Flutter app requires careful testing across screen sizes and OS versions, proper signing for both Android and iOS, and adherence to platform store guidelines. The use of <code>flutter_native_splash</code>, <code>flutter_launcher_icons</code>, and <code>permission_handler</code> ensures a polished, production-ready experience from the very first screen the user sees.</p>
+
+<hr>
+
+<!-- ══════════════════════════════════════════════════════
+     7.6
+══════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h2>7.6 Sample Screenshots and Code Snippets in Flutter</h2>
+
+<h3>1. Introduction</h3>
+<p>Sample screenshots and code snippets are a vital part of technical documentation. They provide visual context and practical implementation examples that guide understanding of how the application works in practice. This section presents key screens of the I Hear You application together with the code structures that drive them.</p>
+
+<h3>2. Authentication Screens</h3>
+
+<h4>2.1 Splash Screen — Theme-Aware Entry Point</h4>
+<p>The splash screen loads the user's saved theme before rendering, determines the correct destination screen, and navigates after a short delay. It is fully theme-aware with no flash of the wrong theme:</p>
+
+<pre>// splash_screen.dart
+@override
+void initState() {
+  super.initState();
+  _navigate();
+}
+
+Future&lt;void&gt; _navigate() async {
+  await Future.delayed(const Duration(seconds: 2));
+  final prefs = await SharedPreferences.getInstance();
+  final isLoggedIn      = prefs.getBool('isLoggedIn') ?? false;
+  final hasSelectedLevel = prefs.getBool('hasSelectedLevel') ?? false;
+  if (!mounted) return;
+
+  if (isLoggedIn &amp;&amp; hasSelectedLevel) {
+    Navigator.pushReplacementNamed(context, Routes.dashboard);
+  } else if (isLoggedIn) {
+    Navigator.pushReplacementNamed(context, Routes.chooseLanguage);
+  } else {
+    Navigator.pushReplacementNamed(context, Routes.startPage);
   }
 }</pre>
 
-<h4>Signup Screen</h4>
-<p><strong>Fields:</strong> Email, Password, Confirm Password<br>
-Password match validation is performed client-side before any API call. On success, the account is mirrored to Firebase and <code>localEmail</code> is saved for the Check Email screen.</p>
+<h4>2.2 Login Screen — Form with Validation</h4>
+<p>The login screen uses <code>TextFormWidget</code> for styled inputs, validates credentials via <code>AuthService</code>, and handles both success and error states. It also bypasses the backend's "verify email" response gracefully:</p>
 
-<h4>Check Email Screen</h4>
-<p>Informs the user to verify their email before continuing. Shown immediately after successful signup.</p>
+<pre>// login_screen.dart
+Future&lt;void&gt; _login() async {
+  if (!_formKey.currentState!.validate()) return;
+  setState(() =&gt; _isLoading = true);
 
-<hr>
+  final result = await AuthService().login(
+    email: _emailCtrl.text.trim(),
+    password: _passCtrl.text.trim(),
+  );
 
-<h3>Onboarding / Quiz Screens</h3>
-<p>The onboarding flow collects user preferences through a series of conversational steps, all wrapped in the reusable <strong>QuizStepScaffold</strong> widget that provides a consistent header, progress indicator, and content area.</p>
+  if (!mounted) return;
+  setState(() =&gt; _isLoading = false);
 
-<h4>Choose Language Screen</h4>
-<p>The user selects which language they want to learn (14 options). The selection is saved to SharedPreferences as <code>langCode</code>, <code>langName</code>, and <code>langFlag</code>.</p>
+  if (result.success || result.message.toLowerCase().contains('verify')) {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', true);
+    final hasLevel = prefs.getBool('hasSelectedLevel') ?? false;
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      hasLevel ? Routes.dashboard : Routes.chooseLanguage,
+      (_) =&gt; false,
+    );
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(result.message), backgroundColor: Colors.red),
+    );
+  }
+}</pre>
 
-<h4>About You Screen</h4>
-<p>The user indicates their existing knowledge level (beginner vs. already studied).</p>
+<h3>3. Onboarding Quiz Screens</h3>
 
-<h4>Purpose Screen</h4>
-<p>The user selects their motivation for learning: immigrant family, entertainment &amp; culture, work, or travel. Saved as <code>userPurpose</code>.</p>
+<h4>3.1 Level Options Screen — CEFR Level Selection</h4>
+<p>The user selects their CEFR level from a list of styled cards. The selection is saved to <code>SharedPreferences</code>:</p>
 
-<h4>Level Intro Screen</h4>
-<p>Explains the CEFR level system and invites the user to choose their starting level.</p>
+<pre>// level_options_screen.dart
+void _selectLevel(String level) async {
+  setState(() =&gt; _selectedLevel = level);
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setString('userLevel', level);
+}
 
-<h4>Level Options Screen</h4>
-<p>Displays the six CEFR levels (Beginner A1, Elementary A2, Intermediate B1, Upper Intermediate B2, Advanced C1, Proficient C2) plus a "Not sure" guidance note. The selected level is saved as <code>userLevel</code>.</p>
+Widget _buildLevelCard(String code, String label, String description) {
+  final isSelected = _selectedLevel == code;
+  return GestureDetector(
+    onTap: () =&gt; _selectLevel(code),
+    child: Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: isSelected ? accent.withValues(alpha: 0.15) : cardColor,
+        border: Border.all(
+          color: isSelected ? accent : Colors.transparent,
+          width: 2,
+        ),
+        borderRadius: BorderRadius.circular(16.r),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 48.w, height: 48.h,
+            decoration: BoxDecoration(
+              color: accent.withValues(alpha: 0.15),
+              shape: BoxShape.circle,
+            ),
+            child: Center(child: Text(code,
+              style: TextStyle(color: accent, fontWeight: FontWeight.bold, fontSize: 14.sp))),
+          ),
+          SizedBox(width: 12.w),
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(label, style: TextStyle(color: textColor, fontSize: 15.sp, fontWeight: FontWeight.w600)),
+            Text(description, style: TextStyle(color: subColor, fontSize: 12.sp)),
+          ])),
+          if (isSelected) Icon(Icons.check_circle_rounded, color: accent, size: 22.sp),
+        ],
+      ),
+    ),
+  );
+}</pre>
 
-<h4>Study Time Screen</h4>
-<p>Lets the user set a daily study goal in minutes (5, 10, 15, 20 min/day). Saved as <code>userMinutesPerDay</code>. After this screen, <code>hasSelectedLevel = true</code> is set and the user is routed to Dashboard.</p>
+<h3>4. Learning Screens</h3>
 
-<hr>
+<h4>4.1 Word List Screen — Flashcard Interface</h4>
+<p>The core learning screen presents vocabulary as flashcards. Each word can be marked "I Know" (saves to SharedPreferences) or "Learn" (keeps in queue):</p>
 
-<h3>Learning Screens</h3>
+<pre>// word_list_screen.dart
+void _markAsKnown(String word) async {
+  final prefs = await SharedPreferences.getInstance();
+  final knownWords = prefs.getStringList('known_$_level') ?? [];
+  if (!knownWords.contains(word)) {
+    knownWords.add(word);
+    await prefs.setStringList('known_$_level', knownWords);
+  }
+  setState(() =&gt; _currentIndex++);
+  if (_currentIndex &gt;= _words.length) {
+    _navigateToSignPractice();
+  }
+}
 
-<h4>Dashboard Screen</h4>
-<p>The main hub displaying learning progress, current CEFR level, words learned, levels completed, and navigation to the full levels list. All data is computed from SharedPreferences.</p>
+void _markForLearning() {
+  setState(() {
+    final word = _words.removeAt(_currentIndex);
+    _words.add(word);  // move to end of queue
+  });
+}</pre>
 
-<h4>Levels Screen</h4>
-<p>Shows all available CEFR levels with progress indicators. Each card shows level name, total word count, learned word count, and lock/unlock status.</p>
+<h4>4.2 Sign Practice Screen — Video Analysis</h4>
+<p>After learning a word, the user records or uploads a video and the AI model verifies the signed word:</p>
 
-<h4>Pre-Start Screen</h4>
-<p>A motivational interstitial before beginning a word list, showing what to expect in the upcoming session.</p>
+<pre>// sign_practice_screen.dart
+Future&lt;void&gt; _pickAndAnalyze() async {
+  final picker = ImagePicker();
+  final picked = await picker.pickVideo(source: ImageSource.gallery);
+  if (picked == null) return;
 
-<h4>Word List Screen</h4>
-<p>The core learning screen — a flashcard-style interface for learning sign-language vocabulary.</p>
-<ul>
-  <li><strong>"I Know"</strong> button: marks a word as known, saves to SharedPreferences</li>
-  <li><strong>"Learn"</strong> button: marks a word as unknown, keeps it in the queue</li>
-  <li>Progress bar shows session completion</li>
-  <li>On completion, navigates to the Sign Practice screen</li>
-</ul>
+  final file = File(picked.path);
+  setState(() =&gt; _selectedVideo = file);
 
-<h4>Sign Practice Screen</h4>
-<p>After learning words, the user practices signing by recording or uploading a video. The app sends it to the AI translation service to verify the signed word.</p>
-<ul>
-  <li>Camera permission via <code>permission_handler</code></li>
-  <li>Video picker via <code>image_picker</code></li>
-  <li>Video preview via <code>video_player</code></li>
-  <li>Result: green "Correct!" or red "Not quite!" with expected vs. detected sign</li>
-</ul>
+  // Submit to AI server via TranslationNotifier
+  final notifier = context.read&lt;TranslationNotifier&gt;();
+  await notifier.predict(file);
+}
 
-<hr>
+// In build() — reactive to TranslationNotifier state:
+if (notifier.isLoading) return const CircularProgressIndicator();
+if (notifier.isSuccess) {
+  return ResultCard(
+    predicted: notifier.result!.top.label,
+    expected: widget.wordToSign,
+    isCorrect: notifier.result!.top.label.toLowerCase() ==
+               widget.wordToSign.toLowerCase(),
+  );
+}
+if (notifier.isError) return ErrorWidget(message: notifier.error);</pre>
 
-<h3>Translation Screen (Lost Page Screen)</h3>
-<p>Upload a sign-language video and receive an instant text translation.</p>
+<h3>5. Translation Screen (Lost Page Screen)</h3>
+<p>The sign-language translation screen allows users to upload any video and receive an instant text translation. State is managed by <code>TranslationNotifier</code>:</p>
 
-<h4>Features</h4>
-<ul>
-  <li>Server health indicator (Online / Offline / Checking…)</li>
-  <li>Supported signs list fetched from backend</li>
-  <li>Video upload from gallery or camera</li>
-  <li>Loading indicator while AI model processes the video</li>
-  <li>Translation result with confidence percentage and alternative possibilities</li>
-  <li>Accumulated sentence builder (long-press a word to remove it)</li>
-</ul>
+<pre>// lost_page_screen.dart
+@override
+void initState() {
+  super.initState();
+  _notifier = TranslationNotifier();
+  _notifier.checkHealth();
+  _notifier.loadClasses();
+  _notifier.addListener(_rebuild);
+}
 
-<table>
-  <tr><th>State</th><th>UI Shown</th></tr>
-  <tr><td><code>idle</code></td><td>Upload prompt with icon</td></tr>
-  <tr><td><code>loading</code></td><td>CircularProgressIndicator with "Analysing…" message</td></tr>
-  <tr><td><code>success</code></td><td>Translation result card with top prediction and alternatives</td></tr>
-  <tr><td><code>error</code></td><td>Error message with retry option</td></tr>
-</table>
+void _rebuild() =&gt; setState(() {});
 
-<hr>
+Widget _buildStatusBadge() {
+  switch (_notifier.serverStatus) {
+    case ServerStatus.online:
+      return _badge('Online', Colors.green);
+    case ServerStatus.offline:
+      return _badge('Offline', Colors.red);
+    default:
+      return _badge('Checking…', Colors.orange);
+  }
+}
 
-<h3>AI Chat Screen</h3>
-<p>A conversational AI assistant specialising in sign language topics.</p>
+// Build body based on state
+Widget _buildBody() {
+  if (_notifier.isLoading)
+    return const Center(child: CircularProgressIndicator());
+  if (_notifier.isSuccess)
+    return ResultView(result: _notifier.result!, sentence: _notifier.sentence);
+  if (_notifier.isError)
+    return ErrorView(message: _notifier.error, onRetry: _notifier.reset);
+  return UploadPromptView(onPick: _pickVideo);
+}</pre>
 
-<h4>Features</h4>
-<ul>
-  <li>Session management (new session on first message, maintains context per session)</li>
-  <li>Speech-to-text input via <code>speech_to_text</code> with microphone permission</li>
-  <li>Chat bubble UI (user bubbles right, assistant bubbles left)</li>
-  <li>Typing indicator animation (three animated dots)</li>
-  <li>Server health badge (Online / Offline)</li>
-  <li>Clear chat button (deletes server-side session history)</li>
-  <li>Common question shortcuts pre-populated on empty state</li>
-  <li>Robot avatar widget (<code>RobotIcon</code>) — a custom-drawn widget using nested Flutter <code>Container</code> layers, requiring no image assets</li>
-</ul>
+<h3>6. AI Chat Screen</h3>
+<p>The conversational AI assistant screen maintains a session, supports voice input, and shows typing indicator animations:</p>
 
-<pre>Future&lt;void&gt; _sendMessage([String? override]) async {
+<pre>// chat_screen.dart
+Future&lt;void&gt; _sendMessage([String? override]) async {
   final text = override ?? _inputController.text.trim();
   if (text.isEmpty) return;
+
   setState(() {
     _messages.add(_ChatMessage(text: text, isUser: true));
     _isTyping = true;
@@ -812,10 +1352,14 @@ Password match validation is performed client-side before any API call. On succe
   String reply;
   try {
     final sessionId = await _ensureSession();
-    reply = await _service.sendMessage(sessionId: sessionId, message: text);
+    reply = await _service.sendMessage(
+      sessionId: sessionId,
+      message: text,
+    );
   } catch (_) {
     reply = "Sorry, I couldn't reach the server. Please check your connection.";
   }
+
   setState(() {
     _isTyping = false;
     _messages.add(_ChatMessage(text: reply, isUser: false));
@@ -823,70 +1367,87 @@ Password match validation is performed client-side before any API call. On succe
   _scrollToBottom();
 }</pre>
 
-<hr>
+<h3>7. Profile Screen — Settings Hub</h3>
+<p>The profile screen combines theme toggle, navigation tiles, editable display name, and logout — all in one cohesive card-based layout:</p>
 
-<h3>Profile &amp; Settings Screens</h3>
+<pre>// profile._screen.dart
+profileTile(
+  icon: Icons.dark_mode_outlined,
+  title: S.get('dark_mode'),
+  textColor: textColor,
+  subText: subText,
+  isDivider: true,
+  trailing: Transform.scale(
+    scale: 0.85,
+    child: Switch(
+      value: isDark,
+      activeThumbColor: Colors.white,
+      activeTrackColor: accent,
+      onChanged: (value) {
+        setState(() =&gt; isDark = value);
+        saveTheme(value);
+        themeNotifier.value =
+            value ? ThemeMode.dark : ThemeMode.light;
+      },
+    ),
+  ),
+),
 
-<h4>Profile Screen</h4>
-<p>User account management hub with the following settings tiles:</p>
-<table>
-  <tr><th>Tile</th><th>Action</th></tr>
-  <tr><td>Dark Mode</td><td>Switch toggle updating <code>themeNotifier</code> and <code>SharedPreferences</code></td></tr>
-  <tr><td>Account Information</td><td>Navigate to AccountInfoScreen</td></tr>
-  <tr><td>Password</td><td>Shows "Coming Soon" green snackbar (no navigation)</td></tr>
-  <tr><td>Translate</td><td>Navigate to Lost Page (translation screen)</td></tr>
-  <tr><td>My Progress</td><td>Navigate to Levels screen</td></tr>
-</table>
-<p>The user card at the top shows a profile avatar, editable display name (saved to SharedPreferences via an AlertDialog), and a verified badge.</p>
-<p><strong>Logout</strong> clears all SharedPreferences keys except <code>hasSelectedLevel</code> and <code>userLevel</code>, which are preserved so the next login skips the onboarding quiz.</p>
+profileTile(
+  icon: Icons.lock_outline_rounded,
+  title: S.get('password'),
+  textColor: textColor,
+  subText: subText,
+  isDivider: true,
+  onTap: () =&gt; ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(S.get('coming_soon')),
+      backgroundColor: const Color(0xFF22C55E),
+      behavior: SnackBarBehavior.floating,
+      duration: const Duration(seconds: 2),
+    ),
+  ),
+),</pre>
 
-<h4>Account Info Screen</h4>
-<p>Displays the user's account details (email, name, account type) in a read-only card layout.</p>
+<h3>8. Multi-Language Support</h3>
+<p>All user-facing strings are served through the <code>S.get(key)</code> helper, which looks up the current language from <code>languageNotifier</code> and falls back to English if a translation is missing:</p>
 
-<hr>
-
-<!-- ═══════════════════════════════════════════════════════ 7.7 -->
-<div class="page-break"></div>
-<h2><span class="section-num">7.7</span> Multi-Language Support</h2>
-
-<h3>Implementation</h3>
-<p>The app supports <strong>14 languages</strong> for the UI interface. All user-facing strings are defined in <code>AppStrings._t</code> — a nested map keyed by language code:</p>
-
-<pre>class S {
+<pre>// app_strings.dart
+class S {
   static String get(String key) {
     final code = languageNotifier.value.code;
     return _t[code]?[key] ?? _t['en']![key] ?? key;
   }
 
   static const _t = &lt;String, Map&lt;String, String&gt;&gt;{
-    'en': { 'login': 'Login', 'signup': 'Sign Up', ... },
-    'ar': { 'login': 'تسجيل الدخول', 'signup': 'إنشاء حساب', ... },
-    // ... 14 languages total
+    'en': {
+      'login': 'Login',
+      'signup': 'Sign Up',
+      'get_started': 'Get Started',
+      'email': 'Email',
+      'password': 'Password',
+      'dark_mode': 'Dark Mode',
+      'coming_soon': 'Coming Soon',
+      // ... 80+ keys
+    },
+    'ar': {
+      'login': 'تسجيل الدخول',
+      'signup': 'إنشاء حساب',
+      'get_started': 'ابدأ الآن',
+      'email': 'البريد الإلكتروني',
+      'password': 'كلمة المرور',
+      'dark_mode': 'الوضع الداكن',
+      'coming_soon': 'قريباً',
+      // ...
+    },
+    // + 12 more languages: sp, fr, ru, ge, it, tu, ja, ch, ko, po, hi, du
   };
 }</pre>
 
-<p>The lookup falls back to English if a key is not defined in the current language, preventing any missing-string crashes.</p>
-
-<h3>Supported UI Languages</h3>
-<table>
-  <tr><th>Code</th><th>Language</th><th>Code</th><th>Language</th></tr>
-  <tr><td><code>en</code></td><td>English</td><td><code>it</code></td><td>Italian</td></tr>
-  <tr><td><code>ar</code></td><td>Arabic</td><td><code>tu</code></td><td>Turkish</td></tr>
-  <tr><td><code>sp</code></td><td>Spanish</td><td><code>ja</code></td><td>Japanese</td></tr>
-  <tr><td><code>fr</code></td><td>French</td><td><code>ch</code></td><td>Chinese</td></tr>
-  <tr><td><code>ru</code></td><td>Russian</td><td><code>ko</code></td><td>Korean</td></tr>
-  <tr><td><code>ge</code></td><td>German</td><td><code>po</code></td><td>Portuguese</td></tr>
-  <tr><td><code>hi</code></td><td>Hindi</td><td><code>du</code></td><td>Dutch</td></tr>
-</table>
-
-<hr>
-
-<!-- ═══════════════════════════════════════════════════════ 7.8 -->
-<h2><span class="section-num">7.8</span> Key Packages and Dependencies</h2>
-
+<h3>9. Key Packages and Dependencies</h3>
 <table>
   <tr><th>Package</th><th>Version</th><th>Purpose</th></tr>
-  <tr><td><code>firebase_auth</code></td><td>^6.5.2</td><td>User authentication and password management</td></tr>
+  <tr><td><code>firebase_auth</code></td><td>^6.5.2</td><td>Password management and secondary auth</td></tr>
   <tr><td><code>firebase_core</code></td><td>^4.10.0</td><td>Firebase initialisation</td></tr>
   <tr><td><code>cloud_firestore</code></td><td>^6.5.0</td><td>Cloud database (available for future features)</td></tr>
   <tr><td><code>flutter_screenutil</code></td><td>^5.9.3</td><td>Responsive UI scaling (designSize 390×844)</td></tr>
@@ -897,66 +1458,15 @@ Password match validation is performed client-side before any API call. On succe
   <tr><td><code>video_player</code></td><td>^2.9.1</td><td>Video preview in sign practice screen</td></tr>
   <tr><td><code>image_picker</code></td><td>^1.1.2</td><td>Gallery and camera video selection</td></tr>
   <tr><td><code>speech_to_text</code></td><td>^7.0.0</td><td>Voice input for AI chat screen</td></tr>
-  <tr><td><code>permission_handler</code></td><td>^11.3.1</td><td>Runtime permission requests (microphone, storage)</td></tr>
+  <tr><td><code>permission_handler</code></td><td>^11.3.1</td><td>Runtime permission requests</td></tr>
   <tr><td><code>flutter_local_notifications</code></td><td>^17.2.2</td><td>Local push notifications</td></tr>
   <tr><td><code>url_launcher</code></td><td>^6.3.1</td><td>Opening external links</td></tr>
   <tr><td><code>flutter_native_splash</code></td><td>^2.4.7</td><td>Native splash screen configuration</td></tr>
   <tr><td><code>flutter_launcher_icons</code></td><td>^0.14.4</td><td>App icon generation for Android and iOS</td></tr>
 </table>
 
-<hr>
-
-<!-- ═══════════════════════════════════════════════════════ 7.9 -->
-<div class="page-break"></div>
-<h2><span class="section-num">7.9</span> Performance and Best Practices</h2>
-
-<h3>Responsive Design</h3>
-<p>All dimensions use <code>flutter_screenutil</code> — no hardcoded pixel values exist in the UI layer. The 390×844 design size matches the iPhone 14 baseline and all values scale proportionally on any screen size.</p>
-
-<h3>Theme Consistency</h3>
-<p>The theme is loaded from SharedPreferences <em>before</em> <code>runApp()</code> in <code>main.dart</code>, eliminating the flash-of-incorrect-theme problem.</p>
-
-<h3>Async Safety</h3>
-<p>Every async method that calls <code>setState</code> includes a <code>mounted</code> guard to prevent calling <code>setState</code> on a disposed widget:</p>
-<pre>if (!mounted) return;
-setState(() { ... });</pre>
-<p><code>TranslationNotifier</code> uses a <code>_disposed</code> flag to prevent <code>notifyListeners()</code> from being called after the notifier is disposed.</p>
-
-<h3>Memory Management</h3>
-<p>All screens that add listeners to <code>ValueNotifier</code> objects (<code>themeNotifier</code>, <code>languageNotifier</code>) remove those listeners in <code>dispose()</code>:</p>
-<pre>@override
-void dispose() {
-  languageNotifier.removeListener(_rebuild);
-  super.dispose();
-}</pre>
-
-<h3>Code Organisation</h3>
-<ul>
-  <li>Service classes (<code>AuthService</code>, <code>TranslationService</code>, <code>ChatService</code>) encapsulate all external communication.</li>
-  <li>Reusable widgets (<code>LinearButton</code>, <code>TextFormWidget</code>) reduce duplication across screens.</li>
-  <li>Named routes centralise all navigation logic in one place.</li>
-  <li>The <code>S.get()</code> system centralises all user-facing strings with automatic language fallback to English.</li>
-</ul>
-
-<hr>
-
-<!-- ═══════════════════════════════════════════════════════ 7.10 -->
-<h2><span class="section-num">7.10</span> Summary</h2>
-
-<p>The I Hear You Flutter application demonstrates a well-structured, feature-complete mobile app built with modern Flutter practices. Key architectural decisions include:</p>
-
-<ul>
-  <li><strong>Feature-based folder structure</strong> separating auth, onboarding, and learning modules clearly.</li>
-  <li><strong>Lightweight state management</strong> using <code>ValueNotifier</code>, <code>ChangeNotifier</code>, and <code>SharedPreferences</code> without unnecessary complexity.</li>
-  <li><strong>Dual-backend integration</strong> — REST API for authentication, Firebase Auth for password management, and a dedicated AI server for sign-language recognition.</li>
-  <li><strong>Full responsive design</strong> via <code>flutter_screenutil</code> ensuring pixel-perfect layouts on all devices.</li>
-  <li><strong>14-language support</strong> with a centralised string lookup and automatic English fallback.</li>
-  <li><strong>Dark/Light theme</strong> switching persisted across sessions with no splash-screen flash.</li>
-  <li><strong>Reusable component library</strong> (<code>LinearButton</code>, <code>TextFormWidget</code>, <code>LogoAndName</code>) maintaining UI consistency.</li>
-  <li><strong>Async safety patterns</strong> (<code>mounted</code> checks, <code>_disposed</code> flags) preventing common Flutter memory and lifecycle errors.</li>
-</ul>
-
-<p>The app provides a complete sign language learning experience: vocabulary flashcards, AI-powered sign recognition practice, a translation tool for live signs, and a conversational AI assistant — all within a polished, accessible, and multilingual interface.</p>
+<h3>10. Summary</h3>
+<p>The I Hear You Flutter application demonstrates a well-structured, feature-complete mobile app built with modern Flutter practices. The combination of a feature-based folder structure, lightweight state management (ValueNotifier, ChangeNotifier, SharedPreferences), dual-backend integration (REST + Firebase), full responsive design via flutter_screenutil, 14-language support, and async safety patterns produces a polished, accessible sign-language learning experience across both Android and iOS platforms.</p>
 
 </body>
 </html>
