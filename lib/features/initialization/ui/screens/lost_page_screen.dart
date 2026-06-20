@@ -444,26 +444,21 @@ class _LostPageState extends State<LostPage>
     if (!_videoReady || _videoController == null) {
       return Container(
         width: double.infinity,
-        height: 180.h,
+        height: 220.h,
         decoration: BoxDecoration(
           color: isDark ? const Color(0xFF1E1F35) : Colors.black12,
-          borderRadius: BorderRadius.circular(16.r),
+          borderRadius: BorderRadius.circular(20.r),
         ),
         child: const Center(
           child: CircularProgressIndicator(color: Color(0xFF7C3AED), strokeWidth: 2),
         ),
       );
     }
-    return Center(
-      child: SizedBox(
-        width: 220.w,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16.r),
-          child: AspectRatio(
-            aspectRatio: _videoController!.value.aspectRatio,
-            child: VideoPlayer(_videoController!),
-          ),
-        ),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20.r),
+      child: AspectRatio(
+        aspectRatio: _videoController!.value.aspectRatio,
+        child: VideoPlayer(_videoController!),
       ),
     );
   }

@@ -226,71 +226,144 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
                 padding: EdgeInsets.all(20.w),
                 child: Column(
                   children: [
-                    // target word card
+                    // unified word + tutorial card
                     Container(
                       width: double.infinity,
-                      padding: EdgeInsets.symmetric(vertical: 28.h, horizontal: 24.w),
                       decoration: BoxDecoration(
                         color: cardBg,
                         borderRadius: BorderRadius.circular(24.r),
-                        border: Border.all(color: const Color(0xFF22C55E).withValues(alpha: 0.3)),
+                        border: Border.all(
+                            color: const Color(0xFF22C55E).withValues(alpha: 0.25)),
                         boxShadow: [
-                          BoxShadow(color: const Color(0xFF22C55E).withValues(alpha: 0.08),
-                              blurRadius: 20, spreadRadius: 2),
+                          BoxShadow(
+                            color: const Color(0xFF22C55E).withValues(alpha: 0.08),
+                            blurRadius: 24,
+                            spreadRadius: 2,
+                            offset: const Offset(0, 4),
+                          ),
                         ],
                       ),
                       child: Column(
                         children: [
-                          Container(
-                            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF22C55E).withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(20.r),
+                          // word section
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(24.w, 20.h, 24.w, 18.h),
+                            child: Column(
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 12.w, vertical: 5.h),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF22C55E)
+                                        .withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(20.r),
+                                  ),
+                                  child: Text(
+                                    S.get('sign_this_word'),
+                                    style: TextStyle(
+                                      color: const Color(0xFF22C55E),
+                                      fontSize: 11.sp,
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: 0.4,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: 10.h),
+                                Text(
+                                  widget.targetWord,
+                                  style: TextStyle(
+                                    color: textColor,
+                                    fontSize: 44.sp,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: -0.5,
+                                  ),
+                                ),
+                                SizedBox(height: 6.h),
+                                Text(
+                                  S.get('sign_word_instructions'),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: subColor, fontSize: 12.sp, height: 1.5),
+                                ),
+                              ],
                             ),
-                            child: Text(S.get('sign_this_word'),
-                                style: TextStyle(color: const Color(0xFF22C55E),
-                                    fontSize: 12.sp, fontWeight: FontWeight.w600)),
                           ),
-                          SizedBox(height: 14.h),
-                          Text(widget.targetWord,
-                              style: TextStyle(color: textColor, fontSize: 40.sp,
-                                  fontWeight: FontWeight.bold)),
-                          SizedBox(height: 8.h),
-                          Text(S.get('sign_word_instructions'),
-                              textAlign: TextAlign.center,
-                              style: TextStyle(color: subColor, fontSize: 13.sp, height: 1.5)),
+
+                          // divider with Tutorial label
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 16.w),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Divider(
+                                    height: 1,
+                                    endIndent: 10.w,
+                                    color: isDark
+                                        ? Colors.white.withValues(alpha: 0.08)
+                                        : Colors.grey.shade100,
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    Icon(Icons.play_circle_outline_rounded,
+                                        color: const Color(0xFF22C55E), size: 13.sp),
+                                    SizedBox(width: 4.w),
+                                    Text(
+                                      'Tutorial',
+                                      style: TextStyle(
+                                        color: const Color(0xFF22C55E),
+                                        fontSize: 11.sp,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Expanded(
+                                  child: Divider(
+                                    height: 1,
+                                    indent: 10.w,
+                                    color: isDark
+                                        ? Colors.white.withValues(alpha: 0.08)
+                                        : Colors.grey.shade100,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          SizedBox(height: 10.h),
+
+                          // video section
+                          if (_ytWebController != null)
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(12.w, 0, 12.w, 12.h),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(16.r),
+                                child: AspectRatio(
+                                  aspectRatio: 16 / 9,
+                                  child: WebViewWidget(
+                                      controller: _ytWebController!),
+                                ),
+                              ),
+                            )
+                          else
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(0, 0, 0, 18.h),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.video_library_outlined,
+                                      color: subColor, size: 20.sp),
+                                  SizedBox(width: 8.w),
+                                  Text('No tutorial available',
+                                      style: TextStyle(
+                                          color: subColor, fontSize: 13.sp)),
+                                ],
+                              ),
+                            ),
                         ],
                       ),
                     ),
-
-                    // tutorial video — embedded inline
-                    SizedBox(height: 16.h),
-                    if (_ytWebController != null)
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(20.r),
-                        child: SizedBox(
-                          height: 210.h,
-                          child: WebViewWidget(controller: _ytWebController!),
-                        ),
-                      )
-                    else
-                      Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 18.h),
-                        decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF1E1F35) : Colors.grey.shade100,
-                          borderRadius: BorderRadius.circular(20.r),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.video_library_outlined, color: subColor, size: 20.sp),
-                            SizedBox(width: 10.w),
-                            Text('No tutorial available',
-                                style: TextStyle(color: subColor, fontSize: 14.sp)),
-                          ],
-                        ),
-                      ),
 
                     SizedBox(height: 20.h),
 
