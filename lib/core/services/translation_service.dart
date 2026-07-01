@@ -6,7 +6,6 @@ import '../models/prediction_model.dart';
 
 class TranslationService {
   static const _base = 'https://ahmedmoasd-sign2gpt.hf.space';
-  static const _newBase = 'http://91.108.113.135';
   static const _timeout = Duration(seconds: 90);
 
   Future<PredictionResult> predict(File video, {int topK = 5}) async {
@@ -29,7 +28,7 @@ class TranslationService {
   Future<bool> checkHealth() async {
     try {
       final res = await http
-          .get(Uri.parse('$_newBase/health'))
+          .get(Uri.parse('$_base/health'))
           .timeout(const Duration(seconds: 10));
       return res.statusCode == 200;
     } catch (_) {

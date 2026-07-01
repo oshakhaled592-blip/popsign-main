@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:video_player/video_player.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/services/translation_service.dart';
 import '../../../../core/models/prediction_model.dart';
@@ -38,7 +38,7 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
 
   VideoPlayerController? _videoController;
   bool _videoReady = false;
-  WebViewController? _ytWebController;
+  String? _videoId;
 
   late AnimationController _celebController;
   late Animation<double> _celebAnim;
@@ -53,49 +53,7 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
     );
     _celebAnim = CurvedAnimation(parent: _celebController, curve: Curves.elasticOut);
 
-    final videoId = _extractVideoId(widget.videoUrl);
-    if (videoId != null) {
-      final embedHtml = '''
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:#000; width:100vw; height:100vh; overflow:hidden; }
-    iframe { position:absolute; top:0; left:0; width:100%; height:100%; border:0; }
-  </style>
-</head>
-<body>
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/$videoId?autoplay=1&playsinline=1&controls=1&rel=0&modestbranding=1"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowfullscreen>
-  </iframe>
-</body>
-</html>''';
-
-      _ytWebController = WebViewController()
-        ..setJavaScriptMode(JavaScriptMode.unrestricted)
-        ..setUserAgent(
-          'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 '
-          '(KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36',
-        )
-        ..setNavigationDelegate(NavigationDelegate(
-          onNavigationRequest: (req) {
-            if (req.url.startsWith('intent://') ||
-                req.url.startsWith('market://')) {
-              return NavigationDecision.prevent;
-            }
-            return NavigationDecision.navigate;
-          },
-        ))
-        ..loadHtmlString(
-          embedHtml,
-          baseUrl: 'https://www.youtube-nocookie.com',
-        );
-    }
+    _videoId = _extractVideoId(widget.videoUrl);
   }
 
   String? _extractVideoId(String url) {
@@ -119,7 +77,6 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
   void dispose() {
     languageNotifier.removeListener(_rebuild);
     _videoController?.dispose();
-    _ytWebController = null;
     _celebController.dispose();
     super.dispose();
   }
@@ -333,16 +290,59 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
 
                           SizedBox(height: 10.h),
 
-                          // video section
-                          if (_ytWebController != null)
-                            Padding(
-                              padding: EdgeInsets.fromLTRB(12.w, 0, 12.w, 12.h),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(16.r),
-                                child: AspectRatio(
-                                  aspectRatio: 16 / 9,
-                                  child: WebViewWidget(
-                                      controller: _ytWebController!),
+                          // video section — thumbnail tap opens YouTube
+                          if (_videoId != null)
+                            GestureDetector(
+                              onTap: () async {
+                                final uri = Uri.parse(
+                                    'https://www.youtube.com/watch?v=$_videoId');
+                                try {
+                                  await launchUrl(uri,
+                                      mode: LaunchMode.externalApplication);
+                                } catch (_) {
+                                  await launchUrl(uri,
+                                      mode: LaunchMode.platformDefault);
+                                }
+                              },
+                              child: Padding(
+                                padding:
+                                    EdgeInsets.fromLTRB(12.w, 0, 12.w, 12.h),
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(16.r),
+                                      child: Image.network(
+                                        'https://img.youtube.com/vi/$_videoId/mqdefault.jpg',
+                                        width: double.infinity,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __, _) => Container(
+                                          width: double.infinity,
+                                          height: 190.h,
+                                          decoration: BoxDecoration(
+                                            color: isDark
+                                                ? const Color(0xFF1E1F35)
+                                                : Colors.black87,
+                                            borderRadius:
+                                                BorderRadius.circular(16.r),
+                                          ),
+                                          child: Icon(
+                                              Icons.ondemand_video_rounded,
+                                              color: Colors.white38,
+                                              size: 48.sp),
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: EdgeInsets.all(16.w),
+                                      decoration: const BoxDecoration(
+                                        color: Colors.black54,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(Icons.play_arrow_rounded,
+                                          color: Colors.white, size: 38.sp),
+                                    ),
+                                  ],
                                 ),
                               ),
                             )

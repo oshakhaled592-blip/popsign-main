@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../../core/helpers/extension.dart';
 import '../../../../../core/helpers/spacing.dart';
+import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/routing/routes.dart';
 import '../../../../../core/theme/styles.dart';
 import '../../../../../core/widgets/linear_button.dart';
@@ -47,7 +48,7 @@ class CheckEmailScreen extends StatelessWidget {
               verticalSpace(28),
 
               Text(
-                'Verify your email',
+                S.get('verify_email_title'),
                 textAlign: TextAlign.center,
                 style: AppTextStyles.font24BoldWhite.copyWith(color: textColor),
               ),
@@ -55,7 +56,7 @@ class CheckEmailScreen extends StatelessWidget {
               verticalSpace(12),
 
               Text(
-                "We've sent a verification link to\n$email\n\nPlease check your inbox and verify your account before logging in.",
+                S.get('verify_email_body').replaceAll('{email}', email),
                 textAlign: TextAlign.center,
                 style: AppTextStyles.font13RegularWhite.copyWith(color: subColor),
               ),
@@ -63,7 +64,7 @@ class CheckEmailScreen extends StatelessWidget {
               verticalSpace(36),
 
               LinearButton(
-                text: 'Go to Login',
+                text: S.get('go_to_login'),
                 onPressed: () {
                   context.pushNamedAndRemoveUntil(
                     Routes.login,

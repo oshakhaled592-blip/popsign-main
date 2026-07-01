@@ -174,6 +174,8 @@ class S {
       'password_changed_success': 'Password changed successfully!',
       'email_sent_instructions': 'Open the email we sent you and tap the reset link to activate your new password.',
       'go_to_login': 'Go to Login',
+      'verify_email_title': 'Verify Your Email',
+      'verify_email_body': "We've sent a verification link to\n{email}\n\nPlease check your inbox and verify your account before logging in.",
     },
     'sp': {
       'learn':          'Aprender',
