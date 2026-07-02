@@ -31,7 +31,11 @@
       "Bash(curl -s --max-time 8 \"http://91.108.113.135/api/submission\" -w \"\\\\nSTATUS:%{http_code}\")",
       "Bash(curl -s --max-time 8 \"http://91.108.113.135/api/predict\" -X POST -w \"\\\\nSTATUS:%{http_code}\")",
       "Bash(curl -s --max-time 15 http://91.108.113.135/api/levels/all -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhMzMyY2ZkMmIwYzJmZThlMDBiMDRhNCIsImlhdCI6MTc4MTczODgxOSwiZXhwIjoxNzgyMzQzNjE5fQ.cb7BHDYiftimyYMh5U2veCXJPKkz7G7kk3JLhYRGdrw')",
-      "Bash(del \"lib\\\\features\\\\initialization\\\\ui\\\\screens\\\\video_web_screen.dart\")"
+      "Bash(del \"lib\\\\features\\\\initialization\\\\ui\\\\screens\\\\video_web_screen.dart\")",
+      "PowerShell(python \"C:\\\\Users\\\\Osha\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\download_videos.py\" 2>&1)",
+      "PowerShell($f = \"C:\\\\Users\\\\Osha\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-Osha-Downloads-popsign-main--1--popsign-main\\\\c3cd3fd8-0f0f-48ef-a67a-00a79ef1da3c\\\\tasks\\\\bj9ix7ro4.output\"; if \\(Test-Path $f\\) { $lines = Get-Content $f; Write-Host \"Lines: $\\($lines.Count\\)\"; $lines | Select-Object -Last 15 } else { Write-Host \"File not found\" })",
+      "PowerShell(python -m yt_dlp -f \"bestvideo[ext=mp4][height<=360]\" -o $out --no-playlist \"https://youtube.com/shorts/vhcGL_BY-AM\" 2>&1)",
+      "PowerShell($out = \"c:\\\\Users\\\\Osha\\\\Downloads\\\\popsign-main \\(1\\)\\\\popsign-main\\\\assets\\\\videos\\\\color.mp4\")"
     ]
   }
 }

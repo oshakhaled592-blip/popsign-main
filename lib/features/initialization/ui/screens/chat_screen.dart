@@ -107,8 +107,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   Future<void> _toggleListening() async {
     if (!_speechAvailable) {
-      _showSnack('Please restart the app to enable the microphone');
-      return;
+      await _initSpeech();
+      if (!_speechAvailable) {
+        _showSnack('Microphone not available. Check app permissions in Settings.');
+        return;
+      }
     }
 
     if (_isListening) {

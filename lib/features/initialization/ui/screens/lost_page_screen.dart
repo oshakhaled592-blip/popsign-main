@@ -532,13 +532,6 @@ class _LostPageState extends State<LostPage>
                   top.label,
                   style: TextStyle(color: textColor, fontSize: 32.sp, fontWeight: FontWeight.bold),
                 ),
-                if (top.labelAr.isNotEmpty) ...[
-                  SizedBox(height: 4.h),
-                  Text(
-                    top.labelAr,
-                    style: TextStyle(color: subColor, fontSize: 20.sp, fontWeight: FontWeight.w500),
-                  ),
-                ],
                 SizedBox(height: 12.h),
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
@@ -592,21 +585,44 @@ class _LostPageState extends State<LostPage>
           width: 80.w,
           height: 80.w,
           decoration: BoxDecoration(
-            color: Colors.red.withValues(alpha: 0.1),
+            color: Colors.orange.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
-          child: Icon(Icons.error_outline_rounded, color: Colors.red, size: 40.sp),
+          child: Icon(Icons.cloud_off_rounded, color: Colors.orange, size: 40.sp),
         ),
         SizedBox(height: 20.h),
-        Text(S.get('something_wrong'),
-            style: TextStyle(color: textColor, fontSize: 18.sp, fontWeight: FontWeight.w600)),
+        Text(
+          'Server Unavailable',
+          style: TextStyle(color: textColor, fontSize: 18.sp, fontWeight: FontWeight.w600),
+        ),
         SizedBox(height: 8.h),
         Text(
-          _notifier.error,
+          'The AI server is temporarily offline.\nPlease try again in a few moments.',
           textAlign: TextAlign.center,
-          maxLines: 3,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(color: subColor, fontSize: 13.sp, height: 1.5),
+          style: TextStyle(color: subColor, fontSize: 13.sp, height: 1.6),
+        ),
+        SizedBox(height: 20.h),
+        GestureDetector(
+          onTap: () {
+            _notifier.reset();
+            _showSourcePicker();
+          },
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+            decoration: BoxDecoration(
+              color: const Color(0xFF7C3AED).withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(14.r),
+              border: Border.all(color: const Color(0xFF7C3AED).withValues(alpha: 0.3)),
+            ),
+            child: Text(
+              'Try Again',
+              style: TextStyle(
+                color: const Color(0xFF7C3AED),
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
         ),
       ],
     );
@@ -660,16 +676,8 @@ class _LostPageState extends State<LostPage>
                     borderRadius: BorderRadius.circular(20.r),
                     border: Border.all(color: purple.withValues(alpha: 0.3)),
                   ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(word.label,
-                          style: TextStyle(color: purple, fontSize: 13.sp, fontWeight: FontWeight.w600)),
-                      if (word.labelAr.isNotEmpty)
-                        Text(word.labelAr,
-                            style: TextStyle(color: subColor, fontSize: 11.sp)),
-                    ],
-                  ),
+                  child: Text(word.label,
+                      style: TextStyle(color: purple, fontSize: 13.sp, fontWeight: FontWeight.w600)),
                 ),
               );
             }).toList(),

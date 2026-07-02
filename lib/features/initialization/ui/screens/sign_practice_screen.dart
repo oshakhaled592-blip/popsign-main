@@ -1,10 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:video_player/video_player.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 import '../../../../core/services/translation_service.dart';
 import '../../../../core/models/prediction_model.dart';
@@ -38,7 +39,10 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
 
   VideoPlayerController? _videoController;
   bool _videoReady = false;
+  VideoPlayerController? _tutorialController;
+  bool _tutorialReady = false;
   String? _videoId;
+  YoutubePlayerController? _ytController;
 
   late AnimationController _celebController;
   late Animation<double> _celebAnim;
@@ -54,6 +58,39 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
     _celebAnim = CurvedAnimation(parent: _celebController, curve: Curves.elasticOut);
 
     _videoId = _extractVideoId(widget.videoUrl);
+    _initTutorialVideo();
+  }
+
+  Future<void> _initTutorialVideo() async {
+    final word = widget.targetWord.toLowerCase().trim();
+    final assetPath = 'assets/videos/$word.mp4';
+    try {
+      await rootBundle.load(assetPath);
+      final ctrl = VideoPlayerController.asset(assetPath);
+      await ctrl.initialize();
+      ctrl.setLooping(true);
+      if (!mounted) { ctrl.dispose(); return; }
+      setState(() {
+        _tutorialController = ctrl;
+        _tutorialReady = true;
+      });
+    } catch (_) {
+      if (_videoId == null || !mounted) return;
+      setState(() {
+        _ytController = YoutubePlayerController.fromVideoId(
+          videoId: _videoId!,
+          autoPlay: false,
+          params: const YoutubePlayerParams(
+            showControls: true,
+            playsInline: true,
+            showFullscreenButton: true,
+            showVideoAnnotations: false,
+            enableCaption: false,
+            strictRelatedVideos: true,
+          ),
+        );
+      });
+    }
   }
 
   String? _extractVideoId(String url) {
@@ -77,6 +114,8 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
   void dispose() {
     languageNotifier.removeListener(_rebuild);
     _videoController?.dispose();
+    _tutorialController?.dispose();
+    _ytController?.close();
     _celebController.dispose();
     super.dispose();
   }
@@ -124,7 +163,8 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
 
   Future<bool> _requestPermission() async {
     final camera = await Permission.camera.request();
-    if (!camera.isGranted) {
+    final mic = await Permission.microphone.request();
+    if (!camera.isGranted || !mic.isGranted) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -290,59 +330,38 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
 
                           SizedBox(height: 10.h),
 
-                          // video section — thumbnail tap opens YouTube
-                          if (_videoId != null)
-                            GestureDetector(
-                              onTap: () async {
-                                final uri = Uri.parse(
-                                    'https://www.youtube.com/watch?v=$_videoId');
-                                try {
-                                  await launchUrl(uri,
-                                      mode: LaunchMode.externalApplication);
-                                } catch (_) {
-                                  await launchUrl(uri,
-                                      mode: LaunchMode.platformDefault);
-                                }
-                              },
-                              child: Padding(
-                                padding:
-                                    EdgeInsets.fromLTRB(12.w, 0, 12.w, 12.h),
-                                child: Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(16.r),
-                                      child: Image.network(
-                                        'https://img.youtube.com/vi/$_videoId/mqdefault.jpg',
-                                        width: double.infinity,
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (_, __, _) => Container(
-                                          width: double.infinity,
-                                          height: 190.h,
-                                          decoration: BoxDecoration(
-                                            color: isDark
-                                                ? const Color(0xFF1E1F35)
-                                                : Colors.black87,
-                                            borderRadius:
-                                                BorderRadius.circular(16.r),
-                                          ),
-                                          child: Icon(
-                                              Icons.ondemand_video_rounded,
-                                              color: Colors.white38,
-                                              size: 48.sp),
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: EdgeInsets.all(16.w),
-                                      decoration: const BoxDecoration(
-                                        color: Colors.black54,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Icon(Icons.play_arrow_rounded,
-                                          color: Colors.white, size: 38.sp),
-                                    ),
-                                  ],
+                          // video section — local asset first, YouTube fallback
+                          if (_tutorialReady && _tutorialController != null)
+                            Padding(
+                              padding:
+                                  EdgeInsets.fromLTRB(12.w, 0, 12.w, 12.h),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(16.r),
+                                child: AspectRatio(
+                                  aspectRatio:
+                                      _tutorialController!.value.aspectRatio,
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      VideoPlayer(_tutorialController!),
+                                      _VideoPlayPause(
+                                          controller: _tutorialController!),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            )
+                          else if (_ytController != null)
+                            Padding(
+                              padding:
+                                  EdgeInsets.fromLTRB(12.w, 0, 12.w, 12.h),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(16.r),
+                                child: YoutubePlayer(
+                                  controller: _ytController!,
+                                  aspectRatio: 16 / 9,
+                                  controlsBuilder: (context, isFullscreen) =>
+                                      _buildBrandingCover(),
                                 ),
                               ),
                             )
@@ -549,6 +568,38 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
     );
   }
 
+  Widget _buildBrandingCover() {
+    // IgnorePointer lets all touches pass through to the YouTube player.
+    // The two boxes visually cover YouTube logo areas without blocking controls.
+    return IgnorePointer(
+      child: Stack(
+        fit: StackFit.expand,
+        children: const [
+          // YouTube watermark — top-right corner
+          Positioned(
+            top: 0,
+            right: 0,
+            child: SizedBox(
+              width: 120,
+              height: 34,
+              child: ColoredBox(color: Colors.black),
+            ),
+          ),
+          // YouTube logo button — bottom-right of the control bar
+          Positioned(
+            bottom: 0,
+            right: 0,
+            child: SizedBox(
+              width: 60,
+              height: 48,
+              child: ColoredBox(color: Colors.black),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _btn(String label, Color color, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
@@ -584,6 +635,53 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
               style: TextStyle(color: color, fontSize: 14.sp, fontWeight: FontWeight.w600)),
         ),
       ],
+    );
+  }
+}
+
+class _VideoPlayPause extends StatefulWidget {
+  const _VideoPlayPause({required this.controller});
+  final VideoPlayerController controller;
+
+  @override
+  State<_VideoPlayPause> createState() => _VideoPlayPauseState();
+}
+
+class _VideoPlayPauseState extends State<_VideoPlayPause> {
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_update);
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_update);
+    super.dispose();
+  }
+
+  void _update() => setState(() {});
+
+  @override
+  Widget build(BuildContext context) {
+    final playing = widget.controller.value.isPlaying;
+    return GestureDetector(
+      onTap: () {
+        playing ? widget.controller.pause() : widget.controller.play();
+      },
+      child: AnimatedOpacity(
+        opacity: playing ? 0.0 : 1.0,
+        duration: const Duration(milliseconds: 200),
+        child: Container(
+          width: 56,
+          height: 56,
+          decoration: const BoxDecoration(
+            color: Color(0xAA000000),
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 36),
+        ),
+      ),
     );
   }
 }
