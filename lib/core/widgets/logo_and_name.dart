@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import '../l10n/app_strings.dart';
 import '../theme/styles.dart';
 
 class LogoAndName extends StatelessWidget {
@@ -17,7 +18,7 @@ class LogoAndName extends StatelessWidget {
           width: 67.45.w,
         ),
         Text(
-          "I Hear You",
+          S.get('app_name'),
           style: AppTextStyles.font36SemiboldWhite.copyWith(
             color: isDark ? Colors.white : const Color(0xFF1A1A2E),
           ),

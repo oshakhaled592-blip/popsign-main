@@ -38,6 +38,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   final stt.SpeechToText _speech = stt.SpeechToText();
   bool _isListening = false;
   bool _speechAvailable = false;
+  bool _manualStop = false;
 
   final List<String> questions = [
     "What are the app's features?",
@@ -80,8 +81,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   Future<void> _initSpeech() async {
     try {
-   
       final status = await Permission.microphone.request();
+      if (status.isPermanentlyDenied) {
+        _speechAvailable = false;
+        if (mounted) _showSnack('Enable microphone in Settings → Apps → Permissions');
+        return;
+      }
       if (!status.isGranted) {
         _speechAvailable = false;
         if (mounted) setState(() {});
@@ -89,13 +94,18 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       }
       _speechAvailable = await _speech.initialize(
         onError: (e) {
+          // Reset so next tap triggers re-init
+          _speechAvailable = false;
           if (mounted) setState(() => _isListening = false);
         },
-        onStatus: (status) {
-          if (status == 'done' || status == 'notListening') {
-            if (mounted) setState(() => _isListening = false);
-            final text = _inputController.text.trim();
-            if (text.isNotEmpty) _sendMessage();
+        onStatus: (s) {
+          if (mounted && (s == 'done' || s == 'notListening')) {
+            setState(() => _isListening = false);
+            if (!_manualStop) {
+              final text = _inputController.text.trim();
+              if (text.isNotEmpty) _sendMessage();
+            }
+            _manualStop = false;
           }
         },
       );
@@ -106,6 +116,14 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   }
 
   Future<void> _toggleListening() async {
+    // Stop if already listening — mark as manual so onStatus won't auto-send
+    if (_isListening) {
+      _manualStop = true;
+      try { await _speech.stop(); } catch (_) {}
+      return;
+    }
+
+    // Ensure speech is available
     if (!_speechAvailable) {
       await _initSpeech();
       if (!_speechAvailable) {
@@ -114,37 +132,33 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       }
     }
 
-    if (_isListening) {
-      try { await _speech.stop(); } catch (_) {}
-      setState(() => _isListening = false);
-      final text = _inputController.text.trim();
-      if (text.isNotEmpty) _sendMessage();
-    } else {
-      _inputController.clear();
-      setState(() => _isListening = true);
-      try {
-        await _speech.listen(
-          onResult: (result) {
-            if (mounted) {
-              setState(() {
-                _inputController.text = result.recognizedWords;
-                _inputController.selection = TextSelection.fromPosition(
-                  TextPosition(offset: _inputController.text.length),
-                );
-              });
-            }
-          },
-          listenOptions: stt.SpeechListenOptions(
-            partialResults: true,
-            autoPunctuation: true,
-            listenFor: const Duration(seconds: 15),
-            pauseFor: const Duration(seconds: 3),
-          ),
-        );
-      } catch (_) {
+    _inputController.clear();
+    if (mounted) setState(() => _isListening = true);
+    try {
+      final started = await _speech.listen(
+        onResult: (result) {
+          if (mounted) {
+            setState(() {
+              _inputController.text = result.recognizedWords;
+              _inputController.selection = TextSelection.fromPosition(
+                TextPosition(offset: _inputController.text.length),
+              );
+            });
+          }
+        },
+        listenOptions: stt.SpeechListenOptions(
+          partialResults: true,
+          listenFor: const Duration(seconds: 15),
+          pauseFor: const Duration(seconds: 3),
+        ),
+      );
+      if (started == false && mounted) {
         setState(() => _isListening = false);
-        _showSnack('Could not start the microphone, please restart the app');
+        _showSnack('Could not start listening. Please try again.');
       }
+    } catch (_) {
+      if (mounted) setState(() => _isListening = false);
+      _showSnack('Microphone error. Please try again.');
     }
   }
 

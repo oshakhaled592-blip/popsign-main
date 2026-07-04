@@ -90,7 +90,7 @@ class _SplashScreenState extends State<SplashScreen>
               ),
               SizedBox(height: 20.h),
               Text(
-                "I Hear You",
+                S.get('app_name'),
                 style: TextStyle(
                   color: textCol,
                   fontSize: 28.sp,

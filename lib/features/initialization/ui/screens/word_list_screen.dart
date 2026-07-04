@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:popsign/core/data/word_data.dart';
+import 'package:popsign/core/data/word_translations.dart';
 import 'package:popsign/core/l10n/app_strings.dart';
 import 'package:popsign/core/routing/routes.dart';
 import 'package:popsign/core/services/levels_service.dart';
@@ -10,17 +10,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class WordModel {
   String word;
+  String englishWord;
   String videoUrl;
   int progress;
 
-  WordModel(this.word, this.videoUrl, this.progress);
+  WordModel(this.word, this.videoUrl, this.progress, {this.englishWord = ''});
 
   bool get isDone => progress == 3;
-}
-
-List<WordModel> _localWordsForLang(String code, String level) {
-  final list = getWords(code, level);
-  return list.map((w) => WordModel(w, '', 0)).toList();
+  String get matchWord => englishWord.isEmpty ? word : englishWord;
 }
 
 class WordListScreen extends StatefulWidget {
@@ -43,24 +40,26 @@ class _WordListScreenState extends State<WordListScreen> {
   void initState() {
     super.initState();
     _currentLangCode = languageNotifier.value.code;
-    words = _localWordsForLang(_currentLangCode, widget.level);
+    words = [];
     languageNotifier.addListener(_onLangChanged);
-    _loadProgress(_currentLangCode);
     _fetchFromApi();
   }
 
   Future<void> _fetchFromApi() async {
-    setState(() => _loadingApi = true);
+    if (mounted) setState(() => _loadingApi = true);
     final apiData = await LevelsService().getLevels();
     final levelWords = apiData[widget.level];
     if (levelWords != null && levelWords.isNotEmpty && mounted) {
       final saved = await _getSavedProgress();
       setState(() {
         words = levelWords.asMap().entries.map((e) {
+          final englishWord = e.value.word;
+          final displayWord = translateWord(englishWord, _currentLangCode);
           return WordModel(
-            e.value.word,
+            displayWord,
             e.value.videoUrl,
             saved != null && e.key < saved.length ? saved[e.key] : 0,
+            englishWord: englishWord,
           );
         }).toList();
         _loadingApi = false;
@@ -82,29 +81,11 @@ class _WordListScreenState extends State<WordListScreen> {
     await prefs.setString(_progressKey, words.map((w) => w.progress).join(','));
   }
 
-  Future<void> _loadProgress(String langCode) async {
-    final prefs = await SharedPreferences.getInstance();
-    final key = 'progress_${langCode}_${widget.level}';
-    final saved = prefs.getString(key);
-    if (saved != null && mounted) {
-      final parts = saved.split(',');
-      setState(() {
-        for (int i = 0; i < words.length && i < parts.length; i++) {
-          words[i].progress = int.tryParse(parts[i]) ?? 0;
-        }
-      });
-    }
-  }
-
   void _onLangChanged() {
     final newCode = languageNotifier.value.code;
     if (newCode != _currentLangCode) {
       _saveProgress();
-      setState(() {
-        _currentLangCode = newCode;
-        words = _localWordsForLang(newCode, widget.level);
-      });
-      _loadProgress(newCode);
+      _currentLangCode = newCode;
       _fetchFromApi();
     }
   }
@@ -131,6 +112,7 @@ class _WordListScreenState extends State<WordListScreen> {
       Routes.signPractice,
       arguments: {
         'word': words[index].word,
+        'englishWord': words[index].matchWord,
         'videoUrl': words[index].videoUrl,
       },
     );

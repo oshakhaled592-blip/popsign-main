@@ -15,11 +15,13 @@ import '../../../../core/theme/language_notifier.dart';
 class SignPracticeScreen extends StatefulWidget {
   final String targetWord;
   final String videoUrl;
+  final String englishWord;
 
   const SignPracticeScreen({
     super.key,
     required this.targetWord,
     this.videoUrl = '',
+    this.englishWord = '',
   });
 
   @override
@@ -62,7 +64,9 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
   }
 
   Future<void> _initTutorialVideo() async {
-    final word = widget.targetWord.toLowerCase().trim();
+    final word = (widget.englishWord.isNotEmpty ? widget.englishWord : widget.targetWord)
+        .toLowerCase()
+        .trim();
     final assetPath = 'assets/videos/$word.mp4';
     try {
       await rootBundle.load(assetPath);
@@ -137,8 +141,12 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
 
     try {
       final result = await _service.predict(file);
-      final matched = result.top.label.toLowerCase().trim() ==
-          widget.targetWord.toLowerCase().trim();
+      final target = (widget.englishWord.isNotEmpty ? widget.englishWord : widget.targetWord)
+          .toLowerCase()
+          .trim();
+      final matched = result.predictions.any(
+        (p) => p.label.toLowerCase().trim() == target,
+      );
       setState(() {
         _result = result;
         _status = matched ? _PracticeStatus.correct : _PracticeStatus.wrong;
@@ -360,8 +368,6 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
                                 child: YoutubePlayer(
                                   controller: _ytController!,
                                   aspectRatio: 16 / 9,
-                                  controlsBuilder: (context, isFullscreen) =>
-                                      _buildBrandingCover(),
                                 ),
                               ),
                             )
@@ -449,7 +455,7 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
                     if (_status == _PracticeStatus.wrong && _result != null)
                       Container(
                         width: double.infinity,
-                        padding: EdgeInsets.symmetric(vertical: 24.h, horizontal: 20.w),
+                        padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 20.w),
                         decoration: BoxDecoration(
                           color: Colors.red.withValues(alpha: isDark ? 0.12 : 0.06),
                           borderRadius: BorderRadius.circular(20.r),
@@ -461,15 +467,76 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
                             SizedBox(height: 10.h),
                             Text(S.get('not_quite_title'), style: TextStyle(color: Colors.red,
                                 fontSize: 20.sp, fontWeight: FontWeight.bold)),
-                            SizedBox(height: 8.h),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                _badge(S.get('expected_label'), widget.targetWord, Colors.green, isDark),
-                                SizedBox(width: 12.w),
-                                _badge(S.get('got_label'), _result!.top.label, Colors.red, isDark),
-                              ],
+                            SizedBox(height: 12.h),
+                            // Expected word
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                              decoration: BoxDecoration(
+                                color: Colors.green.withValues(alpha: isDark ? 0.15 : 0.08),
+                                borderRadius: BorderRadius.circular(12.r),
+                                border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.check_circle_outline, color: Colors.green, size: 16.sp),
+                                  SizedBox(width: 6.w),
+                                  Text(S.get('expected_label'),
+                                      style: TextStyle(color: Colors.green.withValues(alpha: 0.7), fontSize: 11.sp)),
+                                  SizedBox(width: 6.w),
+                                  Text(widget.targetWord,
+                                      style: TextStyle(color: Colors.green, fontSize: 15.sp, fontWeight: FontWeight.bold)),
+                                ],
+                              ),
                             ),
+                            SizedBox(height: 14.h),
+                            // Top-5 predictions
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(S.get('other_possibilities'),
+                                  style: TextStyle(color: subColor, fontSize: 12.sp, fontWeight: FontWeight.w600)),
+                            ),
+                            SizedBox(height: 8.h),
+                            ..._result!.predictions.asMap().entries.map((e) {
+                              final rank = e.key + 1;
+                              final item = e.value;
+                              return Padding(
+                                padding: EdgeInsets.only(bottom: 6.h),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 22.w,
+                                      height: 22.w,
+                                      decoration: BoxDecoration(
+                                        color: rank == 1
+                                            ? Colors.red.withValues(alpha: 0.15)
+                                            : (isDark ? Colors.white10 : Colors.grey.shade200),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Center(
+                                        child: Text('$rank',
+                                            style: TextStyle(
+                                              color: rank == 1 ? Colors.red : subColor,
+                                              fontSize: 11.sp,
+                                              fontWeight: FontWeight.bold,
+                                            )),
+                                      ),
+                                    ),
+                                    SizedBox(width: 10.w),
+                                    Expanded(
+                                      child: Text(item.label,
+                                          style: TextStyle(
+                                            color: rank == 1 ? textColor : subColor,
+                                            fontSize: 14.sp,
+                                            fontWeight: rank == 1 ? FontWeight.w600 : FontWeight.normal,
+                                          )),
+                                    ),
+                                    Text(item.percent,
+                                        style: TextStyle(color: subColor, fontSize: 12.sp)),
+                                  ],
+                                ),
+                              );
+                            }),
                           ],
                         ),
                       ),
@@ -568,38 +635,6 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
     );
   }
 
-  Widget _buildBrandingCover() {
-    // IgnorePointer lets all touches pass through to the YouTube player.
-    // The two boxes visually cover YouTube logo areas without blocking controls.
-    return IgnorePointer(
-      child: Stack(
-        fit: StackFit.expand,
-        children: const [
-          // YouTube watermark — top-right corner
-          Positioned(
-            top: 0,
-            right: 0,
-            child: SizedBox(
-              width: 120,
-              height: 34,
-              child: ColoredBox(color: Colors.black),
-            ),
-          ),
-          // YouTube logo button — bottom-right of the control bar
-          Positioned(
-            bottom: 0,
-            right: 0,
-            child: SizedBox(
-              width: 60,
-              height: 48,
-              child: ColoredBox(color: Colors.black),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _btn(String label, Color color, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
@@ -619,24 +654,6 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
     );
   }
 
-  Widget _badge(String title, String value, Color color, bool isDark) {
-    return Column(
-      children: [
-        Text(title, style: TextStyle(color: color.withValues(alpha: 0.7), fontSize: 11.sp)),
-        SizedBox(height: 4.h),
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: isDark ? 0.15 : 0.08),
-            borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(color: color.withValues(alpha: 0.3)),
-          ),
-          child: Text(value,
-              style: TextStyle(color: color, fontSize: 14.sp, fontWeight: FontWeight.w600)),
-        ),
-      ],
-    );
-  }
 }
 
 class _VideoPlayPause extends StatefulWidget {

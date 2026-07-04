@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:popsign/core/data/word_data.dart';
 import 'package:popsign/core/data/levels_video_data.dart';
+import 'package:popsign/core/data/word_translations.dart';
 import 'package:popsign/core/l10n/app_strings.dart';
 import 'package:popsign/core/routing/routes.dart';
 import 'package:popsign/core/theme/language_notifier.dart';
@@ -73,10 +73,9 @@ class _PreStartScreenState extends State<PreStartScreen>
         : Colors.grey.shade200;
 
     final colors = _levelColors[_level] ?? _levelColors['A1']!;
-    final backendWords = levelsVideoData[_level];
-    final words = backendWords != null && backendWords.isNotEmpty
-        ? backendWords.map((w) => w['word']!).toList()
-        : getWords(languageNotifier.value.code, _level);
+    final langCode = languageNotifier.value.code;
+    final backendWords = levelsVideoData[_level] ?? [];
+    final words = backendWords.map((w) => translateWord(w['word']!, langCode)).toList();
 
     return Scaffold(
       backgroundColor: bg,
@@ -171,7 +170,7 @@ class _PreStartScreenState extends State<PreStartScreen>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '${words.length} words',
+                              '${words.length} ${S.get('words_unit')}',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 16.sp,

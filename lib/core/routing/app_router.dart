@@ -81,15 +81,22 @@ class AppRouter {
         final args = settings.arguments;
         final String word;
         final String videoUrl;
+        final String englishWord;
         if (args is Map) {
-          word = (args['word'] ?? '').toString();
-          videoUrl = (args['videoUrl'] ?? '').toString();
+          word        = (args['word']        ?? '').toString();
+          videoUrl    = (args['videoUrl']    ?? '').toString();
+          englishWord = (args['englishWord'] ?? '').toString();
         } else {
-          word = args?.toString() ?? '';
-          videoUrl = '';
+          word        = args?.toString() ?? '';
+          videoUrl    = '';
+          englishWord = '';
         }
         return MaterialPageRoute(
-          builder: (_) => SignPracticeScreen(targetWord: word, videoUrl: videoUrl),
+          builder: (_) => SignPracticeScreen(
+            targetWord:  word,
+            videoUrl:    videoUrl,
+            englishWord: englishWord,
+          ),
         );
       case Routes.reset:
         return MaterialPageRoute(builder: (_) => const ResetScreen());
