@@ -7,6 +7,7 @@ import '../../../../core/routing/routes.dart';
 import '../../../../core/services/auth_service.dart';
 import '../../../../core/theme/language_notifier.dart';
 import '../../../../core/theme/theme_notifier.dart';
+import '../../../../core/theme/app_colors.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -42,17 +43,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _editName() {
     final controller = TextEditingController(text: _userName);
     final isDark = themeNotifier.value == ThemeMode.dark;
-    const accent = Color(0xFF22C55E);
+    const accent = AppColors.success;
+    final subText = isDark ? Colors.white38 : AppColors.grayTextLight;
 
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: isDark ? const Color(0xFF181830) : Colors.white,
+        backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
         title: Text(
           S.get('full_name'),
           style: TextStyle(
-            color: isDark ? Colors.white : const Color(0xFF1A1A2E),
+            color: isDark ? Colors.white : AppColors.lightTextPrimary,
             fontSize: 16.sp,
             fontWeight: FontWeight.w700,
           ),
@@ -61,18 +63,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
           controller: controller,
           autofocus: true,
           style: TextStyle(
-            color: isDark ? Colors.white : const Color(0xFF1A1A2E),
+            color: isDark ? Colors.white : AppColors.lightTextPrimary,
             fontSize: 15.sp,
           ),
           cursorColor: accent,
           decoration: InputDecoration(
             hintText: S.get('full_name'),
-            hintStyle: TextStyle(color: isDark ? Colors.white38 : Colors.grey, fontSize: 14.sp),
+            hintStyle: TextStyle(color: subText, fontSize: 14.sp),
             enabledBorder: UnderlineInputBorder(
               borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.grey.shade300),
             ),
-            focusedBorder: const UnderlineInputBorder(
-              borderSide: BorderSide(color: accent, width: 2),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: accent, width: 2.w),
             ),
           ),
         ),
@@ -80,7 +82,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(S.get('cancel'),
-                style: TextStyle(color: Colors.grey, fontSize: 14.sp)),
+                style: TextStyle(color: subText, fontSize: 14.sp)),
           ),
           TextButton(
             onPressed: () async {
@@ -116,22 +118,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bgColor    = isDark ? const Color(0xFF0B1020) : const Color(0xFFF5F7FB);
-    final cardColor  = isDark ? const Color(0xFF181830) : Colors.white;
-    final textColor  = isDark ? Colors.white : const Color(0xFF1A1A2E);
-    final subText    = isDark ? Colors.white54 : const Color(0xFF9CA3AF);
+    final bgColor    = isDark ? AppColors.darkBackground : AppColors.lightBackground;
+    final cardColor  = isDark ? AppColors.darkSurface : AppColors.lightSurface;
+    final textColor  = isDark ? Colors.white : AppColors.lightTextPrimary;
+    final subText    = isDark ? Colors.white54 : AppColors.grayTextLight;
 
     final cardShadow = isDark
         ? <BoxShadow>[]
         : [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.07),
-              blurRadius: 16,
-              offset: const Offset(0, 4),
+              blurRadius: 16.r,
+              offset: Offset(0, 4.h),
             ),
           ];
 
-    const accent = Color(0xFF22C55E);
+    const accent = AppColors.success;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -200,7 +202,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             decoration: BoxDecoration(
                               color: accent,
                               shape: BoxShape.circle,
-                              border: Border.all(color: cardColor, width: 2),
+                              border: Border.all(color: cardColor, width: 2.w),
                             ),
                             child: Icon(Icons.check, color: Colors.white, size: 10.sp),
                           ),
@@ -299,7 +301,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           activeThumbColor: Colors.white,
                           activeTrackColor: accent,
                           inactiveThumbColor: Colors.white,
-                          inactiveTrackColor: Colors.grey.shade300,
+                          inactiveTrackColor: isDark ? Colors.white24 : Colors.grey.shade300,
                           onChanged: (value) {
                             setState(() => isDark = value);
                             saveTheme(value);
@@ -328,7 +330,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       onTap: () => ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(S.get('coming_soon')),
-                          backgroundColor: const Color(0xFF22C55E),
+                          backgroundColor: accent,
                           behavior: SnackBarBehavior.floating,
                           duration: const Duration(seconds: 2),
                         ),
@@ -380,20 +382,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   width: double.infinity,
                   padding: EdgeInsets.symmetric(vertical: 16.h),
                   decoration: BoxDecoration(
-                    color: Colors.red.withValues(alpha: 0.08),
+                    color: AppColors.error.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(16.r),
                     border:
-                        Border.all(color: Colors.red.withValues(alpha: 0.25)),
+                        Border.all(color: AppColors.error.withValues(alpha: 0.25)),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.logout_rounded, color: Colors.red, size: 20.sp),
+                      Icon(Icons.logout_rounded, color: AppColors.error, size: 20.sp),
                       SizedBox(width: 10.w),
                       Text(
                         S.get('logout'),
                         style: TextStyle(
-                          color: Colors.red,
+                          color: AppColors.error,
                           fontSize: 16.sp,
                           fontWeight: FontWeight.w600,
                         ),
@@ -434,12 +436,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   decoration: BoxDecoration(
                     color: isDark
                         ? Colors.white.withValues(alpha: 0.06)
-                        : const Color(0xFF22C55E).withValues(alpha: 0.1),
+                        : AppColors.success.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(11.r),
                   ),
                   child: Icon(
                     icon,
-                    color: isDark ? Colors.white70 : const Color(0xFF22C55E),
+                    color: isDark ? Colors.white70 : AppColors.success,
                     size: 20.sp,
                   ),
                 ),

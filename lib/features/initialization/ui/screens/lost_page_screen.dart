@@ -8,6 +8,7 @@ import '../../../../core/models/prediction_model.dart';
 import '../../../../core/state/translation_notifier.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/language_notifier.dart';
+import '../../../../core/theme/app_colors.dart';
 
 class LostPage extends StatefulWidget {
   const LostPage({super.key});
@@ -72,7 +73,7 @@ class _LostPageState extends State<LostPage>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(S.get('storage_permission_required')),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.error,
           ),
         );
       }
@@ -104,7 +105,7 @@ class _LostPageState extends State<LostPage>
     final isDark = Theme.of(context).brightness == Brightness.dark;
     showModalBottomSheet(
       context: context,
-      backgroundColor: isDark ? const Color(0xFF141829) : Colors.white,
+      backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
       ),
@@ -156,7 +157,7 @@ class _LostPageState extends State<LostPage>
     required VoidCallback onTap,
     required bool isDark,
   }) {
-    const purple = Color(0xFF7C3AED);
+    const purple = AppColors.accent;
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -174,7 +175,7 @@ class _LostPageState extends State<LostPage>
             Text(
               label,
               style: TextStyle(
-                color: isDark ? Colors.white : const Color(0xFF1A1A2E),
+                color: isDark ? Colors.white : AppColors.lightTextPrimary,
                 fontSize: 15.sp,
                 fontWeight: FontWeight.w500,
               ),
@@ -188,9 +189,9 @@ class _LostPageState extends State<LostPage>
   @override
   Widget build(BuildContext context) {
     final isDark    = Theme.of(context).brightness == Brightness.dark;
-    final bg        = isDark ? const Color(0xFF0D0F1A) : const Color(0xFFF2F4FA);
-    final cardBg    = isDark ? const Color(0xFF141829) : Colors.white;
-    final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
+    final bg        = isDark ? AppColors.darkBackground : AppColors.lightBackground;
+    final cardBg    = isDark ? AppColors.darkSurface : AppColors.lightSurface;
+    final textColor = isDark ? Colors.white : AppColors.lightTextPrimary;
     final subColor  = isDark ? Colors.white38 : Colors.grey.shade500;
     final btnBg     = isDark ? const Color(0xFF1E1F35) : Colors.white;
 
@@ -248,8 +249,8 @@ class _LostPageState extends State<LostPage>
 
   Widget _buildHeader(Color textColor, Color btnBg) {
     final serverColor = switch (_notifier.serverStatus) {
-      ServerStatus.online  => Colors.green,
-      ServerStatus.offline => Colors.red,
+      ServerStatus.online  => AppColors.success,
+      ServerStatus.offline => AppColors.error,
       ServerStatus.unknown => Colors.orange,
     };
 
@@ -297,7 +298,7 @@ class _LostPageState extends State<LostPage>
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: isDark ? const Color(0xFF141829) : Colors.white,
+      backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
       ),
@@ -322,7 +323,7 @@ class _LostPageState extends State<LostPage>
               Text(
                 '${S.get('supported_signs')} (${classes.length})',
                 style: TextStyle(
-                  color: isDark ? Colors.white : const Color(0xFF1A1A2E),
+                  color: isDark ? Colors.white : AppColors.lightTextPrimary,
                   fontSize: 16.sp, fontWeight: FontWeight.w700,
                 ),
               ),
@@ -330,7 +331,7 @@ class _LostPageState extends State<LostPage>
               if (_notifier.classesLoading)
                 Padding(
                   padding: EdgeInsets.all(32.w),
-                  child: const CircularProgressIndicator(color: Color(0xFF7C3AED), strokeWidth: 2),
+                  child: const CircularProgressIndicator(color: AppColors.accent, strokeWidth: 2),
                 )
               else if (classes.isEmpty)
                 Padding(
@@ -347,10 +348,10 @@ class _LostPageState extends State<LostPage>
                         child: Container(
                           padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF7C3AED).withValues(alpha: 0.15),
+                            color: AppColors.accent.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(12.r),
                           ),
-                          child: Text(S.get('retry'), style: TextStyle(color: const Color(0xFF7C3AED), fontSize: 14.sp)),
+                          child: Text(S.get('retry'), style: TextStyle(color: AppColors.accent, fontSize: 14.sp)),
                         ),
                       ),
                     ],
@@ -368,14 +369,14 @@ class _LostPageState extends State<LostPage>
                         return Container(
                           padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF7C3AED).withValues(alpha: isDark ? 0.15 : 0.08),
+                            color: AppColors.accent.withValues(alpha: isDark ? 0.15 : 0.08),
                             borderRadius: BorderRadius.circular(20.r),
-                            border: Border.all(color: const Color(0xFF7C3AED).withValues(alpha: 0.25)),
+                            border: Border.all(color: AppColors.accent.withValues(alpha: 0.25)),
                           ),
                           child: Text(
                             word,
                             style: TextStyle(
-                              color: const Color(0xFF7C3AED),
+                              color: AppColors.accent,
                               fontSize: 13.sp, fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -402,7 +403,7 @@ class _LostPageState extends State<LostPage>
           color: bg,
           borderRadius: BorderRadius.circular(14.r),
           boxShadow: [
-            BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 8, offset: const Offset(0, 2)),
+            BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 8.r, offset: Offset(0, 2.h)),
           ],
         ),
         child: Icon(icon, color: color, size: 18.sp),
@@ -421,10 +422,10 @@ class _LostPageState extends State<LostPage>
             width: 120.w,
             height: 120.w,
             decoration: BoxDecoration(
-              color: const Color(0xFF7C3AED).withValues(alpha: 0.12),
+              color: AppColors.accent.withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.video_camera_back_rounded, size: 52.sp, color: const Color(0xFF7C3AED)),
+            child: Icon(Icons.video_camera_back_rounded, size: 52.sp, color: AppColors.accent),
           ),
         ),
         SizedBox(height: 24.h),
@@ -450,7 +451,7 @@ class _LostPageState extends State<LostPage>
           borderRadius: BorderRadius.circular(20.r),
         ),
         child: const Center(
-          child: CircularProgressIndicator(color: Color(0xFF7C3AED), strokeWidth: 2),
+          child: CircularProgressIndicator(color: AppColors.accent, strokeWidth: 2),
         ),
       );
     }
@@ -476,7 +477,7 @@ class _LostPageState extends State<LostPage>
             SizedBox(
               width: 20.w,
               height: 20.w,
-              child: const CircularProgressIndicator(strokeWidth: 2.5, color: Color(0xFF7C3AED)),
+              child: const CircularProgressIndicator(strokeWidth: 2.5, color: AppColors.accent),
             ),
             SizedBox(width: 12.w),
             Text(S.get('analyzing_video'),
@@ -496,7 +497,7 @@ class _LostPageState extends State<LostPage>
   Widget _buildResult(Color cardBg, Color textColor, Color subColor, bool isDark) {
     final result = _notifier.result!;
     final top    = result.top;
-    const purple = Color(0xFF7C3AED);
+    const purple = AppColors.accent;
 
     return SingleChildScrollView(
       key: const ValueKey('result'),
@@ -536,12 +537,12 @@ class _LostPageState extends State<LostPage>
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
                   decoration: BoxDecoration(
-                    color: Colors.green.withValues(alpha: isDark ? 0.15 : 0.1),
+                    color: AppColors.success.withValues(alpha: isDark ? 0.15 : 0.1),
                     borderRadius: BorderRadius.circular(20.r),
                   ),
                   child: Text(
                     '${S.get('confidence_label')}  ${top.percent}',
-                    style: TextStyle(color: Colors.green, fontSize: 13.sp, fontWeight: FontWeight.w600),
+                    style: TextStyle(color: AppColors.success, fontSize: 13.sp, fontWeight: FontWeight.w600),
                   ),
                 ),
               ],
@@ -610,14 +611,14 @@ class _LostPageState extends State<LostPage>
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
             decoration: BoxDecoration(
-              color: const Color(0xFF7C3AED).withValues(alpha: 0.12),
+              color: AppColors.accent.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(14.r),
-              border: Border.all(color: const Color(0xFF7C3AED).withValues(alpha: 0.3)),
+              border: Border.all(color: AppColors.accent.withValues(alpha: 0.3)),
             ),
             child: Text(
               'Try Again',
               style: TextStyle(
-                color: const Color(0xFF7C3AED),
+                color: AppColors.accent,
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w600,
               ),
@@ -629,7 +630,7 @@ class _LostPageState extends State<LostPage>
   }
 
   Widget _buildSentenceBar(Color cardBg, Color textColor, Color subColor, bool isDark) {
-    const purple = Color(0xFF7C3AED);
+    const purple = AppColors.accent;
     final sentence = _notifier.sentence;
     return Container(
       width: double.infinity,
@@ -656,7 +657,7 @@ class _LostPageState extends State<LostPage>
                   _notifier.clearSentence();
                 },
                 child: Text(S.get('clear_all'),
-                    style: TextStyle(color: Colors.red.withValues(alpha: 0.8), fontSize: 12.sp)),
+                    style: TextStyle(color: AppColors.error.withValues(alpha: 0.8), fontSize: 12.sp)),
               ),
             ],
           ),
@@ -692,7 +693,7 @@ class _LostPageState extends State<LostPage>
 
   Widget _buildActionButton(bool isDark) {
     final isResult = _notifier.isSuccess || _notifier.isError;
-    const purple = Color(0xFF7C3AED);
+    const purple = AppColors.accent;
 
     return Column(
       children: [

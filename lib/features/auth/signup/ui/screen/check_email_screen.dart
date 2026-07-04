@@ -6,6 +6,7 @@ import '../../../../../core/helpers/spacing.dart';
 import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/routing/routes.dart';
 import '../../../../../core/theme/styles.dart';
+import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/linear_button.dart';
 
 class CheckEmailScreen extends StatelessWidget {
@@ -16,16 +17,16 @@ class CheckEmailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark    = Theme.of(context).brightness == Brightness.dark;
-    final bg        = isDark ? const Color(0xFF0D0F1A) : const Color(0xFFF5F7FB);
-    final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
-    final subColor  = isDark ? Colors.white60 : const Color(0xFF6B7280);
-    const accent    = Color(0xFF22C55E);
+    final bg        = isDark ? AppColors.darkBackground : AppColors.lightBackground;
+    final textColor = isDark ? Colors.white : AppColors.lightTextPrimary;
+    final subColor  = isDark ? Colors.white60 : AppColors.grayTextLight;
+    const accent    = AppColors.success;
 
     return Scaffold(
       backgroundColor: bg,
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 35.w),
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 35.w, vertical: 20.h),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

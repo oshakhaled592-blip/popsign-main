@@ -6,6 +6,7 @@ import 'package:popsign/core/routing/routes.dart';
 import 'package:popsign/core/services/levels_service.dart';
 import 'package:popsign/core/services/progress_service.dart';
 import 'package:popsign/core/theme/language_notifier.dart';
+import 'package:popsign/core/theme/app_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class WordModel {
@@ -166,7 +167,7 @@ class _WordListScreenState extends State<WordListScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark ? Colors.white : const Color(0xFF1C1C1C);
+    final textColor = isDark ? Colors.white : AppColors.lightTextPrimary;
     final subTextColor = isDark ? Colors.white54 : Colors.grey.shade600;
 
     return Scaffold(
@@ -237,12 +238,12 @@ class _WordListScreenState extends State<WordListScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.refresh, color: Colors.red),
+                    Icon(Icons.refresh, color: AppColors.error, size: 20.sp),
                     SizedBox(width: 10.w),
                     Text(
                       S.get('reset_all'),
                       style: TextStyle(
-                        color: Colors.red,
+                        color: AppColors.error,
                         fontSize: 20.sp,
                         fontWeight: FontWeight.w500,
                       ),
@@ -264,7 +265,7 @@ class _WordListScreenState extends State<WordListScreen> {
                   height: 14.w,
                   child: const CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: Color(0xFF7C3AED),
+                    color: AppColors.accent,
                   ),
                 ),
                 SizedBox(width: 8.w),
@@ -283,24 +284,27 @@ class _WordListScreenState extends State<WordListScreen> {
           SizedBox(height: 18.h),
 
           Expanded(
-            child: Scrollbar(
-              controller: _scrollController,
-              thumbVisibility: true,
-              thickness: 4,
-              radius: const Radius.circular(8),
-              child: ListView.builder(
+            child: SafeArea(
+              top: false,
+              child: Scrollbar(
                 controller: _scrollController,
-                itemCount: words.length,
-                itemBuilder: (context, index) {
-                  final item = words[index];
-                  return WordCard(
-                    word: item.word,
-                    videoUrl: item.videoUrl,
-                    progress: item.progress,
-                    isDone: item.isDone,
-                    onTap: () => onLearn(index),
-                  );
-                },
+                thumbVisibility: true,
+                thickness: 4.w,
+                radius: Radius.circular(8.r),
+                child: ListView.builder(
+                  controller: _scrollController,
+                  itemCount: words.length,
+                  itemBuilder: (context, index) {
+                    final item = words[index];
+                    return WordCard(
+                      word: item.word,
+                      videoUrl: item.videoUrl,
+                      progress: item.progress,
+                      isDone: item.isDone,
+                      onTap: () => onLearn(index),
+                    );
+                  },
+                ),
               ),
             ),
           ),
@@ -329,10 +333,10 @@ class WordCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark ? Colors.white : const Color(0xFF1C1C1C);
+    final textColor = isDark ? Colors.white : AppColors.lightTextPrimary;
     final dimColor = isDark ? const Color(0xFF31384A) : Colors.grey.shade300;
     final inactiveColor = isDark ? const Color(0xFF232938) : Colors.grey.shade200;
-    const accent = Color(0xFF7C3AED);
+    const accent = AppColors.accent;
 
     return Container(
       height: 72.h,
@@ -355,6 +359,8 @@ class WordCard extends StatelessWidget {
           Expanded(
             child: Text(
               word,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: isDone ? textColor.withValues(alpha: 0.38) : textColor,
                 fontSize: 18.sp,
@@ -370,7 +376,7 @@ class WordCard extends StatelessWidget {
                 width: 7.w,
                 height: 7.w,
                 decoration: BoxDecoration(
-                  color: i < progress ? Colors.green : dimColor,
+                  color: i < progress ? AppColors.success : dimColor,
                   shape: BoxShape.circle,
                 ),
               );
@@ -383,7 +389,7 @@ class WordCard extends StatelessWidget {
             width: 40.w,
             height: 40.w,
             decoration: BoxDecoration(
-              color: isDone ? Colors.green : inactiveColor,
+              color: isDone ? AppColors.success : inactiveColor,
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: Icon(

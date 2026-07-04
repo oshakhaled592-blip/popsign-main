@@ -5,6 +5,7 @@ import 'package:popsign/core/data/word_translations.dart';
 import 'package:popsign/core/l10n/app_strings.dart';
 import 'package:popsign/core/routing/routes.dart';
 import 'package:popsign/core/theme/language_notifier.dart';
+import 'package:popsign/core/theme/app_colors.dart';
 import 'package:popsign/core/widgets/linear_button.dart';
 import 'word_list_screen.dart';
 
@@ -62,12 +63,12 @@ class _PreStartScreenState extends State<PreStartScreen>
   @override
   Widget build(BuildContext context) {
     final isDark    = Theme.of(context).brightness == Brightness.dark;
-    final bg        = isDark ? const Color(0xFF0D0F1A) : const Color(0xFFF2F4FA);
-    final cardBg    = isDark ? const Color(0xFF141829) : Colors.white;
-    final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
+    final bg        = isDark ? AppColors.darkBackground : AppColors.lightBackground;
+    final cardBg    = isDark ? AppColors.darkSurface : AppColors.lightSurface;
+    final textColor = isDark ? Colors.white : AppColors.lightTextPrimary;
     final subColor  = isDark ? Colors.white38 : Colors.grey.shade500;
     final btnBg     = isDark ? const Color(0xFF1E1F35) : Colors.white;
-    final btnIcon   = isDark ? Colors.white70 : const Color(0xFF1A1A2E);
+    final btnIcon   = isDark ? Colors.white70 : AppColors.lightTextPrimary;
     final divColor  = isDark
         ? Colors.white.withValues(alpha: 0.06)
         : Colors.grey.shade200;
@@ -85,20 +86,20 @@ class _PreStartScreenState extends State<PreStartScreen>
           width: 60.w,
           height: 60.w,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: isDark ? AppColors.darkSurface : Colors.white,
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.15),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
+                color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.15),
+                blurRadius: 12.r,
+                offset: Offset(0, 4.h),
               ),
             ],
           ),
           child: Center(
             child: Icon(
               Icons.smart_toy_rounded,
-              color: const Color(0xFF1A1A2E),
+              color: isDark ? Colors.white70 : AppColors.lightTextPrimary,
               size: 30.sp,
             ),
           ),
@@ -292,8 +293,8 @@ class _PreStartScreenState extends State<PreStartScreen>
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+              blurRadius: 8.r,
+              offset: Offset(0, 2.h),
             ),
           ],
         ),

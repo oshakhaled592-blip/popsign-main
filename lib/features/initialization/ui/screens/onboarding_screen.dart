@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/theme/language_notifier.dart';
+import '../../../../core/theme/app_colors.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -65,10 +66,10 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? const Color(0xFF0D0F1A) : const Color(0xFFF5F7FB);
-    final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
-    final subColor = isDark ? Colors.white54 : const Color(0xFF9CA3AF);
-    const accent = Color(0xFF22C55E);
+    final bg = isDark ? AppColors.darkBackground : AppColors.lightBackground;
+    final textColor = isDark ? Colors.white : AppColors.lightTextPrimary;
+    final subColor = isDark ? Colors.white54 : AppColors.grayTextLight;
+    const accent = AppColors.success;
     final isLast = _current == 1;
 
     return Scaffold(
@@ -158,8 +159,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     boxShadow: [
                       BoxShadow(
                         color: accent.withValues(alpha: 0.4),
-                        blurRadius: 20,
-                        offset: const Offset(0, 8),
+                        blurRadius: 20.r,
+                        offset: Offset(0, 8.h),
                       ),
                     ],
                   ),
@@ -202,11 +203,12 @@ class _Page1 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const accent = Color(0xFF22C55E);
+    const accent = AppColors.success;
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 28.w),
-      child: Column(
+      child: SingleChildScrollView(
+        child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           AnimatedBuilder(
@@ -244,8 +246,8 @@ class _Page1 extends StatelessWidget {
                           BoxShadow(
                             color: Colors.black.withValues(
                                 alpha: isDark ? 0.4 : 0.1),
-                            blurRadius: 24,
-                            offset: const Offset(0, 8),
+                            blurRadius: 24.r,
+                            offset: Offset(0, 8.h),
                           ),
                         ],
                       ),
@@ -297,6 +299,8 @@ class _Page1 extends StatelessWidget {
                                   child: Center(
                                     child: Text(
                                       S.get('i_know'),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                         color: accent,
                                         fontSize: 12.sp,
@@ -319,6 +323,8 @@ class _Page1 extends StatelessWidget {
                                   child: Center(
                                     child: Text(
                                       S.get('learn'),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                         color: textColor,
                                         fontSize: 12.sp,
@@ -346,7 +352,7 @@ class _Page1 extends StatelessWidget {
                         boxShadow: [
                           BoxShadow(
                             color: accent.withValues(alpha: 0.4),
-                            blurRadius: 12,
+                            blurRadius: 12.r,
                           ),
                         ],
                       ),
@@ -371,7 +377,7 @@ class _Page1 extends StatelessWidget {
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.12),
-                            blurRadius: 8,
+                            blurRadius: 8.r,
                           ),
                         ],
                       ),
@@ -412,6 +418,7 @@ class _Page1 extends StatelessWidget {
             ),
           ),
         ],
+        ),
       ),
     );
   }
@@ -432,11 +439,12 @@ class _Page2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const purple = Color(0xFF7C3AED);
+    const purple = AppColors.accent;
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 28.w),
-      child: Column(
+      child: SingleChildScrollView(
+        child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           AnimatedBuilder(
@@ -494,6 +502,7 @@ class _Page2 extends StatelessWidget {
             ),
           ),
         ],
+        ),
       ),
     );
   }

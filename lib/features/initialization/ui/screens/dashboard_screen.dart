@@ -100,10 +100,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? const Color(0xFF0D0F1A) : const Color(0xFFF2F4FA);
-    final cardBg = isDark ? const Color(0xFF141829) : Colors.white;
-    final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
-    final subColor = isDark ? Colors.white54 : Colors.grey.shade500;
+    final bg = isDark ? AppColors.darkBackground : AppColors.lightBackground;
+    final cardBg = isDark ? AppColors.darkSurface : AppColors.lightSurface;
+    final textColor = isDark ? Colors.white : AppColors.lightTextPrimary;
+    final subColor = isDark ? Colors.white54 : AppColors.grayTextLight;
     final levelColor = _levelColors[_currentLevel] ?? AppColors.a1Color;
 
     return PopScope(
@@ -112,7 +112,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         backgroundColor: bg,
         body: SafeArea(
         child: _loading
-            ? const Center(child: CircularProgressIndicator())
+            ? const Center(child: CircularProgressIndicator(color: AppColors.accent))
             : RefreshIndicator(
                 onRefresh: _loadData,
                 child: SingleChildScrollView(
@@ -151,7 +151,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       // Words learned card
                       _buildCard(
                         cardBg: cardBg,
-                        accentColor: const Color(0xFF22C55E),
+                        accentColor: AppColors.success,
                         icon: Icons.menu_book_rounded,
                         label: S.get('words_learned'),
                         value: '$_totalWords ${S.get('words_unit')}',

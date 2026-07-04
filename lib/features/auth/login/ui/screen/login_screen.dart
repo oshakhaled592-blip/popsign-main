@@ -9,6 +9,7 @@ import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/routing/routes.dart';
 import '../../../../../core/theme/language_notifier.dart';
 import '../../../../../core/theme/styles.dart';
+import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/linear_button.dart';
 import '../../../../../core/widgets/logo_and_name.dart';
 import '../../../../../core/widgets/text_form_widget.dart';
@@ -99,64 +100,73 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg        = isDark ? const Color(0xFF0D0F1A) : const Color(0xFFF5F7FB);
-    final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
-    final subColor  = isDark ? Colors.white60 : const Color(0xFF6B7280);
+    final bg        = isDark ? AppColors.darkBackground : AppColors.lightBackground;
+    final textColor = isDark ? Colors.white : AppColors.lightTextPrimary;
+    final subColor  = isDark ? Colors.white60 : AppColors.grayTextLight;
 
     return Scaffold(
       backgroundColor: bg,
-      body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 35.w),
-        width: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const LogoAndName(),
-            verticalSpace(36),
-
-            Text(S.get('login'),
-                style: AppTextStyles.font24BoldWhite.copyWith(color: textColor)),
-            Text(
-              S.get('login_subtitle'),
-              style: AppTextStyles.font13RegularWhite.copyWith(color: subColor),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 35.w, vertical: 20.h),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height -
+                  MediaQuery.of(context).padding.top -
+                  MediaQuery.of(context).padding.bottom -
+                  40.h,
             ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const LogoAndName(),
+                verticalSpace(36),
 
-            verticalSpace(28),
+                Text(S.get('login'),
+                    style: AppTextStyles.font24BoldWhite.copyWith(color: textColor)),
+                Text(
+                  S.get('login_subtitle'),
+                  style: AppTextStyles.font13RegularWhite.copyWith(color: subColor),
+                ),
 
-            TextFormWidget(
-              controller: emailController,
-              hintText: S.get('email'),
-              icon: Icons.email_outlined,
-              keyboardType: TextInputType.emailAddress,
+                verticalSpace(28),
+
+                TextFormWidget(
+                  controller: emailController,
+                  hintText: S.get('email'),
+                  icon: Icons.email_outlined,
+                  keyboardType: TextInputType.emailAddress,
+                ),
+
+                verticalSpace(20),
+
+                TextFormWidget(
+                  controller: passwordController,
+                  hintText: S.get('password'),
+                  icon: Icons.lock_outline,
+                  obscureText: true,
+                  keyboardType: TextInputType.visiblePassword,
+                ),
+
+                verticalSpace(17),
+
+                LinearButton(
+                  text: S.get('login'),
+                  onPressed: login,
+                ),
+
+                verticalSpace(17),
+
+                DontHaveAccount(
+                  text: S.get('dont_have'),
+                  actionText: S.get('signup'),
+                  onTap: () {
+                    context.pushNamed(Routes.signup);
+                  },
+                ),
+              ],
             ),
-
-            verticalSpace(20),
-
-            TextFormWidget(
-              controller: passwordController,
-              hintText: S.get('password'),
-              icon: Icons.lock_outline,
-              obscureText: true,
-              keyboardType: TextInputType.visiblePassword,
-            ),
-
-            verticalSpace(17),
-
-            LinearButton(
-              text: S.get('login'),
-              onPressed: login,
-            ),
-
-            verticalSpace(17),
-
-            DontHaveAccount(
-              text: S.get('dont_have'),
-              actionText: S.get('signup'),
-              onTap: () {
-                context.pushNamed(Routes.signup);
-              },
-            ),
-          ],
+          ),
         ),
       ),
     );

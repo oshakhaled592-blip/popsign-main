@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../../core/l10n/app_strings.dart';
 import '../../../../../core/services/auth_service.dart';
 import '../../../../../core/theme/language_notifier.dart';
+import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/linear_button.dart';
 import '../../../../../core/widgets/text_form_widget.dart';
 
@@ -56,7 +57,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(result.message),
-          backgroundColor: Colors.green,
+          backgroundColor: AppColors.success,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -65,7 +66,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(result.message),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -75,12 +76,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark     = Theme.of(context).brightness == Brightness.dark;
-    final bg         = isDark ? const Color(0xFF0B1020) : const Color(0xFFF5F7FB);
-    final cardColor  = isDark ? const Color(0xFF181830) : Colors.white;
-    final textColor  = isDark ? Colors.white : const Color(0xFF1A1A2E);
-    final subColor   = isDark ? Colors.white54 : const Color(0xFF9CA3AF);
+    final bg         = isDark ? AppColors.darkBackground : AppColors.lightBackground;
+    final cardColor  = isDark ? AppColors.darkSurface : AppColors.lightSurface;
+    final textColor  = isDark ? Colors.white : AppColors.lightTextPrimary;
+    final subColor   = isDark ? Colors.white54 : AppColors.grayTextLight;
     final btnBg      = isDark ? const Color(0xFF1E1F35) : Colors.grey.shade100;
-    const accent     = Color(0xFF7C3AED);
+    const accent     = AppColors.accent;
 
     return Scaffold(
       backgroundColor: bg,

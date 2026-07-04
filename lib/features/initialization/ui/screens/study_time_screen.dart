@@ -7,6 +7,7 @@ import '../../../../core/helpers/spacing.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/routing/routes.dart';
 import '../widgets/quiz_step_scaffold.dart';
+import '../../../../core/theme/app_colors.dart';
 
 class StudyTimeScreen extends StatefulWidget {
   const StudyTimeScreen({super.key});
@@ -22,7 +23,7 @@ class _StudyTimeScreenState extends State<StudyTimeScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final subColor = isDark ? Colors.white60 : const Color(0xFF9CA3AF);
+    final subColor = isDark ? Colors.white60 : AppColors.grayTextLight;
 
     return QuizScaffold(
       step: 5,

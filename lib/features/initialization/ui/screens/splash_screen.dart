@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:popsign/core/l10n/app_strings.dart';
 import 'package:popsign/core/routing/routes.dart';
 import 'package:popsign/core/theme/language_notifier.dart';
+import 'package:popsign/core/theme/app_colors.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -66,56 +67,58 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     final isDark   = Theme.of(context).brightness == Brightness.dark;
-    final bg       = isDark ? const Color(0xFF0A0E18) : const Color(0xFFF5F7FB);
-    final textCol  = isDark ? Colors.white : const Color(0xFF1A1A2E);
-    final subCol   = isDark ? Colors.white38 : const Color(0xFF9CA3AF);
+    final bg       = isDark ? AppColors.darkBackground : AppColors.lightBackground;
+    final textCol  = isDark ? Colors.white : AppColors.lightTextPrimary;
+    final subCol   = isDark ? Colors.white38 : AppColors.grayTextLight;
 
     return Scaffold(
       backgroundColor: bg,
-      body: FadeTransition(
-        opacity: _fade,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                'assets/images/Logo.png',
-                width: 100.w,
-                height: 100.w,
-                errorBuilder: (ctx, err, stack) => Icon(
-                  Icons.hearing,
-                  color: textCol,
-                  size: 80.sp,
+      body: SafeArea(
+        child: FadeTransition(
+          opacity: _fade,
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  'assets/images/Logo.png',
+                  width: 100.w,
+                  height: 100.w,
+                  errorBuilder: (ctx, err, stack) => Icon(
+                    Icons.hearing,
+                    color: textCol,
+                    size: 80.sp,
+                  ),
                 ),
-              ),
-              SizedBox(height: 20.h),
-              Text(
-                S.get('app_name'),
-                style: TextStyle(
-                  color: textCol,
-                  fontSize: 28.sp,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.5,
+                SizedBox(height: 20.h),
+                Text(
+                  S.get('app_name'),
+                  style: TextStyle(
+                    color: textCol,
+                    fontSize: 28.sp,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.5,
+                  ),
                 ),
-              ),
-              SizedBox(height: 8.h),
-              Text(
-                S.get('splash_tagline'),
-                style: TextStyle(
-                  color: subCol,
-                  fontSize: 14.sp,
+                SizedBox(height: 8.h),
+                Text(
+                  S.get('splash_tagline'),
+                  style: TextStyle(
+                    color: subCol,
+                    fontSize: 14.sp,
+                  ),
                 ),
-              ),
-              SizedBox(height: 60.h),
-              SizedBox(
-                width: 24.w,
-                height: 24.w,
-                child: const CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Color(0xFFE9A6A6),
+                SizedBox(height: 60.h),
+                SizedBox(
+                  width: 24.w,
+                  height: 24.w,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: AppColors.accent,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

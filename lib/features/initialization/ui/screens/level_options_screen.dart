@@ -31,9 +31,9 @@ class _LevelOptionsScreenState extends State<LevelOptionsScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
-    final subColor = isDark ? Colors.white60 : const Color(0xFF9CA3AF);
-    final cardColor = isDark ? const Color(0xFF13182A) : Colors.white;
+    final textColor = isDark ? Colors.white : AppColors.lightTextPrimary;
+    final subColor = isDark ? Colors.white60 : AppColors.grayTextLight;
+    final cardColor = isDark ? AppColors.darkSurface : AppColors.lightSurface;
 
     return QuizScaffold(
       step: 4,
@@ -82,15 +82,15 @@ class _LevelOptionsScreenState extends State<LevelOptionsScreen> {
                             : (isDark
                                 ? const Color(0xFF263047)
                                 : Colors.grey.shade300),
-                        width: isSelected ? 2 : 1.2,
+                        width: isSelected ? 2.w : 1.2.w,
                       ),
                       boxShadow: isDark
                           ? []
                           : [
                               BoxShadow(
                                 color: Colors.black.withValues(alpha: 0.05),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
+                                blurRadius: 10.r,
+                                offset: Offset(0, 4.h),
                               ),
                             ],
                     ),
@@ -131,8 +131,10 @@ class _LevelOptionsScreenState extends State<LevelOptionsScreen> {
                             shape: BoxShape.circle,
                             color: isSelected ? quizAccent : Colors.transparent,
                             border: Border.all(
-                              color: isSelected ? quizAccent : Colors.grey,
-                              width: 1.5,
+                              color: isSelected
+                                  ? quizAccent
+                                  : (isDark ? const Color(0xFF263047) : Colors.grey.shade300),
+                              width: 1.5.w,
                             ),
                           ),
                           child: isSelected

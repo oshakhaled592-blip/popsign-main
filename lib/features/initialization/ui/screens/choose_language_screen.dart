@@ -7,6 +7,7 @@ import '../../../../core/helpers/spacing.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/routing/routes.dart';
 import '../../../../core/theme/language_notifier.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/linear_button.dart';
 
 class ChooseLanguageScreen extends StatefulWidget {
@@ -84,15 +85,15 @@ class _ChooseLanguageScreenState extends State<ChooseLanguageScreen>
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final primary = Theme.of(context).colorScheme.primary;
-    final textColor = isDark ? Colors.white : Colors.black;
-    final cardColor = isDark ? const Color(0xFF0F1422) : Colors.white;
+    final textColor = isDark ? Colors.white : AppColors.lightTextPrimary;
+    final cardColor = isDark ? AppColors.darkSurface : AppColors.lightSurface;
     final btnBgColor = isDark ? const Color(0xFF181830) : Colors.grey.shade200;
     final arrowBg =
         isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.shade100;
     final arrowIcon = isDark ? Colors.white60 : Colors.grey.shade600;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0D0F1A) : Colors.white,
+      backgroundColor: isDark ? AppColors.darkBackground : AppColors.lightBackground,
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
@@ -121,17 +122,14 @@ class _ChooseLanguageScreenState extends State<ChooseLanguageScreen>
 
               // ── TITLE ──────────────────────────────────────
               Center(
-                child: SizedBox(
-                  width: 300.w,
-                  child: Text(
-                    S.get('select_lang'),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 22.sp,
-                      fontWeight: FontWeight.w700,
-                      height: 1.3,
-                      color: textColor,
-                    ),
+                child: Text(
+                  S.get('select_lang'),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 22.sp,
+                    fontWeight: FontWeight.w700,
+                    height: 1.3,
+                    color: textColor,
                   ),
                 ),
               ),
@@ -204,7 +202,11 @@ class _ChooseLanguageScreenState extends State<ChooseLanguageScreen>
                                     color:
                                         isSelected ? primary : Colors.transparent,
                                     border: Border.all(
-                                      color: isSelected ? primary : Colors.grey,
+                                      color: isSelected
+                                          ? primary
+                                          : isDark
+                                              ? const Color(0xFF263047)
+                                              : Colors.grey.shade300,
                                       width: 1.5,
                                     ),
                                   ),

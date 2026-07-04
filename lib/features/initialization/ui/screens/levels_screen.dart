@@ -33,9 +33,9 @@ class LevelsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? const Color(0xFF0D0F1A) : const Color(0xFFF2F4FA);
-    final cardBg = isDark ? const Color(0xFF141829) : Colors.white;
-    final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
+    final bg = isDark ? AppColors.darkBackground : AppColors.lightBackground;
+    final cardBg = isDark ? AppColors.darkSurface : AppColors.lightSurface;
+    final textColor = isDark ? Colors.white : AppColors.lightTextPrimary;
     final subColor = isDark ? Colors.white54 : Colors.grey.shade500;
 
     return Scaffold(
@@ -61,7 +61,9 @@ class LevelsScreen extends StatelessWidget {
         future: SharedPreferences.getInstance(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: CircularProgressIndicator(color: AppColors.accent),
+            );
           }
 
           if (!snapshot.hasData) {
@@ -72,7 +74,9 @@ class LevelsScreen extends StatelessWidget {
 
           final userLevel = snapshot.data!.getString('userLevel') ?? 'A1';
 
-          return ListView.separated(
+          return SafeArea(
+            top: false,
+            child: ListView.separated(
             padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
             itemCount: allLevels.length,
             separatorBuilder: (context, i) => SizedBox(height: 12.h),
@@ -152,6 +156,7 @@ class LevelsScreen extends StatelessWidget {
                 ),
               );
             },
+            ),
           );
         },
       ),

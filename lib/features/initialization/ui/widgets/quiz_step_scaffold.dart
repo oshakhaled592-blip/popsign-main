@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/helpers/spacing.dart';
+import '../../../../core/theme/app_colors.dart';
 
-const Color quizAccent = Color(0xFF7C3AED);
+const Color quizAccent = AppColors.accent;
 
 class QuizScaffold extends StatelessWidget {
   final int step;
@@ -26,8 +27,8 @@ class QuizScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? const Color(0xFF0D0F1A) : const Color(0xFFF5F7FB);
-    final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
+    final bg = isDark ? AppColors.darkBackground : AppColors.lightBackground;
+    final textColor = isDark ? Colors.white : AppColors.lightTextPrimary;
     final btnBgColor = isDark ? const Color(0xFF181830) : Colors.white;
     final trackColor =
         isDark ? Colors.white24 : Colors.black.withValues(alpha: 0.1);
@@ -57,8 +58,8 @@ class QuizScaffold extends StatelessWidget {
                               : [
                                   BoxShadow(
                                     color: Colors.black.withValues(alpha: 0.06),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
+                                    blurRadius: 10.r,
+                                    offset: Offset(0, 4.h),
                                   ),
                                 ],
                         ),
@@ -88,7 +89,7 @@ class QuizScaffold extends StatelessWidget {
                 ],
               ),
               verticalSpace(28),
-              Expanded(child: child),
+              Expanded(child: SingleChildScrollView(child: child)),
               verticalSpace(16),
               Container(
                 width: double.infinity,
@@ -103,8 +104,8 @@ class QuizScaffold extends StatelessWidget {
                       : [
                           BoxShadow(
                             color: quizAccent.withValues(alpha: 0.35),
-                            blurRadius: 20,
-                            offset: const Offset(0, 8),
+                            blurRadius: 20.r,
+                            offset: Offset(0, 8.h),
                           ),
                         ],
                 ),
@@ -152,9 +153,9 @@ class QuestionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
-    final subColor = isDark ? Colors.white60 : const Color(0xFF6B7280);
-    final cardColor = isDark ? const Color(0xFF13182A) : Colors.white;
+    final textColor = isDark ? Colors.white : AppColors.lightTextPrimary;
+    final subColor = isDark ? Colors.white60 : AppColors.grayTextLight;
+    final cardColor = isDark ? AppColors.darkSurface : AppColors.lightSurface;
 
     return Column(
       children: [
@@ -180,8 +181,8 @@ class QuestionHeader extends StatelessWidget {
                 : [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.06),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
+                      blurRadius: 16.r,
+                      offset: Offset(0, 6.h),
                     ),
                   ],
             border: isDark
@@ -235,9 +236,9 @@ class QuizOptionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
-    final subColor = isDark ? Colors.white60 : const Color(0xFF9CA3AF);
-    final cardColor = isDark ? const Color(0xFF13182A) : Colors.white;
+    final textColor = isDark ? Colors.white : AppColors.lightTextPrimary;
+    final subColor = isDark ? Colors.white60 : AppColors.grayTextLight;
+    final cardColor = isDark ? AppColors.darkSurface : AppColors.lightSurface;
 
     return GestureDetector(
       onTap: onTap,
@@ -252,15 +253,15 @@ class QuizOptionCard extends StatelessWidget {
             color: selected
                 ? quizAccent
                 : (isDark ? const Color(0xFF263047) : Colors.grey.shade300),
-            width: selected ? 2 : 1.2,
+            width: selected ? 2.w : 1.2.w,
           ),
           boxShadow: isDark
               ? []
               : [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
+                    blurRadius: 10.r,
+                    offset: Offset(0, 4.h),
                   ),
                 ],
         ),
@@ -305,7 +306,10 @@ class QuizOptionCard extends StatelessWidget {
                 shape: BoxShape.circle,
                 color: selected ? quizAccent : Colors.transparent,
                 border: Border.all(
-                    color: selected ? quizAccent : Colors.grey, width: 1.5),
+                    color: selected
+                        ? quizAccent
+                        : (isDark ? const Color(0xFF263047) : Colors.grey.shade300),
+                    width: 1.5.w),
               ),
               child: selected
                   ? Icon(Icons.check, color: Colors.white, size: 14.sp)

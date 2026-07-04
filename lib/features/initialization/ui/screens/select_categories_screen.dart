@@ -90,13 +90,13 @@ class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
-    final subColor = isDark ? const Color(0xFF83899F) : Colors.grey.shade600;
-    final cardColor = isDark ? const Color(0xFF22252E) : Colors.white;
+    final textColor = isDark ? Colors.white : AppColors.lightTextPrimary;
+    final subColor = isDark ? const Color(0xFF83899F) : AppColors.grayTextLight;
+    final cardColor = isDark ? const Color(0xFF22252E) : AppColors.lightSurface;
     final cardBorder = isDark
         ? Colors.transparent
         : Colors.grey.shade200;
-    final bgColor = isDark ? const Color(0xFF14161B) : const Color(0xFFF5F7FB);
+    final bgColor = isDark ? AppColors.darkBackground : AppColors.lightBackground;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -156,22 +156,22 @@ class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
                         duration: const Duration(milliseconds: 200),
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? Colors.green.withValues(alpha: isDark ? 0.25 : 0.12)
+                              ? AppColors.success.withValues(alpha: isDark ? 0.25 : 0.12)
                               : cardColor,
                           borderRadius: BorderRadius.circular(16.r),
                           border: Border.all(
                             color: isSelected
-                                ? Colors.green.withValues(alpha: 0.6)
+                                ? AppColors.success.withValues(alpha: 0.6)
                                 : cardBorder,
-                            width: isSelected ? 1.5 : 1,
+                            width: isSelected ? 1.5.w : 1.w,
                           ),
                           boxShadow: isDark
                               ? []
                               : [
                                   BoxShadow(
                                     color: Colors.black.withValues(alpha: 0.06),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 2),
+                                    blurRadius: 8.r,
+                                    offset: Offset(0, 2.h),
                                   ),
                                 ],
                         ),
@@ -199,12 +199,16 @@ class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
 
                             horizontalSpace(12),
 
-                            Text(
-                              item['quantity'],
-                              style: TextStyle(
-                                color: textColor,
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.w500,
+                            Flexible(
+                              child: Text(
+                                item['quantity'],
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: textColor,
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
 
@@ -216,10 +220,12 @@ class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
                               height: 24.w,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: isSelected ? Colors.green : Colors.transparent,
+                                color: isSelected ? AppColors.success : Colors.transparent,
                                 border: Border.all(
-                                  color: isSelected ? Colors.green : Colors.grey,
-                                  width: 1.5,
+                                  color: isSelected
+                                      ? AppColors.success
+                                      : (isDark ? const Color(0xFF263047) : Colors.grey.shade300),
+                                  width: 1.5.w,
                                 ),
                               ),
                               child: isSelected
@@ -250,7 +256,7 @@ class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
               LinearButton(
                 text: isLoading ? S.get('loading') : S.get('continue'),
                 onPressed: (selectedLevel == null || isLoading) ? null : saveLevel,
-                width: double.infinity.w,
+                width: double.infinity,
                 radius: 12.r,
               ),
 

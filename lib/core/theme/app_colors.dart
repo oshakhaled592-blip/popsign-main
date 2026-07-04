@@ -13,10 +13,20 @@ class AppColors {
 
   // ━━━━ Background & Text ━━━━
   static const darkBackground  = Color(0xFF0D0F1A);
+  static const lightBackground = Color(0xFFF5F7FB);
+  static const darkSurface     = Color(0xFF141829);
+  static const lightSurface    = Colors.white;
+  static const darkTextPrimary  = Colors.white;
+  static const lightTextPrimary = Color(0xFF1A1A2E);
   static const grayText        = Color(0xFF94A3B8);
+  static const grayTextLight   = Color(0xFF6B7280);
   static const darkGray        = Color(0xFF161929);
   static const moredarkGray    = Color(0xFF111320);
   static const mediumGray      = Color(0xFF252B45);
+
+  // ━━━━ Semantic ━━━━
+  static const success = Color(0xFF22C55E);
+  static const error   = Color(0xFFEF4444);
 
   // ━━━━ Level Accent Colors ━━━━
   static const a1Color = Color(0xFF04826B);

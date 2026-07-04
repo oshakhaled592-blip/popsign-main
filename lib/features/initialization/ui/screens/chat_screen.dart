@@ -5,6 +5,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 import '../../../../core/services/chat_service.dart';
+import '../../../../core/theme/app_colors.dart';
 
 class _ChatMessage {
   final String text;
@@ -237,28 +238,36 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFF0D0F1A), Color(0xFF0A0C15), Color(0xFF080910)],
+            colors: isDark
+                ? const [Color(0xFF0D0F1A), Color(0xFF0A0C15), Color(0xFF080910)]
+                : const [Color(0xFFF5F7FB), Color(0xFFEEF1FA), Color(0xFFE6EAF6)],
           ),
         ),
         child: SafeArea(
           child: Column(
             children: [
-              _buildHeader(),
-              Container(height: 1.h, color: Colors.white.withValues(alpha: 0.08)),
+              _buildHeader(isDark),
+              Container(
+                height: 1.h,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.08)
+                    : Colors.black.withValues(alpha: 0.06),
+              ),
               Expanded(
                 child: _messages.isEmpty
-                    ? _buildCommonQuestions()
-                    : _buildMessageList(),
+                    ? _buildCommonQuestions(isDark)
+                    : _buildMessageList(isDark),
               ),
-              if (_isTyping) _buildTypingIndicator(),
-              _buildInputBar(),
+              if (_isTyping) _buildTypingIndicator(isDark),
+              _buildInputBar(isDark),
             ],
           ),
         ),
@@ -266,8 +275,10 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     );
   }
 
- 
-  Widget _buildHeader() {
+
+  Widget _buildHeader(bool isDark) {
+    final dimIconColor = isDark ? Colors.white38 : Colors.black45;
+    final disabledIconColor = isDark ? Colors.white12 : Colors.black12;
     return FadeTransition(
       opacity: _pageFade,
       child: Padding(
@@ -277,7 +288,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             IconButton(
               onPressed: () => Navigator.pop(context),
               icon: Icon(Icons.arrow_back_ios_new,
-                  color: Colors.white38, size: 20.sp),
+                  color: dimIconColor, size: 20.sp),
             ),
             SizedBox(width: 2.w),
 
@@ -320,7 +331,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             IconButton(
               onPressed: _messages.isEmpty ? null : _clearChat,
               icon: Icon(Icons.refresh_rounded,
-                  color: _messages.isEmpty ? Colors.white12 : Colors.white38, size: 22.sp),
+                  color: _messages.isEmpty ? disabledIconColor : dimIconColor, size: 22.sp),
             ),
           ],
         ),
@@ -329,44 +340,49 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   }
 
 
-  Widget _buildCommonQuestions() {
+  Widget _buildCommonQuestions(bool isDark) {
+    final dimColor = isDark
+        ? Colors.white.withValues(alpha: 0.15)
+        : Colors.black.withValues(alpha: 0.2);
     return FadeTransition(
       opacity: _pageFade,
-      child: Column(
-        children: [
-          SizedBox(height: 28.h),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(height: 28.h),
 
-          Icon(
-            Icons.edit_outlined,
-            color: Colors.white.withValues(alpha: 0.15),
-            size: 30.sp,
-          ),
-
-          SizedBox(height: 6.h),
-
-          Text(
-            'Common Question',
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.15),
-              fontSize: 24.sp,
-              fontWeight: FontWeight.w500,
+            Icon(
+              Icons.edit_outlined,
+              color: dimColor,
+              size: 30.sp,
             ),
-          ),
 
-          SizedBox(height: 18.h),
+            SizedBox(height: 6.h),
 
-          
-          ...List.generate(
-            questions.length,
-            (index) => _buildQuestionCard(questions[index], index),
-          ),
-        ],
+            Text(
+              'Common Question',
+              style: TextStyle(
+                color: dimColor,
+                fontSize: 24.sp,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+
+            SizedBox(height: 18.h),
+
+
+            ...List.generate(
+              questions.length,
+              (index) => _buildQuestionCard(questions[index], index, isDark),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  
-  Widget _buildQuestionCard(String title, int index) {
+
+  Widget _buildQuestionCard(String title, int index, bool isDark) {
     final slideAnim = Tween<Offset>(
       begin: const Offset(0, 1),
       end: Offset.zero,
@@ -400,8 +416,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             height: 52.h,
             margin: EdgeInsets.symmetric(horizontal: 28.w, vertical: 6.h),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: isDark ? Colors.white : AppColors.lightSurface,
               borderRadius: BorderRadius.circular(30.r),
+              border: isDark ? null : Border.all(color: Colors.grey.shade200),
+              boxShadow: isDark
+                  ? null
+                  : [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8)],
             ),
             child: Center(
               child: Padding(
@@ -425,17 +445,18 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     );
   }
 
- 
-  Widget _buildMessageList() {
+
+  Widget _buildMessageList(bool isDark) {
     return ListView.builder(
       controller: _scrollController,
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       itemCount: _messages.length,
-      itemBuilder: (_, i) => _buildBubble(_messages[i]),
+      itemBuilder: (_, i) => _buildBubble(_messages[i], isDark),
     );
   }
 
-  Widget _buildBubble(_ChatMessage msg) {
+  Widget _buildBubble(_ChatMessage msg, bool isDark) {
+    final botBubbleColor = isDark ? Colors.white : AppColors.lightSurface;
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 5.h),
       child: Row(
@@ -458,13 +479,19 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
               decoration: BoxDecoration(
-                color: msg.isUser ? const Color(0xFF7C3AED) : Colors.white,
+                color: msg.isUser ? const Color(0xFF7C3AED) : botBubbleColor,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(18.r),
                   topRight: Radius.circular(18.r),
                   bottomLeft: Radius.circular(msg.isUser ? 18.r : 4.r),
                   bottomRight: Radius.circular(msg.isUser ? 4.r : 18.r),
                 ),
+                border: (!msg.isUser && !isDark)
+                    ? Border.all(color: Colors.grey.shade200)
+                    : null,
+                boxShadow: (!msg.isUser && !isDark)
+                    ? [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 6)]
+                    : null,
               ),
               child: Text(
                 msg.text,
@@ -484,7 +511,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   }
 
 
-  Widget _buildTypingIndicator() {
+  Widget _buildTypingIndicator(bool isDark) {
     return Padding(
       padding: EdgeInsets.only(left: 20.w, bottom: 4.h),
       child: Row(
@@ -501,7 +528,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
             decoration: BoxDecoration(
-                color: Colors.white, borderRadius: BorderRadius.circular(18.r)),
+                color: isDark ? Colors.white : AppColors.lightSurface,
+                borderRadius: BorderRadius.circular(18.r),
+                border: isDark ? null : Border.all(color: Colors.grey.shade200)),
             child: _TypingDots(),
           ),
         ],
@@ -509,8 +538,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     );
   }
 
-  
-  Widget _buildInputBar() {
+
+  Widget _buildInputBar(bool isDark) {
+    final barColor = isDark ? const Color(0xFF1A1D2E) : AppColors.lightSurface;
+    final textColor = isDark ? Colors.white : AppColors.lightTextPrimary;
+    final hintColor = isDark ? Colors.white38 : AppColors.grayTextLight;
     return FadeTransition(
       opacity: _pageFade,
       child: Container(
@@ -518,20 +550,24 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         height: 56.h,
         padding: EdgeInsets.symmetric(horizontal: 18.w),
         decoration: BoxDecoration(
-          color: const Color(0xFF1A1D2E),
+          color: barColor,
           borderRadius: BorderRadius.circular(30.r),
+          border: isDark ? null : Border.all(color: Colors.grey.shade200),
+          boxShadow: isDark
+              ? null
+              : [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8)],
         ),
         child: Row(
           children: [
             Expanded(
               child: TextField(
                 controller: _inputController,
-                cursorColor: Colors.white,
-                cursorWidth: 2,
+                cursorColor: textColor,
+                cursorWidth: 2.w,
                 keyboardType: TextInputType.multiline,
                 maxLines: 1,
                 style: TextStyle(
-                  color: Colors.white,
+                  color: textColor,
                   fontSize: 15.sp,
                   height: 1.4,
                 ),
@@ -541,7 +577,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                   contentPadding: EdgeInsets.symmetric(vertical: 8.h),
                   hintText: 'Type your message...',
                   hintStyle: TextStyle(
-                    color: Colors.white38,
+                    color: hintColor,
                     fontSize: 15.sp,
                   ),
                 ),
@@ -562,7 +598,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 ),
                 child: Icon(
                   _isListening ? Icons.mic_rounded : Icons.mic_none_rounded,
-                  color: _isListening ? Colors.red : Colors.white,
+                  color: _isListening ? Colors.red : textColor,
                   size: 24.sp,
                 ),
               ),

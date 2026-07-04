@@ -42,7 +42,7 @@ class LinearButton extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             icon != null
-                ? Icon(icon, color: Colors.white)
+                ? Icon(icon, color: Colors.white, size: 20.sp)
                 : SizedBox.shrink(),
             icon != null ? horizontalSpace(5) : SizedBox.shrink(),
             Flexible(

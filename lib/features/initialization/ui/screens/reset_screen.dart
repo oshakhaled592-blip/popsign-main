@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:popsign/core/l10n/app_strings.dart';
+import 'package:popsign/core/theme/app_colors.dart';
 
 class ResetScreen extends StatefulWidget {
   const ResetScreen({super.key});
@@ -66,8 +67,8 @@ class _ResetScreenState extends State<ResetScreen>
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.18),
-                    blurRadius: 40,
-                    offset: const Offset(0, 12),
+                    blurRadius: 40.r,
+                    offset: Offset(0, 12.h),
                   ),
                 ],
               ),
@@ -80,12 +81,12 @@ class _ResetScreenState extends State<ResetScreen>
                     width: 64.w,
                     height: 64.w,
                     decoration: BoxDecoration(
-                      color: Colors.red.withValues(alpha: 0.1),
+                      color: AppColors.error.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       Icons.refresh_rounded,
-                      color: Colors.red,
+                      color: AppColors.error,
                       size: 32.sp,
                     ),
                   ),
@@ -164,7 +165,7 @@ class _ResetScreenState extends State<ResetScreen>
                               child: Text(
                                 resetLbl,
                                 style: GoogleFonts.poppins(
-                                  color: Colors.red,
+                                  color: AppColors.error,
                                   fontSize: 15.sp,
                                   fontWeight: FontWeight.w600,
                                 ),

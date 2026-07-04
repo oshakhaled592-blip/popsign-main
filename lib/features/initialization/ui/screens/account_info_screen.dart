@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/services/auth_service.dart';
 import '../../../../core/theme/language_notifier.dart';
+import '../../../../core/theme/app_colors.dart';
 
 class AccountInfoScreen extends StatefulWidget {
   const AccountInfoScreen({super.key});
@@ -45,8 +46,8 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
 
   void _editName(BuildContext context, bool isDark, Color textColor, Color subText) {
     final controller = TextEditingController(text: _name);
-    const accent = Color(0xFF22C55E);
-    final cardColor = isDark ? const Color(0xFF171C2B) : Colors.white;
+    const accent = AppColors.success;
+    final cardColor = isDark ? AppColors.darkSurface : AppColors.lightSurface;
 
     showDialog(
       context: context,
@@ -69,7 +70,7 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
               borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.grey.shade300),
             ),
             focusedBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: accent, width: 2),
+              borderSide: BorderSide(color: accent, width: 2.w),
             ),
           ),
         ),
@@ -99,19 +100,19 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark     = Theme.of(context).brightness == Brightness.dark;
-    final bgColor    = isDark ? const Color(0xFF0B1020) : const Color(0xFFF5F7FB);
-    final cardColor  = isDark ? const Color(0xFF171C2B) : Colors.white;
-    final textColor  = isDark ? Colors.white : const Color(0xFF1A1A2E);
-    final subText    = isDark ? Colors.white54 : const Color(0xFF9CA3AF);
-    const accent     = Color(0xFF22C55E);
+    final bgColor    = isDark ? AppColors.darkBackground : AppColors.lightBackground;
+    final cardColor  = isDark ? AppColors.darkSurface : AppColors.lightSurface;
+    final textColor  = isDark ? Colors.white : AppColors.lightTextPrimary;
+    final subText    = isDark ? Colors.white54 : AppColors.grayTextLight;
+    const accent     = AppColors.success;
 
     final cardShadow = isDark
         ? <BoxShadow>[]
         : [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.07),
-              blurRadius: 16,
-              offset: const Offset(0, 4),
+              blurRadius: 16.r,
+              offset: Offset(0, 4.h),
             ),
           ];
 
@@ -169,15 +170,15 @@ class _AccountInfoScreenState extends State<AccountInfoScreen> {
                           : Icon(Icons.person_rounded, color: accent, size: 52.sp),
                     ),
                     Positioned(
-                      bottom: 2,
-                      right: 2,
+                      bottom: 2.h,
+                      right: 2.w,
                       child: Container(
                         width: 22.w,
                         height: 22.h,
                         decoration: BoxDecoration(
                           color: accent,
                           shape: BoxShape.circle,
-                          border: Border.all(color: bgColor, width: 2),
+                          border: Border.all(color: bgColor, width: 2.w),
                         ),
                         child: Icon(Icons.check, color: Colors.white, size: 12.sp),
                       ),

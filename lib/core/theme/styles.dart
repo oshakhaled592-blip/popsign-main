@@ -10,34 +10,9 @@ class AppTextStyles {
     fontSize: 36.sp,
     color: Colors.white,
   );
-  static TextStyle font16boldWhite = GoogleFonts.poppins(
-    fontWeight: FontWeightHelper.bold,
-    fontSize: 16.sp,
-    color: Colors.white,
-  );
-  static TextStyle font18RegularWhite = GoogleFonts.poppins(
-    fontWeight: FontWeightHelper.regular,
-    fontSize: 18.sp,
-    color: Colors.white,
-  );
   static TextStyle font24BoldWhite = GoogleFonts.openSans(
     fontWeight: FontWeightHelper.bold,
     fontSize: 24.sp,
-    color: Colors.white,
-  );
-  static TextStyle font22BoldWhiteInter = GoogleFonts.inter(
-    fontWeight: FontWeightHelper.bold,
-    fontSize: 22.sp,
-    color: Colors.white,
-  );
-  static TextStyle font13RegularWhiteInter = GoogleFonts.inter(
-    fontWeight: FontWeightHelper.regular,
-    fontSize: 13.sp,
-    color: AppColors.grayText,
-  );
-  static TextStyle font18RegularWhiteInter = GoogleFonts.inter(
-    fontWeight: FontWeightHelper.regular,
-    fontSize: 18.sp,
     color: Colors.white,
   );
 

@@ -50,7 +50,7 @@ class _TextFormWidgetState extends State<TextFormWidget> {
         filled: true,
         fillColor: fillColor,
         prefixIcon: widget.icon != null
-            ? Icon(widget.icon, color: iconColor)
+            ? Icon(widget.icon, color: iconColor, size: 20.sp)
             : null,
         suffixIcon: widget.obscureText == true
             ? IconButton(
@@ -62,6 +62,7 @@ class _TextFormWidgetState extends State<TextFormWidget> {
                 icon: Icon(
                   _isObscured ? Icons.visibility : Icons.visibility_off,
                   color: iconColor,
+                  size: 20.sp,
                 ),
               )
             : null,
@@ -81,11 +82,11 @@ class _TextFormWidgetState extends State<TextFormWidget> {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30.r),
-          borderSide: const BorderSide(color: Colors.red),
+          borderSide: const BorderSide(color: AppColors.error),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30.r),
-          borderSide: const BorderSide(color: Colors.red),
+          borderSide: const BorderSide(color: AppColors.error),
         ),
       ),
     );
