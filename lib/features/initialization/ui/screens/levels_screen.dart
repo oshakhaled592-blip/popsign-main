@@ -18,14 +18,17 @@ class LevelsScreen extends StatelessWidget {
     'C2': AppColors.c2Color,
   };
 
-  static const _levelDesc = {
-    'A1': '1 – 100 words',
-    'A2': '101 – 1k words',
-    'B1': '1k – 2k words',
-    'B2': '2k – 3k words',
-    'C1': '3k – 4k words',
-    'C2': '4k – 5k words',
-  };
+  static String _levelDesc(String level) {
+    final w = S.get('words_unit');
+    return {
+      'A1': '1 – 100 $w',
+      'A2': '101 – 1k $w',
+      'B1': '1k – 2k $w',
+      'B2': '2k – 3k $w',
+      'C1': '3k – 4k $w',
+      'C2': '4k – 5k $w',
+    }[level] ?? '';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -133,7 +136,7 @@ class LevelsScreen extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              _levelDesc[level] ?? '',
+                              _levelDesc(level),
                               style: TextStyle(color: subColor, fontSize: 12.sp),
                             ),
                           ],

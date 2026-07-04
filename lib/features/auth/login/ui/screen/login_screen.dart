@@ -142,19 +142,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
             verticalSpace(17),
 
-            Align(
-              alignment: Alignment.centerRight,
-              child: GestureDetector(
-                onTap: () => context.pushNamed(Routes.forgotPassword),
-                child: Text(
-                  S.get('forgot'),
-                  style: AppTextStyles.font13Regularpink,
-                ),
-              ),
-            ),
-
-            verticalSpace(17),
-
             LinearButton(
               text: S.get('login'),
               onPressed: login,

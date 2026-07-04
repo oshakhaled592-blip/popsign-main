@@ -43,14 +43,17 @@ class _SelectCategoriesScreenState extends State<SelectCategoriesScreen> {
     super.dispose();
   }
 
-  final List<Map<String, dynamic>> categories = [
-    {'category': 'A1', 'quantity': '1-100 words', 'color': AppColors.a1Color},
-    {'category': 'A2', 'quantity': '101 - 1k words', 'color': AppColors.a2Color},
-    {'category': 'B1', 'quantity': '1k - 2k words', 'color': AppColors.b1Color},
-    {'category': 'B2', 'quantity': '2k - 3k words', 'color': AppColors.b2Color},
-    {'category': 'C1', 'quantity': '3k - 4k words', 'color': AppColors.c1Color},
-    {'category': 'C2', 'quantity': '4k - 5k words', 'color': AppColors.c2Color},
-  ];
+  List<Map<String, dynamic>> get categories {
+    final w = S.get('words_unit');
+    return [
+      {'category': 'A1', 'quantity': '1-100 $w', 'color': AppColors.a1Color},
+      {'category': 'A2', 'quantity': '101 - 1k $w', 'color': AppColors.a2Color},
+      {'category': 'B1', 'quantity': '1k - 2k $w', 'color': AppColors.b1Color},
+      {'category': 'B2', 'quantity': '2k - 3k $w', 'color': AppColors.b2Color},
+      {'category': 'C1', 'quantity': '3k - 4k $w', 'color': AppColors.c1Color},
+      {'category': 'C2', 'quantity': '4k - 5k $w', 'color': AppColors.c2Color},
+    ];
+  }
 
   Future<void> saveLevel() async {
     if (selectedLevel == null) return;

@@ -179,13 +179,13 @@ class _PreStartScreenState extends State<PreStartScreen>
                             ),
                             SizedBox(height: 2.h),
                             Text(
-                              const {
-                                'A1': '1 – 100 words',
-                                'A2': '101 – 1k words',
-                                'B1': '1k – 2k words',
-                                'B2': '2k – 3k words',
-                                'C1': '3k – 4k words',
-                                'C2': '4k – 5k words',
+                              {
+                                'A1': '1 – 100 ${S.get('words_unit')}',
+                                'A2': '101 – 1k ${S.get('words_unit')}',
+                                'B1': '1k – 2k ${S.get('words_unit')}',
+                                'B2': '2k – 3k ${S.get('words_unit')}',
+                                'C1': '3k – 4k ${S.get('words_unit')}',
+                                'C2': '4k – 5k ${S.get('words_unit')}',
                               }[_level] ?? '',
                               style: TextStyle(
                                 color: Colors.white.withValues(alpha: 0.75),
