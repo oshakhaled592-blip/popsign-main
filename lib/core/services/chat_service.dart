@@ -63,12 +63,24 @@ class ChatService {
   Future<String> sendMessage({
     required String sessionId,
     required String message,
+    String? replyLanguage,
   }) async {
+    // The backend has no dedicated language parameter, so we nudge the model
+    // with an inline instruction instead — the UI keeps showing the user's
+    // original, unmodified message.
+    final outgoingMessage = (replyLanguage == null || replyLanguage == 'English')
+        ? message
+        : '$message\n\n(Please reply in $replyLanguage.)';
+
     final res = await http
         .post(
           Uri.parse('$_base/api/chat'),
           headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({'session_id': sessionId, 'message': message}),
+          body: jsonEncode({
+            'session_id': sessionId,
+            'message': outgoingMessage,
+            'language': replyLanguage,
+          }),
         )
         .timeout(_timeout);
 

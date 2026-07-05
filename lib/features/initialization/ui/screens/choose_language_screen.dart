@@ -11,7 +11,9 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/linear_button.dart';
 
 class ChooseLanguageScreen extends StatefulWidget {
-  const ChooseLanguageScreen({super.key});
+  final bool fromSettings;
+
+  const ChooseLanguageScreen({super.key, this.fromSettings = false});
 
   @override
   State<ChooseLanguageScreen> createState() => _ChooseLanguageScreenState();
@@ -29,24 +31,18 @@ class _ChooseLanguageScreenState extends State<ChooseLanguageScreen>
 
   final List<Map<String, String>> languages = [
     {"name": "English", "flag": "🇺🇸"},
-    {"name": "Spanish", "flag": "🇪🇸"},
-    {"name": "French", "flag": "🇫🇷"},
-    {"name": "Russian", "flag": "🇷🇺"},
     {"name": "Arabic", "flag": "🇸🇦"},
-    {"name": "German", "flag": "🇩🇪"},
-    {"name": "Italian", "flag": "🇮🇹"},
-    {"name": "Turkish", "flag": "🇹🇷"},
-    {"name": "Japanese", "flag": "🇯🇵"},
-    {"name": "Chinese", "flag": "🇨🇳"},
-    {"name": "Korean", "flag": "🇰🇷"},
-    {"name": "Portuguese", "flag": "🇵🇹"},
-    {"name": "Hindi", "flag": "🇮🇳"},
-    {"name": "Dutch", "flag": "🇳🇱"},
   ];
 
   @override
   void initState() {
     super.initState();
+
+    if (widget.fromSettings) {
+      final currentName = languageNotifier.value.name;
+      final idx = languages.indexWhere((l) => l['name'] == currentName);
+      if (idx != -1) selectedLanguageIndex = idx;
+    }
 
     _arrowController = AnimationController(
       vsync: this,
@@ -62,6 +58,15 @@ class _ChooseLanguageScreenState extends State<ChooseLanguageScreen>
           _scrollController.position.maxScrollExtent - 40;
       if (atBottom != !_showArrow) {
         setState(() => _showArrow = !atBottom);
+      }
+    });
+
+    // With only a couple of languages the list may not scroll at all —
+    // don't leave the "scroll down" arrow stuck on screen in that case.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_scrollController.hasClients) return;
+      if (_scrollController.position.maxScrollExtent <= 0) {
+        setState(() => _showArrow = false);
       }
     });
   }
@@ -101,24 +106,28 @@ class _ChooseLanguageScreenState extends State<ChooseLanguageScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // ── BACK BUTTON ────────────────────────────────
-              Container(
-                width: 42.w,
-                height: 42.h,
-                decoration: BoxDecoration(
-                  color: btnBgColor,
-                  borderRadius: BorderRadius.circular(14.r),
-                ),
-                child: IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: Icon(
-                    Icons.arrow_back_ios_new_rounded,
-                    size: 18.sp,
-                    color: textColor,
+              // Only shown when this screen is reopened from Profile
+              // settings — during first-time onboarding there's no
+              // previous step worth going back to, so it's hidden.
+              if (widget.fromSettings) ...[
+                Container(
+                  width: 42.w,
+                  height: 42.h,
+                  decoration: BoxDecoration(
+                    color: btnBgColor,
+                    borderRadius: BorderRadius.circular(14.r),
+                  ),
+                  child: IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: Icon(
+                      Icons.arrow_back_ios_new_rounded,
+                      size: 18.sp,
+                      color: textColor,
+                    ),
                   ),
                 ),
-              ),
-
-              verticalSpace(12),
+                verticalSpace(12),
+              ],
 
               // ── TITLE ──────────────────────────────────────
               Center(
@@ -173,8 +182,8 @@ class _ChooseLanguageScreenState extends State<ChooseLanguageScreen>
                                   color: isDark
                                       ? Colors.black.withValues(alpha: 0.15)
                                       : Colors.grey.withValues(alpha: 0.08),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
+                                  blurRadius: 10.r,
+                                  offset: Offset(0, 4.h),
                                 ),
                               ],
                             ),
@@ -282,6 +291,10 @@ class _ChooseLanguageScreenState extends State<ChooseLanguageScreen>
                     await prefs.setString('langName', info.name);
                     await prefs.setString('langFlag', info.flag);
                     if (context.mounted) {
+                      if (widget.fromSettings) {
+                        Navigator.pop(context);
+                        return;
+                      }
                       final isLoggedIn =
                           prefs.getBool('isLoggedIn') ?? false;
                       if (isLoggedIn) {

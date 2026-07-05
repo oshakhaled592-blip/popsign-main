@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
@@ -37,7 +38,7 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
   _PracticeStatus _status = _PracticeStatus.idle;
   PredictionResult? _result;
   String _error = '';
-  final bool _videoWatched = false;
+  bool _videoWatched = false;
 
   VideoPlayerController? _videoController;
   bool _videoReady = false;
@@ -45,6 +46,7 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
   bool _tutorialReady = false;
   String? _videoId;
   YoutubePlayerController? _ytController;
+  StreamSubscription<YoutubePlayerValue>? _ytStateSub;
 
   late AnimationController _celebController;
   late Animation<double> _celebAnim;
@@ -74,26 +76,42 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
       await ctrl.initialize();
       ctrl.setLooping(true);
       if (!mounted) { ctrl.dispose(); return; }
+      ctrl.addListener(_onTutorialProgress);
       setState(() {
         _tutorialController = ctrl;
         _tutorialReady = true;
       });
     } catch (_) {
       if (_videoId == null || !mounted) return;
-      setState(() {
-        _ytController = YoutubePlayerController.fromVideoId(
-          videoId: _videoId!,
-          autoPlay: false,
-          params: const YoutubePlayerParams(
-            showControls: true,
-            playsInline: true,
-            showFullscreenButton: true,
-            showVideoAnnotations: false,
-            enableCaption: false,
-            strictRelatedVideos: true,
-          ),
-        );
+      final yt = YoutubePlayerController.fromVideoId(
+        videoId: _videoId!,
+        autoPlay: false,
+        params: const YoutubePlayerParams(
+          showControls: true,
+          playsInline: true,
+          showFullscreenButton: true,
+          showVideoAnnotations: false,
+          enableCaption: false,
+          strictRelatedVideos: true,
+        ),
+      );
+      _ytStateSub = yt.listen((value) {
+        if (!_videoWatched && value.playerState == PlayerState.playing) {
+          setState(() => _videoWatched = true);
+        }
       });
+      setState(() {
+        _ytController = yt;
+      });
+    }
+  }
+
+  // Marks the tutorial as watched the first time playback actually advances.
+  void _onTutorialProgress() {
+    if (_videoWatched) return;
+    final value = _tutorialController?.value;
+    if (value != null && value.isInitialized && value.position > Duration.zero) {
+      setState(() => _videoWatched = true);
     }
   }
 
@@ -118,7 +136,9 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
   void dispose() {
     languageNotifier.removeListener(_rebuild);
     _videoController?.dispose();
+    _tutorialController?.removeListener(_onTutorialProgress);
     _tutorialController?.dispose();
+    _ytStateSub?.cancel();
     _ytController?.close();
     _celebController.dispose();
     super.dispose();
@@ -186,6 +206,16 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
     return true;
   }
 
+  // What to report back to the word list when this screen closes, so the
+  // 3-dot progress (watched → tried → correct) advances no further than
+  // what actually happened here.
+  Object _currentResult() {
+    if (_status == _PracticeStatus.correct) return true;
+    if (_status == _PracticeStatus.wrong) return 'wrong';
+    if (_videoWatched) return 'watched';
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -206,13 +236,13 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
               child: Row(
                 children: [
                   GestureDetector(
-                    onTap: () => Navigator.pop(context, _videoWatched ? 'done' : false),
+                    onTap: () => Navigator.pop(context, _currentResult()),
                     child: Container(
                       width: 44.w, height: 44.h,
                       decoration: BoxDecoration(
                         color: btnBg,
                         borderRadius: BorderRadius.circular(14.r),
-                        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 8)],
+                        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 8.r)],
                       ),
                       child: Icon(Icons.arrow_back_ios_new_rounded, color: textColor, size: 18.sp),
                     ),
@@ -229,7 +259,10 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
             Expanded(
               child: SingleChildScrollView(
                 padding: EdgeInsets.all(20.w),
-                child: Column(
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 680),
+                    child: Column(
                   children: [
                     // unified word + tutorial card
                     Container(
@@ -242,9 +275,9 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
                         boxShadow: [
                           BoxShadow(
                             color: const Color(0xFF22C55E).withValues(alpha: 0.08),
-                            blurRadius: 24,
-                            spreadRadius: 2,
-                            offset: const Offset(0, 4),
+                            blurRadius: 24.r,
+                            spreadRadius: 2.r,
+                            offset: Offset(0, 4.h),
                           ),
                         ],
                       ),
@@ -553,6 +586,8 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
                             style: TextStyle(color: Colors.red, fontSize: 13.sp)),
                       ),
                   ],
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -577,7 +612,7 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
                     }),
                     SizedBox(height: 10.h),
                     GestureDetector(
-                      onTap: () => Navigator.pop(context, false),
+                      onTap: () => Navigator.pop(context, 'wrong'),
                       child: Text(S.get('skip_for_now'),
                           style: TextStyle(color: subColor, fontSize: 14.sp)),
                     ),
@@ -609,10 +644,10 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.check_circle_rounded, color: Colors.green, size: 20.sp),
+                            Icon(Icons.check_circle_rounded, color: Colors.green, size: 18.sp),
                             SizedBox(width: 8.w),
-                            Text('I know this sign',
-                                style: TextStyle(color: Colors.green, fontSize: 15.sp, fontWeight: FontWeight.w600)),
+                            Text(S.get('tutorial_watched'),
+                                style: TextStyle(color: Colors.green, fontSize: 13.sp, fontWeight: FontWeight.w600)),
                           ],
                         ),
                       ),
@@ -644,11 +679,11 @@ class _SignPracticeScreenState extends State<SignPracticeScreen>
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(16.r),
-          boxShadow: [BoxShadow(color: color.withValues(alpha: 0.35), blurRadius: 16, offset: const Offset(0, 6))],
+          boxShadow: [BoxShadow(color: color.withValues(alpha: 0.35), blurRadius: 16.r, offset: Offset(0, 6.h))],
         ),
         child: Center(
           child: Text(label,
-              style: TextStyle(color: Colors.white, fontSize: 16.sp, fontWeight: FontWeight.w600)),
+              style: TextStyle(color: Colors.white, fontSize: 14.sp, fontWeight: FontWeight.w600)),
         ),
       ),
     );
@@ -690,13 +725,13 @@ class _VideoPlayPauseState extends State<_VideoPlayPause> {
         opacity: playing ? 0.0 : 1.0,
         duration: const Duration(milliseconds: 200),
         child: Container(
-          width: 56,
-          height: 56,
+          width: 56.w,
+          height: 56.w,
           decoration: const BoxDecoration(
             color: Color(0xAA000000),
             shape: BoxShape.circle,
           ),
-          child: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 36),
+          child: Icon(Icons.play_arrow_rounded, color: Colors.white, size: 36.sp),
         ),
       ),
     );

@@ -77,7 +77,8 @@ class _SplashScreenState extends State<SplashScreen>
         child: FadeTransition(
           opacity: _fade,
           child: Center(
-            child: Column(
+            child: SingleChildScrollView(
+              child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image.asset(
@@ -118,6 +119,7 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                 ),
               ],
+              ),
             ),
           ),
         ),

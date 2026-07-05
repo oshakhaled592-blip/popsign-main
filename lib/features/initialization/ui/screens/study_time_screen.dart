@@ -34,7 +34,8 @@ class _StudyTimeScreenState extends State<StudyTimeScreen> {
         await prefs.setInt('onb_minutesPerDay', selectedMinutes.round());
         if (context.mounted) context.pushNamed(Routes.signup);
       },
-      child: Column(
+      child: SingleChildScrollView(
+        child: Column(
         children: [
           QuestionHeader(
             emoji: '⏰',
@@ -78,6 +79,7 @@ class _StudyTimeScreenState extends State<StudyTimeScreen> {
             ),
           ),
         ],
+        ),
       ),
     );
   }

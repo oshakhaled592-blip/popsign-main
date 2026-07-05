@@ -89,7 +89,7 @@ class QuizScaffold extends StatelessWidget {
                 ],
               ),
               verticalSpace(28),
-              Expanded(child: SingleChildScrollView(child: child)),
+              Expanded(child: child),
               verticalSpace(16),
               Container(
                 width: double.infinity,

@@ -8,6 +8,7 @@ import '../../../../core/services/auth_service.dart';
 import '../../../../core/theme/language_notifier.dart';
 import '../../../../core/theme/theme_notifier.dart';
 import '../../../../core/theme/app_colors.dart';
+import 'choose_language_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -319,6 +320,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       subText: subText,
                       isDivider: true,
                       onTap: () => Navigator.pushNamed(context, Routes.accountInfo).then((_) => _loadName()),
+                    ),
+
+                    profileTile(
+                      icon: Icons.translate_rounded,
+                      title: S.get('app_language'),
+                      textColor: textColor,
+                      subText: subText,
+                      isDivider: true,
+                      trailing: ValueListenableBuilder<LanguageInfo>(
+                        valueListenable: languageNotifier,
+                        builder: (context, value, child) => Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '${value.flag}  ${value.name}',
+                              style: TextStyle(color: subText, fontSize: 13.sp),
+                            ),
+                            SizedBox(width: 6.w),
+                            Icon(Icons.arrow_forward_ios_rounded, color: subText, size: 14.sp),
+                          ],
+                        ),
+                      ),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ChooseLanguageScreen(fromSettings: true),
+                        ),
+                      ),
                     ),
 
                     profileTile(

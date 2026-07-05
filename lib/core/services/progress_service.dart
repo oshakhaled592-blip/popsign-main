@@ -30,10 +30,7 @@ class ProgressService {
   ];
 
   static const _allCefr  = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
-  static const _allLangs = [
-    'en', 'ar', 'fr', 'es', 'de', 'it',
-    'pt', 'ru', 'tr', 'ja', 'zh', 'ko', 'hi', 'nl'
-  ];
+  static const _allLangs = ['en', 'ar'];
 
   static Future<void> init() async {
     if (_initialized) return;

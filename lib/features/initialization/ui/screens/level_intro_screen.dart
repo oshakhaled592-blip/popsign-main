@@ -15,11 +15,13 @@ class LevelIntroScreen extends StatelessWidget {
       totalSteps: 5,
       buttonText: S.get('choose_level_btn'),
       onContinue: () => context.pushNamed(Routes.levelOptions),
-      child: Center(
-        child: QuestionHeader(
-          emoji: '🧭',
-          title: S.get('know_level_title'),
-          subtitle: S.get('know_level_subtitle'),
+      child: SingleChildScrollView(
+        child: Center(
+          child: QuestionHeader(
+            emoji: '🧭',
+            title: S.get('know_level_title'),
+            subtitle: S.get('know_level_subtitle'),
+          ),
         ),
       ),
     );

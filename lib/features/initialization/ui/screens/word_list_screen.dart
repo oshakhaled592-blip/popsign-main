@@ -120,8 +120,9 @@ class _WordListScreenState extends State<WordListScreen> {
 
     if (!mounted) return;
 
-    if (result == 'done') {
-      // "I know this sign" — mark word as fully complete
+    // 3-dot progression: 1 = watched the tutorial, 2 = tried (right or
+    // wrong), 3 = correct camera prediction (mastered). Never regresses.
+    if (result == true) {
       final wasNotDone = words[index].progress < 3;
       setState(() => words[index].progress = 3);
       await _saveProgress();
@@ -129,16 +130,15 @@ class _WordListScreenState extends State<WordListScreen> {
         ProgressService.onWordLearned();
         _checkLevelComplete();
       }
-    } else if (result == true) {
-      // Correct camera prediction — add one dot (need 3 to finish)
-      final wasNotDone = words[index].progress < 3;
-      setState(() {
-        if (wasNotDone) words[index].progress++;
-      });
-      await _saveProgress();
-      if (wasNotDone && words[index].progress == 3) {
-        ProgressService.onWordLearned();
-        _checkLevelComplete();
+    } else if (result == 'wrong') {
+      if (words[index].progress < 2) {
+        setState(() => words[index].progress = 2);
+        await _saveProgress();
+      }
+    } else if (result == 'watched') {
+      if (words[index].progress < 1) {
+        setState(() => words[index].progress = 1);
+        await _saveProgress();
       }
     }
   }

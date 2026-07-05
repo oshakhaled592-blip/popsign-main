@@ -6,6 +6,8 @@ import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 import '../../../../core/services/chat_service.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/language_notifier.dart';
+import '../../../../core/l10n/app_strings.dart';
 
 class _ChatMessage {
   final String text;
@@ -41,15 +43,16 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   bool _speechAvailable = false;
   bool _manualStop = false;
 
-  final List<String> questions = [
-    "What are the app's features?",
-    "How do I communicate with a deaf person?",
-    "How do I say hello in sign language?",
-  ];
+  List<String> get questions => [
+        S.get('chat_q1'),
+        S.get('chat_q2'),
+        S.get('chat_q3'),
+      ];
 
   @override
   void initState() {
     super.initState();
+    languageNotifier.addListener(_rebuild);
     _pageController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1200),
@@ -60,6 +63,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     _checkServerHealth();
     _sessionFuture = _startSession();
   }
+
+  void _rebuild() => setState(() {});
 
   Future<void> _checkServerHealth() async {
     final online = await _service.checkHealth();
@@ -85,7 +90,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       final status = await Permission.microphone.request();
       if (status.isPermanentlyDenied) {
         _speechAvailable = false;
-        if (mounted) _showSnack('Enable microphone in Settings → Apps → Permissions');
+        if (mounted) _showSnack(S.get('chat_mic_permanently_denied'));
         return;
       }
       if (!status.isGranted) {
@@ -128,7 +133,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     if (!_speechAvailable) {
       await _initSpeech();
       if (!_speechAvailable) {
-        _showSnack('Microphone not available. Check app permissions in Settings.');
+        _showSnack(S.get('chat_mic_unavailable'));
         return;
       }
     }
@@ -155,11 +160,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       );
       if (started == false && mounted) {
         setState(() => _isListening = false);
-        _showSnack('Could not start listening. Please try again.');
+        _showSnack(S.get('chat_mic_start_error'));
       }
     } catch (_) {
       if (mounted) setState(() => _isListening = false);
-      _showSnack('Microphone error. Please try again.');
+      _showSnack(S.get('chat_mic_generic_error'));
     }
   }
 
@@ -176,6 +181,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    languageNotifier.removeListener(_rebuild);
     _speech.stop();
     _pageController.dispose();
     _inputController.dispose();
@@ -197,9 +203,13 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     String reply;
     try {
       final sessionId = await _ensureSession();
-      reply = await _service.sendMessage(sessionId: sessionId, message: text);
+      reply = await _service.sendMessage(
+        sessionId: sessionId,
+        message: text,
+        replyLanguage: languageNotifier.value.name,
+      );
     } catch (_) {
-      reply = "Sorry, I couldn't reach the server. Please check your connection and try again.";
+      reply = S.get('chat_server_error_reply');
     }
     if (!mounted) return;
 
@@ -301,7 +311,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Sign Assistant',
+                    S.get('chat_title'),
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: const Color(0xFF7C3AED),
@@ -311,9 +321,9 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                   ),
                   Text(
                     switch (_serverStatus) {
-                      _ServerStatus.online => '• Online',
-                      _ServerStatus.offline => '• Offline',
-                      _ServerStatus.connecting => '• Connecting…',
+                      _ServerStatus.online => S.get('chat_online'),
+                      _ServerStatus.offline => S.get('chat_offline'),
+                      _ServerStatus.connecting => S.get('chat_connecting'),
                     },
                     style: TextStyle(
                       color: switch (_serverStatus) {
@@ -360,7 +370,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
             SizedBox(height: 6.h),
 
             Text(
-              'Common Question',
+              S.get('chat_common_question'),
               style: TextStyle(
                 color: dimColor,
                 fontSize: 24.sp,
@@ -421,7 +431,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               border: isDark ? null : Border.all(color: Colors.grey.shade200),
               boxShadow: isDark
                   ? null
-                  : [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8)],
+                  : [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8.r)],
             ),
             child: Center(
               child: Padding(
@@ -490,7 +500,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                     ? Border.all(color: Colors.grey.shade200)
                     : null,
                 boxShadow: (!msg.isUser && !isDark)
-                    ? [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 6)]
+                    ? [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 6.r)]
                     : null,
               ),
               child: Text(
@@ -555,7 +565,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           border: isDark ? null : Border.all(color: Colors.grey.shade200),
           boxShadow: isDark
               ? null
-              : [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8)],
+              : [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8.r)],
         ),
         child: Row(
           children: [
@@ -575,7 +585,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                   border: InputBorder.none,
                   isCollapsed: true,
                   contentPadding: EdgeInsets.symmetric(vertical: 8.h),
-                  hintText: 'Type your message...',
+                  hintText: S.get('chat_input_hint'),
                   hintStyle: TextStyle(
                     color: hintColor,
                     fontSize: 15.sp,

@@ -513,9 +513,9 @@ class _LostPageState extends State<LostPage>
               color: cardBg,
               borderRadius: BorderRadius.circular(24.r),
               boxShadow: [
-                BoxShadow(color: purple.withValues(alpha: 0.15), blurRadius: 30, spreadRadius: 2),
+                BoxShadow(color: purple.withValues(alpha: 0.15), blurRadius: 30.r, spreadRadius: 2.r),
               ],
-              border: Border.all(color: purple.withValues(alpha: 0.25), width: 1.5),
+              border: Border.all(color: purple.withValues(alpha: 0.25), width: 1.5.w),
             ),
             child: Column(
               children: [
@@ -718,8 +718,8 @@ class _LostPageState extends State<LostPage>
                   boxShadow: [
                     BoxShadow(
                       color: purple.withValues(alpha: 0.35),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
+                      blurRadius: 16.r,
+                      offset: Offset(0, 6.h),
                     ),
                   ],
                 ),
@@ -749,8 +749,8 @@ class _LostPageState extends State<LostPage>
                 boxShadow: [
                   BoxShadow(
                     color: purple.withValues(alpha: 0.35),
-                    blurRadius: 16,
-                    offset: const Offset(0, 6),
+                    blurRadius: 16.r,
+                    offset: Offset(0, 6.h),
                   ),
                 ],
               ),
