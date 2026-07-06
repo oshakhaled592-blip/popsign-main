@@ -42,6 +42,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   bool _isListening = false;
   bool _speechAvailable = false;
   bool _manualStop = false;
+  List<stt.LocaleName> _speechLocales = [];
 
   List<String> get questions => [
         S.get('chat_q1'),
@@ -123,10 +124,26 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           }
         },
       );
+      if (_speechAvailable) {
+        _speechLocales = await _speech.locales();
+      }
     } catch (_) {
       _speechAvailable = false;
     }
     if (mounted) setState(() {});
+  }
+
+  // Picks the device's speech-recognition locale that matches the current
+  // UI language (e.g. 'en' -> 'en_US'), instead of always using whatever
+  // locale the phone happens to default to.
+  String? _localeIdForCurrentLanguage() {
+    final code = languageNotifier.value.code;
+    for (final locale in _speechLocales) {
+      if (locale.localeId.toLowerCase().startsWith(code)) {
+        return locale.localeId;
+      }
+    }
+    return null;
   }
 
   Future<void> _toggleListening() async {
@@ -164,6 +181,7 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           partialResults: true,
           listenFor: const Duration(seconds: 15),
           pauseFor: const Duration(seconds: 3),
+          localeId: _localeIdForCurrentLanguage(),
         ),
       );
       if (started == false && mounted) {
