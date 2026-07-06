@@ -74,9 +74,17 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   }
 
   Future<String> _startSession() async {
-    final id = await _service.newSession();
-    _sessionId = id;
-    return id;
+    try {
+      final id = await _service.newSession();
+      _sessionId = id;
+      return id;
+    } catch (e) {
+      // Don't cache a failed session forever — let the next attempt
+      // (e.g. the emulator's network wasn't ready yet on first launch)
+      // actually retry instead of always replaying this one failure.
+      _sessionFuture = null;
+      rethrow;
+    }
   }
 
   Future<String> _ensureSession() {
@@ -208,6 +216,11 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         message: text,
         replyLanguage: languageNotifier.value.name,
       );
+      // The chat backend isn't guaranteed to reply in Arabic even when
+      // asked to, so force-translate the reply client-side as a fallback.
+      if (languageNotifier.value.code == 'ar') {
+        reply = await _service.translateText(reply, targetLangCode: 'ar');
+      }
     } catch (_) {
       reply = S.get('chat_server_error_reply');
     }
@@ -553,6 +566,12 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     final barColor = isDark ? const Color(0xFF1A1D2E) : AppColors.lightSurface;
     final textColor = isDark ? Colors.white : AppColors.lightTextPrimary;
     final hintColor = isDark ? Colors.white38 : AppColors.grayTextLight;
+    // Base the field's direction on the app's current language so typing
+    // Arabic looks natural (cursor + alignment on the right) — English
+    // words typed inside still flow correctly thanks to Unicode bidi.
+    final isArabicUI = languageNotifier.value.code == 'ar';
+    final inputDirection = isArabicUI ? TextDirection.rtl : TextDirection.ltr;
+    final inputAlign = isArabicUI ? TextAlign.right : TextAlign.left;
     return FadeTransition(
       opacity: _pageFade,
       child: Container(
@@ -576,6 +595,8 @@ class _ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
                 cursorWidth: 2.w,
                 keyboardType: TextInputType.multiline,
                 maxLines: 1,
+                textDirection: inputDirection,
+                textAlign: inputAlign,
                 style: TextStyle(
                   color: textColor,
                   fontSize: 15.sp,

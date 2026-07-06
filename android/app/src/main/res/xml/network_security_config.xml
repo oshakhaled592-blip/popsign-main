@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android blocks plain HTTP (cleartext) traffic by default since API 28.
+  Our chat/auth backend (91.108.113.135) is served over HTTP, not HTTPS,
+  so it needs to be explicitly allowed here — scoped to just that host,
+  rather than allowing cleartext traffic app-wide.
+-->
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">91.108.113.135</domain>
+    </domain-config>
+</network-security-config>

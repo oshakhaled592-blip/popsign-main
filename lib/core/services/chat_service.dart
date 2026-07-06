@@ -95,6 +95,28 @@ class ChatService {
     return json['reply'] as String? ?? '';
   }
 
+  // Translates arbitrary text into [targetLangCode] (e.g. 'ar') using the
+  // free MyMemory API. Used to force the bot's reply into Arabic client-side,
+  // since we don't control what language the chat backend itself replies in.
+  Future<String> translateText(String text, {required String targetLangCode}) async {
+    if (text.trim().isEmpty) return text;
+    try {
+      final uri = Uri.https('api.mymemory.translated.net', '/get', {
+        'q': text,
+        'langpair': 'en|$targetLangCode',
+      });
+      final res = await http.get(uri).timeout(const Duration(seconds: 10));
+      if (res.statusCode != 200) return text;
+
+      final json = jsonDecode(res.body) as Map<String, dynamic>;
+      final translated =
+          (json['responseData'] as Map<String, dynamic>?)?['translatedText'] as String?;
+      return (translated == null || translated.isEmpty) ? text : translated;
+    } catch (_) {
+      return text;
+    }
+  }
+
   Future<List<ChatHistoryMessage>> getHistory(String sessionId) async {
     final res = await http
         .get(Uri.parse('$_base/api/chat/history/$sessionId'))
